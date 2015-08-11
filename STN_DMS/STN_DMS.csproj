@@ -1,0 +1,238 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{344FFBFB-0D14-44DC-AB76-F206C8CC46FC}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>STN_DMS</RootNamespace>
+    <AssemblyName>STN_DMS</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <UseIISExpress>false</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <TypeScriptToolsVersion>1.4</TypeScriptToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="css\bootstrap-theme.css.map" />
+    <Content Include="css\bootstrap.css.map" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="images\Events1.png" />
+    <Content Include="images\Members1.png" />
+    <Content Include="images\Tables1.png" />
+    <Content Include="js\vendor\angular-animate.min.js.map" />
+    <Content Include="js\vendor\angular-aria.min.js.map" />
+    <Content Include="js\vendor\angular-cookies.min.js.map" />
+    <Content Include="js\vendor\angular-loader.min.js.map" />
+    <Content Include="js\vendor\angular-messages.min.js.map" />
+    <Content Include="js\vendor\angular-resource.min.js.map" />
+    <Content Include="js\vendor\angular-route.min.js.map" />
+    <Content Include="js\vendor\angular-sanitize.min.js.map" />
+    <Content Include="js\vendor\angular-touch.min.js.map" />
+    <Content Include="js\vendor\angular.min.js.map" />
+    <Content Include="js\vendor\checklist-model.js" />
+    <Content Include="js\vendor\errors.json" />
+    <Content Include="js\vendor\version.json" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="css\app.css" />
+    <Content Include="css\bootstrap-multiselect.css" />
+    <Content Include="css\bootstrap-table.css" />
+    <Content Include="css\bootstrap-theme.css" />
+    <Content Include="css\bootstrap-theme.min.css" />
+    <Content Include="css\bootstrap.css" />
+    <Content Include="css\bootstrap.min.css" />
+    <Content Include="css\bootstrap_3.1.1.css" />
+    <Content Include="css\isteven-multi-select.css" />
+    <Content Include="css\select.css" />
+    <Content Include="css\toastr.css" />
+    <Content Include="css\xeditable.css" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="images\loading1.gif" />
+    <Content Include="index.html" />
+    <Content Include="js\app.js" />
+    <Content Include="js\datePickrCtrl.js" />
+    <Content Include="js\STNControllers.js" />
+    <Content Include="js\vendor\angular-animate.js" />
+    <Content Include="js\vendor\angular-animate.min.js" />
+    <Content Include="js\vendor\angular-aria.js" />
+    <Content Include="js\vendor\angular-aria.min.js" />
+    <Content Include="js\vendor\angular-cookies.js" />
+    <Content Include="js\vendor\angular-cookies.min.js" />
+    <Content Include="js\vendor\angular-csp.css" />
+    <Content Include="js\vendor\angular-input-modified.min.js" />
+    <Content Include="js\vendor\angular-loader.js" />
+    <Content Include="js\vendor\angular-loader.min.js" />
+    <Content Include="js\vendor\angular-messages.js" />
+    <Content Include="js\vendor\angular-messages.min.js" />
+    <Content Include="js\vendor\angular-mocks.js" />
+    <Content Include="js\vendor\angular-resource.js" />
+    <Content Include="js\vendor\angular-resource.min.js" />
+    <Content Include="js\vendor\angular-route.js" />
+    <Content Include="js\vendor\angular-route.min.js" />
+    <Content Include="js\vendor\angular-sanitize.js" />
+    <Content Include="js\vendor\angular-sanitize.min.js" />
+    <Content Include="js\vendor\angular-scenario.js" />
+    <Content Include="js\vendor\angular-touch.js" />
+    <Content Include="js\vendor\angular-touch.min.js" />
+    <Content Include="js\vendor\angular-ui-router.js" />
+    <Content Include="js\vendor\angular.js" />
+    <Content Include="js\vendor\angular.min.js" />
+    <Content Include="js\vendor\bootstrap-multiselect.js" />
+    <Content Include="js\vendor\bootstrap-table.js" />
+    <Content Include="js\vendor\bootstrap.js" />
+    <Content Include="js\vendor\bootstrap.min.js" />
+    <Content Include="js\vendor\inputmask.min.js" />
+    <Content Include="js\vendor\isteven-multi-select.js" />
+    <Content Include="js\vendor\jquery-1.10.2.min.js" />
+    <Content Include="js\vendor\jquery.inputmask.js" />
+    <Content Include="js\vendor\lodash.min.js" />
+    <Content Include="js\vendor\marked.js" />
+    <Content Include="js\vendor\npm.js" />
+    <Content Include="js\vendor\restangular.min.js" />
+    <Content Include="js\vendor\select.js" />
+    <Content Include="js\vendor\toastr.js" />
+    <Content Include="js\vendor\ui-bootstrap-tpls-0.11.0.js" />
+    <Content Include="js\vendor\ui-utils.js" />
+    <Content Include="js\vendor\xeditable.js" />
+    <Content Include="js\vendor\xeditable.min.js" />
+    <Content Include="partials\Reporting\completedReportView.html" />
+    <Content Include="partials\Reporting\generateReport.html" />
+    <Content Include="partials\Reporting\reportDash.html" />
+    <Content Include="partials\Reporting\reporting.html" />
+    <Content Include="partials\Reporting\submitReport.html" />
+    <Content Include="partials\Resources\PageContent\VertDatum.html" />
+    <Content Include="partials\Resources\PageContent\HWMType.html" />
+    <Content Include="partials\Resources\PageContent\HWMQual.html" />
+    <Content Include="partials\Resources\PageContent\InstrCollCondition.html" />
+    <Content Include="partials\Resources\PageContent\Agency.html" />
+    <Content Include="partials\Resources\PageContent\Marker.html" />
+    <Content Include="partials\Resources\PageContent\ContactType.html" />
+    <Content Include="partials\Resources\PageContent\NetworkNames.html" />
+    <Content Include="partials\Resources\PageContent\DepPriority.html" />
+    <Content Include="partials\Resources\PageContent\SensorType.html" />
+    <Content Include="partials\Resources\PageContent\EventStatus.html" />
+    <Content Include="partials\Resources\PageContent\OPquality.html" />
+    <Content Include="partials\Resources\PageContent\EventType.html" />
+    <Content Include="partials\Resources\PageContent\StatusType.html" />
+    <Content Include="partials\Resources\PageContent\FileType.html" />
+    <Content Include="partials\Resources\PageContent\OPType.html" />
+    <Content Include="partials\Resources\PageContent\SensorBrand.html" />
+    <Content Include="partials\Resources\PageContent\DepType.html" />
+    <Content Include="partials\Resources\PageContent\NetworkType.html" />
+    <Content Include="partials\Resources\PageContent\VertCollMethod.html" />
+    <Content Include="partials\Resources\resourcesHolderView.html" />
+    <Content Include="partials\Resources\PageContent\HorCollMethd.html" />
+    <Content Include="partials\Resources\PageContent\HorDatum.html" />
+    <Content Include="partials\Resources\PageContent\HousingType.html" />
+    <Content Include="partials\Resources\resourcesList.html" />
+    <Content Include="partials\Event\eventHolderView.html" />
+    <Content Include="partials\Event\eventInfo.html" />
+    <Content Include="partials\Event\eventsList.html" />
+    <Content Include="partials\Member\membersList.html" />
+    <Content Include="partials\Member\memberInfo.html" />
+    <Content Include="partials\Map.html" />
+    <Content Include="partials\Approval.html" />
+    <Content Include="partials\Member\memberHolderView.html" />
+    <Content Include="partials\Reporting.html" />
+    <Content Include="partials\Settings.html" />
+    <Content Include="partials\SiteSearch.html" />
+    <Content Include="partials\homeBase.html" />
+    <Content Include="partials\entryView.html" />
+    <Content Include="partials\login.html" />
+    <Content Include="services\businessServices.js" />
+    <Content Include="services\STNResource.js" />
+    <Content Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>1113</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>https://localhost/STN_DMS</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
