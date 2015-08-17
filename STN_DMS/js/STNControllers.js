@@ -69,7 +69,7 @@
         };
     });
 
-    //format the ng-model date as date on initial load
+   // format the ng-model date as date on initial load
     STNControllers.directive('datepickerPopup', function () {
         return {
             restrict: 'EAC',
@@ -80,6 +80,7 @@
             }
         }
     });
+    
 
     STNControllers.directive('focus', function () {
         return function (scope, element, attributes) {
@@ -445,22 +446,24 @@
     //#endregion Site Search Controller
 
     //#region Reporting Controller
-    STNControllers.controller('ReportingCtrl', ['$scope', '$rootScope', '$location', '$state', '$http', '$modal', 'incompleteReports', 'allEvents', 'allStates', 'allReports', 'thisMember', 'allAgencies', 'REPORT', 'CONTACT', 'checkCreds', 'getCreds', ReportingCtrl]);
-    function ReportingCtrl($scope, $rootScope, $location, $state, $http, $modal, incompleteReports, allEvents, allStates, allReports, thisMember, allAgencies, REPORT, CONTACT, checkCreds, getCreds) {
+    STNControllers.controller('ReportingCtrl', ['$scope', '$rootScope', '$location', '$state', '$http', '$modal', 'incompleteReports', 'allEvents', 'allStates', 'allReports', 'allEventTypes', 'allEventStatus', 'thisMember', 'allAgencies', 'REPORT', 'CONTACT', 'checkCreds', 'getCreds', ReportingCtrl]);
+    function ReportingCtrl($scope, $rootScope, $location, $state, $http, $modal, incompleteReports, allEvents, allStates, allReports, allEventTypes, allEventStatus, thisMember, allAgencies, REPORT, CONTACT, checkCreds, getCreds) {
         if (!checkCreds()) {
             $scope.auth = false;
             $location.path('/login');
         } else {
             //#region changing tabs handler /////////////////////
             $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-                //var formNameModified = false;
-                var formNameDirty = false;
+                var formIsPopulated = false;
                 switch (fromState.url) {
                     case '/SubmitReport':
-                        formNameDirty = $scope.fullReportForm.submit.$dirty;
+                        if ($scope.fullReportForm.submit != undefined) {
+                            formIsPopulated = $scope.fullReportForm.submit.$dirty;
+                            formIsPopulated = $scope.fullReportForm.submit.EVENT_ID.$viewValue != undefined ? true : formIsPopulated;
+                        }
                         break;
                 }
-                if (formNameDirty) { //is dirty
+                if (formIsPopulated) { //is dirty
                     console.log('toState.name: ' + toState.name);
                     console.log('fromState.name: ' + fromState.name);
 
@@ -475,6 +478,7 @@
                 }
             });
             //#endregion changing tabs handler //////////////////////
+
             //#region Datepicker
             $scope.datepickrs = {
                 projStDate: false,
@@ -489,19 +493,40 @@
 
                 $scope.datepickrs[which] = true;
             };
-            $scope.format = 'MMM dd, yyyy';
+           // $scope.format = 'MMMM dd, yyyy';
             //#endregion Datepicker
 
+            //format the date mm/dd/yyyy
+            $scope.formatDate = function (d) {
+                var currentDt = new Date(d);
+                var mm = currentDt.getMonth() + 1;
+                mm = (mm < 10) ? '0' + mm : mm;
+                var dd = currentDt.getDate();
+                var yyyy = currentDt.getFullYear();
+                var date = mm + '/' + dd + '/' + yyyy;
+                return date;
+            };
+
+            //#region global vars
             $scope.fullReportForm = {};
+            $scope.newReport = {};
+            $scope.DeployStaff = {}; $scope.GenStaff = {};
+            $scope.InlandStaff = {}; $scope.CoastStaff = {};
+            $scope.WaterStaff = {};
+            $scope.disabled = true;
+            $scope.needToComplete = false;
             $scope.memberIncompletes = incompleteReports.filter(function (ir) { return ir.COMPLETE == 0 });
             $scope.events = allEvents;
             $scope.states = allStates;
             $scope.reports = allReports;
             $scope.Submitter = thisMember;
             $scope.agencies = allAgencies;
+            $scope.eventTypes = allEventTypes;
+            $scope.eventStats = allEventStatus;
             var memberAgency = allAgencies.filter(function (a) { return a.AGENCY_ID == $scope.Submitter.AGENCY_ID; });
             $scope.Submitter.AGENCY_NAME = memberAgency[0].AGENCY_NAME;
             $scope.Submitter.AGENCY_ADDRESS = memberAgency[0].ADDRESS + ", " + memberAgency[0].CITY + " " + memberAgency[0].STATE + " " + memberAgency[0].ZIP;
+            //#endregion global vars
 
             //#region Generate Report tab
             $scope.Statemodel = {};//binding to the state multi-select
@@ -516,18 +541,86 @@
                 angular.forEach($scope.Statemodel.value, function (state) {
                     names.push(state.STATE_NAME); abbrevs.push(state.STATE_ABBREV);
                 });
+                
                 $scope.StateNames = names.join(', '); $scope.StateAbbrevs = abbrevs.join(',');
             }
 
+            $scope.MetricDisplayModel = []; //hold all reportModels for 'Display Metrics Summary'
             //clicked Display Metrics Summary, show content in new tab
             $scope.displayMetricSum = function (valid) {
                 if (valid == true) {
+                    $scope.MetricDisplayModel =[];
+                    $scope.GenRepEventModel = { };
                     //get metrics summary to show in new tab
                     $scope.Statemodel.value; //contains the states chosen
-                    $scope.genSummary.SUM_DATE; //the date chosen
                     $scope.EventName[0];//event chosen
-                    
-                }
+                    var abbrevs = [];
+                    angular.forEach($scope.Statemodel.value, function (state) {
+                        abbrevs.push(state.STATE_ABBREV);
+                    });
+                    var abbrevString = abbrevs.join(', ');
+                    var thisDate = $scope.formatDate($scope.genSummary.SUM_DATE);
+                    //need: 
+                    //1. all reports
+                    REPORT.getFilteredReports({
+                        Event: $scope.EventName[0].EVENT_ID, States: abbrevString, Date: thisDate
+                    }).$promise.then(function (result) {
+                        var test;
+                        //for each report, get all reports with that event and state
+                        for (var x = 0; x < result.length; x++) {
+                            var evStReports = $scope.reports.filter(function (f) { return f.EVENT_ID == result[x].EVENT_ID && f.STATE == result[x].STATE; });
+                            var thisRPModel = {};
+                            thisRPModel.report = result[x]; var YesSWFsum = 0; var YesWQFsum = 0; var YesSWOsum = 0; var YesWQOsum = 0;
+                            for (var t = 0; t < result.length; t++) { YesSWFsum += result[t].SW_YEST_FIELDPERS; };
+                            for (var t = 0; t < result.length; t++) { YesWQFsum += result[t].WQ_YEST_FIELDPERS; };
+                            for (var t = 0; t < result.length; t++) { YesSWOsum += result[t].SW_YEST_OFFICEPERS; };
+                            for (var t = 0; t < result.length; t++) { YesWQOsum += result[t].WQ_YEST_OFFICEPERS; };
+
+                            thisRPModel.FieldPYesSWTot = YesSWFsum;
+                            thisRPModel.FieldPYesWQTot = YesWQFsum;
+                            thisRPModel.OfficePYesSWTot = YesSWOsum;
+                            thisRPModel.OfficePYesWQTot = YesWQOsum;
+
+                            $scope.MetricDisplayModel.push(thisRPModel);
+                        }//end forloop for ReportModelList
+                        //2. this Event
+                        $scope.GenRepEventModel = {};
+                        $scope.GenRepEventModel.Event = $scope.EventName[0];
+                        $scope.GenRepEventModel.EventType = $scope.eventTypes.filter(function (et) { return et.EVENT_TYPE_ID == $scope.EventName[0].EVENT_TYPE_ID; });
+                        $scope.GenRepEventModel.EventStat = $scope.eventStats.filter(function (es) { return es.EVENT_STATUS_ID == $scope.EventName[0].EVENT_STATUS_ID; });
+                        //3. event Coordinator info
+                        $scope.GenRepEventModel.Coordinator = $scope.Submitter;
+                        $scope.GenRepEventModel.CoordAgency = $scope.agencies.filter(function (a) { return a.AGENCY_ID == $scope.Submitter.AGENCY_ID; });
+
+                        //modal
+                        var modalInstance = $modal.open({
+                            templateUrl: 'MetricsSummary.html',
+                            size: 'lg',
+                            windowClass: 'rep-dialog',
+                            resolve: {
+                                thisReport: function () {
+                                    return $scope.MetricDisplayModel;
+                                },
+                                thisEvent: function () {
+                                    return $scope.GenRepEventModel;
+                                }
+                            },
+                            controller: function ($scope, thisReport, thisEvent) {
+                                $scope.Report = thisReport;
+                                $scope.Event = thisEvent;
+                                $scope.ok = function () {
+                                    
+                                    $modalInstance.dismiss('cancel');
+                                };
+                            }
+                        });
+                        modalInstance.result.then(function () {
+                            //nothing
+                            
+                        });
+                        //end modal
+                    });    
+                }//end if valid = true
             }
 
             //clicked Display Contacts Summary, show content in new tab
@@ -556,8 +649,8 @@
     }
     //#endregion Reporting Controller
 
-    STNControllers.controller('ReportingDashCtrl', ['$scope', '$modal', '$state', '$http', 'CONTACT', 'MEMBER', 'getCreds', 'allReportsAgain', ReportingDashCtrl]);
-    function ReportingDashCtrl($scope, $modal, $state, $http, CONTACT, MEMBER, getCreds, allReportsAgain) {
+    STNControllers.controller('ReportingDashCtrl', ['$scope', '$location', '$filter', '$modal', '$state', '$http', 'CONTACT', 'MEMBER', 'getCreds', 'allReportsAgain', ReportingDashCtrl]);
+    function ReportingDashCtrl($scope, $location, $filter, $modal, $state, $http, CONTACT, MEMBER, getCreds, allReportsAgain) {
         $scope.reportsToDate = allReportsAgain;
         $scope.todayRpts = []; $scope.yesterdayRpts = []; $scope.pickDateRpts = []; $scope.pickAdateReports = false;
         $scope.today = new Date();
@@ -567,8 +660,6 @@
         $scope.THIS_DATE = {};
         //View Report button clicked, get stuff and make a pdf 
         $scope.ViewReport = function (r) {
-            var test;
-            
             //modal
             var modalInstance = $modal.open({
                 templateUrl: 'ViewReport.html',
@@ -625,6 +716,7 @@
             }
             return returnList;
         };
+
         var todayReports = $scope.reportsToDate.filter(function (todayrep) {
             var reportDate = new Date(todayrep.REPORT_DATE).setHours(0, 0, 0, 0);
             return new Date(reportDate).getTime() == $scope.today.getTime();
@@ -638,37 +730,103 @@
         $scope.yesterdayRpts = formatReport(yesterdayReports);
         
         //give me the reports done on this date
-        $scope.getReportsByDate = function () {            
-            var thisDateReports = $scope.reportsToDate.filter(function (tdate) {
-                var reportDate = new Date(tdate.REPORT_DATE).setHours(0, 0, 0, 0);
-                return new Date(reportDate).getTime() == $scope.THIS_DATE.date.getTime();
-            });
-            $scope.pickDateRpts = formatReport(thisDateReports);
-            $scope.pickAdateReports = true;
+        $scope.getReportsByDate = function () {
+            if ($scope.THIS_DATE.date != undefined) {
+                var thisDateReports = $scope.reportsToDate.filter(function (tdate) {
+                    var reportDate = new Date(tdate.REPORT_DATE).setHours(0, 0, 0, 0);
+                    return new Date(reportDate).getTime() == $scope.THIS_DATE.date.getTime();
+                });
+                $scope.pickDateRpts = formatReport(thisDateReports);
+                $scope.pickAdateReports = true;
+            } else {
+                alert("Pick a date first.");
+            };
+
         }
 
         //complete the report button clicked -- send back to submit with report populated
         $scope.CompleteThisReport = function (rep) {
-            var test;
+            $scope.$parent.newReport = rep;
+            $scope.$parent.disabled = false; $scope.$parent.needToComplete = true;
+            CONTACT.query({ ReportMetric: rep.REPORTING_METRICS_ID, ContactType: 1 }, function success(response) {    
+                $scope.$parent.DeployStaff = response;
+            }).$promise.then(function () {
+                CONTACT.query({ ReportMetric: rep.REPORTING_METRICS_ID, ContactType: 2 }, function success(response) {
+                    $scope.$parent.GenStaff = response;
+                }).$promise.then(function () {
+                    CONTACT.query({ ReportMetric: rep.REPORTING_METRICS_ID, ContactType: 3 }, function success(response) {
+                        $scope.$parent.InlandStaff = response;
+                    }).$promise.then(function () {
+                        CONTACT.query({ ReportMetric: rep.REPORTING_METRICS_ID, ContactType: 4 }, function success(response) {
+                            $scope.$parent.CoastStaff = response;
+                        }).$promise.then(function () {
+                            CONTACT.query({ ReportMetric: rep.REPORTING_METRICS_ID, ContactType: 5 }, function success(response) {
+                                $scope.$parent.WaterStaff = response;
+                            }).$promise.then(function () {
+                                $state.go('reporting.submitReport');
+                                //$location.path('/Reporting/SubmitReport');
+                            });
+                        });
+                    });
+                });
+            });
         }
+
+        //project alert text in modal
+        $scope.getProjectAlertText = function (rep) {
+            
+            //need: 
+            //1. thisReport
+            $scope.ProjectAlertParts = {};
+            $scope.ProjectAlertParts.Report = rep;
+            //2. total of YEST FIELDPERS
+            $scope.ProjectAlertParts.totYestFieldPers = rep.SW_YEST_FIELDPERS + rep.WQ_YEST_FIELDPERS;
+            //3. total of OFFICEPERS
+            $scope.ProjectAlertParts.totYestOfficPers = rep.SW_YEST_OFFICEPERS + rep.WQ_YEST_OFFICEPERS;
+            //4. total TOT_CHECK_MEAS+TOT_DISCHARGE_MEAS
+            $scope.ProjectAlertParts.measureCts = rep.TOT_CHECK_MEAS + rep.TOT_DISCHARGE_MEAS;
+            //5. total states responding (all reports with this event_id, count of each state)
+            var eventReports = $scope.reportsToDate.filter(function (r) { return r.EVENT_ID == rep.EVENT_ID; });
+            var test = $filter('countBy')(eventReports, 'STATE');
+            $scope.ProjectAlertParts.stateCount = 0;
+            angular.forEach(test, function (er) {
+                $scope.ProjectAlertParts.stateCount++;
+            })
+            //6. this event
+            $scope.ProjectAlertParts.Event = $scope.events.filter(function (e) { return e.EVENT_ID == rep.EVENT_ID; });
+                
+            //modal
+            var modalInstance = $modal.open({
+                templateUrl: $scope.ProjectAlertParts.Event[0].EVENT_TYPE_ID == 1 ? 'FloodPA.html' : 'HurricanePA.html',
+                controller: 'ProjAlertModalCtrl',
+                size: 'md',
+                windowClass: 'rep-dialog',
+                resolve: {
+                    ProjAlert: function () {
+                        return $scope.ProjectAlertParts;
+                    }
+                }
+            });
+            modalInstance.result.then(function (r) {
+                //nothing to do here
+            });
+            //end modal
+        }
+
     }
 
     STNControllers.controller('SubmitReportCtrl', ['$scope', '$http', '$modal', '$state', 'getCreds', 'CONTACT', 'REPORT', SubmitReportCtrl]);
     function SubmitReportCtrl($scope, $http, $modal, $state, getCreds, CONTACT, REPORT) {
-        //#region Submit Report tab
-        //$scope.clearReportScope = function () {
-        //    if ($scope.newReport.EVENT_ID != undefined)
-        //        $scope.newReport = {};
-        //};
-        $scope.isCompleted = false; //when report is complete set flag for readonly
-        //$scope.memberIncompletes = incompleteReports.filter(function (ir) { return ir.COMPLETE == 0 });
-        $scope.newReport = {};
-        $scope.DeployStaff = {};
-        $scope.GenStaff = {};
-        $scope.InlandStaff = {};
-        $scope.CoastStaff = {};
-        $scope.WaterStaff = {};
-        $scope.disabled = true;
+        //#make sure this clears except for if they care needing to complete a report
+        if ($scope.$parent.needToComplete != true) {
+            $scope.$parent.newReport = {};
+        } 
+        
+        //reset it here so form will clear when they leave and come back.
+        $scope.$parent.needToComplete = false; 
+
+        if ($scope.newReport.REPORTING_METRICS_ID == undefined)
+            $scope.disabled = true;
 
         //get this event name from the eventid
         $scope.getEventName = function (evID) {
@@ -769,18 +927,18 @@
                 //PUT
                 REPORT.update({ id: $scope.newReport.REPORTING_METRICS_ID }, $scope.newReport, function success(response) {
                     toastr.success("Report Updated");
+                    $scope.newReport.EVENT_NAME = $scope.getEventName($scope.newReport.EVENT_ID);
                     if ($scope.newReport.COMPLETE == 1) {
-                        removeIncomplete();
-                        $scope.newReport.EVENT_NAME = $scope.getEventName($scope.newReport.EVENT_ID);
+                        removeIncomplete();   
                         $scope.isCompleted = true;
-                        //TODO:: clear the page.. can't edit a Completed report
                     }                    
                     //then POST the ReportContacts
-                    postReportContacts($scope.newReport.REPORTING_METRICS_ID);//$scope.DeployStaff,.GenStaff,.InlandStaff,.CoastStaff,.WaterStaff
+                    postReportContacts($scope.newReport.REPORTING_METRICS_ID);
                 }, function error(errorResponse) {
                     toastr.error("Error: " + errorResponse.statusText);
                 }).$promise.then(function () {
                     $scope.fullReportForm.submit.$setPristine();
+                    $scope.fullReportForm.submit.EVENT_ID.$viewValue = undefined;//needed for the changeState to not throw up leaving tab message
                     $state.go('reporting.reportDash');
                 });
             } else {
@@ -791,15 +949,15 @@
                     if ($scope.newReport.COMPLETE == 1) {
                         removeIncomplete(); $scope.isCompleted = true;
                         $scope.newReport.EVENT_NAME = $scope.getEventName($scope.newReport.EVENT_ID);                        
-                        //TODO:: clear the page.. can't edit a Completed report
                     }
                     //then POST the ReportContacts
                     $scope.newReport.REPORTING_METRICS_ID = response.REPORTING_METRICS_ID;
-                    postReportContacts($scope.newReport.REPORTING_METRICS_ID);//$scope.DeployStaff,.GenStaff,.InlandStaff,.CoastStaff,.WaterStaff
+                    postReportContacts($scope.newReport.REPORTING_METRICS_ID);
                 }, function error(errorResponse) {
                     toastr.error("Error: " + errorResponse.statusText);
                 }).$promise.then(function () {
                     $scope.fullReportForm.submit.$setPristine();
+                    $scope.fullReportForm.submit.EVENT_ID.$viewValue = undefined; //needed for the changeState to not throw up leaving tab message
                     $state.go('reporting.reportDash');
                 });
             }//end post
@@ -887,8 +1045,6 @@
                     });//end modalInstance.result.then
                 } else {
                     //the report is complete, just post/put it                        
-
-                    //$scope.newReport.COMPLETE = $scope.newReport.COMPLETE == true ? 1 : 0;                        
                     $scope.newReport.MEMBER_ID = $scope.Submitter.MEMBER_ID;
                     PostPutReportAndReportContacts();
                 }
@@ -1020,7 +1176,7 @@
                     }, function error(errorResponse) {
                         toastr.error("Error: " + errorResponse.statusText);
                     }).$promise.then(function () {
-                        $scope.apply;
+                        $scope.$apply();
                         $location.path('/Members/MembersList').replace();
                     });
                 });
@@ -1109,7 +1265,7 @@
                             nm.Role = ro[0].ROLE_NAME;                            
                             $scope.memberList.push(nm);
                         }).$promise.then(function () {
-                            $scope.apply;
+                            $scope.$apply();
                             $location.path('/Members/MembersList').replace();                            
                         });
                         
@@ -1243,7 +1399,7 @@
                     }, function error(errorResponse) {
                         toastr.error("Error: " + errorResponse.statusText);
                     }).$promise.then(function () {
-                        $scope.apply;
+                        $scope.$apply();
                         $location.path('/Events/EventsList').replace();
                     });
                 });
@@ -1298,7 +1454,7 @@
 
                             $scope.eventList.push(E);
                         }).$promise.then(function () {
-                            $scope.apply;
+                            $scope.$apply();
                             $location.path('/Events/EventsList').replace();
                         });
 
@@ -3369,6 +3525,24 @@
             $modalInstance.dismiss('cancel');
         };
     };
+
+    STNControllers.controller('ProjAlertModalCtrl', ['$scope', '$modalInstance', 'ProjAlert', ProjAlertModalCtrl]);
+    function ProjAlertModalCtrl($scope, $modalInstance, ProjAlert) {
+        $scope.ProjAlertParts = ProjAlert;
+        $scope.ok = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    }
+
+    //STNControllers.controller('MetricSumModalCtrl', ['$scope', '$modalInstance', 'thisReport', 'thisEvent', MetricSumModalCtrl]);
+    //function MetricSumModalCtrl($scope, $modalInstance, thisReport, thisEvent) {
+    //    $scope.Report = thisReport;
+    //    $scope.Event = thisEvent;
+    //    $scope.ok = function () {
+    //        $modalInstance.dismiss('cancel');
+    //    };
+    //}
+
     //#endregion MODALS
 
     //#region LOGIN/OUT

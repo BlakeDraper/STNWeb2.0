@@ -106,7 +106,7 @@
                 })
                 //#endregion
 
-                //#region reporting (abstract)
+                ////#region reporting (abstract)
                 .state("reporting", {
                     url: "/Reporting",
                     abstract: true,
@@ -131,6 +131,14 @@
                             $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
                             $http.defaults.headers.common['Accept'] = 'application/json';
                             return m.query({ id: mID }).$promise;
+                        },
+                        et: 'EVENT_TYPE', 
+                        allEventTypes: function(et) {
+                            return et.getAll().$promise;
+                        },
+                        es: 'EVENT_STATUS',
+                        allEventStatus: function (es) {
+                            return es.getAll().$promise;
                         },
                         ag: 'AGENCY',
                         allAgencies: function (ag) {
@@ -170,9 +178,7 @@
                     url: "/GenerateReport",
                     templateUrl: "partials/Reporting/generateReport.html"                    
                 })//#endregion reporting.GenerateReport
-
-               
-            
+          
                 //#region settings 
                 .state("settings", {
                     url: "/Settings",                    

@@ -26,7 +26,7 @@
     <script src="js/vendor/angular-sanitize.js"></script> <!--not sure if needed-->
     <script src="js/vendor/bootstrap-table.js"></script>
     <script src="js/vendor/ui-utils.js"></script> <!--for data masking ui-mask="(999)-****", unique, validate-->
-    <script src="js/vendor/ui-bootstrap-tpls-0.11.0.js"></script> <!-- for date picker, and tooltips-->
+    <script src="js/vendor/ui-bootstrap-tpls-0.13.3.min.js"></script> <!-- for date picker, and tooltips-->
     <script src="js/vendor/toastr.js"></script>
     <script src="js/vendor/isteven-multi-select.js"></script>
     <script src="js/vendor/angular-input-modified.min.js"></script> <!--determine if form is dirty/clean-->
@@ -62,7 +62,7 @@
             </div>
             <div>
                 <div style="width:60%;float:left;">
-                    <h2>STN: Data Management System (DMS)</h2>
+                    <h2>Short-Term Network</h2>
                 </div>
                 <div class="pull-right" style="margin-top:10px" ng-show="isAuth.val">
                     <div><span>Welcome, <a ui-sref="members.MemberInfo({id: userID})">{{usersName}}</a></span></div>
@@ -113,6 +113,7 @@
         <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
     </div>
 </script>
+
 <script type="text/ng-template" id="saveReportModal.html">
     <div class="modal-header">
         <h3 class="modal-title">Confirm</h3>
@@ -123,5 +124,55 @@
     <div class="modal-footer">
         <button class="btn btn-primary" ng-click="ok()">OK</button>
         <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    </div>
+</script>
+
+<script type="text/ng-template" id="FloodPA.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Project Alert Paragraph for a Flood Event</h3>
+    </div>
+    <div class="modal-body">
+        <div>
+            Flooding has or is occurring in {{ProjAlertParts.Report.STATE}} and is considered {MAJOR, MODERATE OR MINOR}. The areas with the most significant
+            flooding are {AREAS OF FLOODING}. {{ProjAlertParts.Event.EVENT_DESCRIPTION}}, {DAMAGES AND FATALITIES}. The USGS {{ProjAlertParts.Report.STATE}} Office has dispatched
+            {{ProjAlertParts.totYestFieldPers}} field staff to support high water data collection.  In addition, {{ProjAlertParts.totYestOfficPers}}
+            office staff are supporting the flood response.  Numerous contacts have been made with {EVENT CONTACTS}. These contacts were
+            primarily to give streamgage status updates and {OTHER REASONS}. {{ProjAlertParts.measureCts}} additional streamflow measurements
+            have been made in the {OTHER AREAS MEASUREMENTS TAKEN} area. {{ProjAlertParts.Report.GAGE_PEAK_RECORD}} streamgages have exceeded
+            previous period of record highs. Peaks at {NUMBER OF GAGES} streamgages rank in the top 5 for the period of record.  Preliminary
+            flood frequency estimates indicate {NUMBER OF GAGES} streamgages had Annual Exceedance Probabilities (AEP) less than 1% and
+            {NUMBER OF GAGES} streamgages had AEP between 2% and 1%.
+        </div>
+        <div style="margin-top:2em">Click <a href="http://water.usgs.gov/project_alert/alert_form.html" target="_blank">here</a> to open Project Alert in a new tab.</div>
+        <br clear="all" />
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">OK</button>
+    </div>
+</script>
+
+<script type="text/ng-template" id="HurricanePA.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Project Alert Paragraph for an Hurricane Event</h3>
+    </div>
+    <div class="modal-body">
+        <div>
+            A major landfall hurricane is affecting {{ProjAlertParts.Report.STATE}}. The Storm Team has been activated and daily conference calls are being held at 0900
+            Eastern Time. {{ProjAlertParts.Event.EVENT_DESCRIPTION}}, {WEATHER DAMAGES AND FATALITIES}. The areas with the most significant local impacts are
+            {AREAS WITH MOST LOCAL IMPACT}. The USGS {{ProjAlertParts.Report.STATE}} Office has dispatched {{ProjAlertParts.totYestFieldPers}} field staff to support high water
+            data collection.  In addition, {{ProjAlertParts.totYestOfficPers}} office staff are supporting the flood response. In total, {{ProjAlertParts.stateCount}}
+            USGS states are responding to this event. Within {{ProjAlertParts.Report.STATE}}, {{ProjAlertParts.Report.DEP_RAPDEPL_GAGE}} rapidly-deployable streamgages,
+            {{ProjAlertParts.Report.DEP_WTRLEV_SENSOR}} storm-tide water level sensors, and {{ProjAlertParts.Report.DEP_WV_SENS}} wave height and structure
+            sensors have been deployed to record storm conditions. As of today, {{ProjAlertParts.Report.HWM_FLAGGED}} high-water marks have been flagged with
+            {{ProjAlertParts.Report.HWM_COLLECTED}} surveyed into the elevations. {{ProjAlertParts.Report.QW_DISCR_SAMPLES}} water quality samples have been collected in
+            {{ProjAlertParts.Report.STATE}}. Numerous contacts have been made with {EVENT CONTACTS}. These contacts were primarily to give instrumentation status updates
+            and {OTHER REASONS}. {{ProjAlertParts.measureCts}} additional streamflow measurements have been made at the surface-water gages in the
+            {OTHER AREAS MEASUREMENTS TAKEN} area. {{ProjAlertParts.Report.GAGE_PEAK_RECORD}} streamgages have exceeded period of record highs.
+        </div>
+        <div style="margin-top:2em">Click <a href="http://water.usgs.gov/project_alert/alert_form.html" target="_blank">here</a> to open Project Alert in a new tab.</div>
+        <br clear="all" />
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">OK</button>        
     </div>
 </script>
