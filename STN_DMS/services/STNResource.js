@@ -4,7 +4,6 @@
     //look up common service module, and register the new factory with that module 
     var STNResource = angular.module('STNResource', ['ngResource']);
     var rootURL = "/STNServices";
-   // var rootURL = "/STNServicesTest";
     
     //#region AGENCY
     STNResource.factory('AGENCY', ['$resource', function ($resource) {
@@ -350,6 +349,7 @@
                 getReportByEvSt: { method: 'GET', isArray: true },
                 getDailyReportTots: {method: 'GET', url: rootURL + '/ReportingMetrics/DailyReportTotals'},
                 getMemberReports: { method: 'GET', isArray: true, url: rootURL + '/Members/:memberId/Reports.json' },
+                getFilteredReports: {method: 'GET', isArray: true, url: rootURL + '/ReportingMetrics/FilteredReports.json'},
                 getReportsCSV: {method: 'GET', url: rootURL + '/ReportingMetrics/FilteredReports.csv'},
                 getAll: { method: 'GET', isArray: true },
                 update: { method: 'PUT', cache: false, isArray: false },

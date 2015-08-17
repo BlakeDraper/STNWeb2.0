@@ -81,12 +81,6 @@
     <Content Include="js\vendor\checklist-model.js" />
     <Content Include="js\vendor\errors.json" />
     <Content Include="js\vendor\version.json" />
-    <None Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
-    <None Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="css\app.css" />
@@ -146,7 +140,6 @@
     <Content Include="js\vendor\restangular.min.js" />
     <Content Include="js\vendor\select.js" />
     <Content Include="js\vendor\toastr.js" />
-    <Content Include="js\vendor\ui-bootstrap-tpls-0.11.0.js" />
     <Content Include="js\vendor\ui-utils.js" />
     <Content Include="js\vendor\xeditable.js" />
     <Content Include="js\vendor\xeditable.min.js" />
@@ -196,12 +189,20 @@
     <Content Include="partials\login.html" />
     <Content Include="services\businessServices.js" />
     <Content Include="services\STNResource.js" />
-    <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Web.config" />
+    <Content Include="js\vendor\ui-bootstrap-tpls-0.13.3.min.js" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
