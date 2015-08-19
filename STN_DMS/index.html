@@ -158,7 +158,7 @@
     <div class="modal-body">
         <div>
             A major landfall hurricane is affecting {{ProjAlertParts.Report.STATE}}. The Storm Team has been activated and daily conference calls are being held at 0900
-            Eastern Time. {{ProjAlertParts.Event.EVENT_DESCRIPTION}}, {WEATHER DAMAGES AND FATALITIES}. The areas with the most significant local impacts are
+            Eastern Time. {{ProjAlertParts.Event.EVENT_DESCRIPTION || "(No Event Discription)"}}, {WEATHER DAMAGES AND FATALITIES}. The areas with the most significant local impacts are
             {AREAS WITH MOST LOCAL IMPACT}. The USGS {{ProjAlertParts.Report.STATE}} Office has dispatched {{ProjAlertParts.totYestFieldPers}} field staff to support high water
             data collection.  In addition, {{ProjAlertParts.totYestOfficPers}} office staff are supporting the flood response. In total, {{ProjAlertParts.stateCount}}
             USGS states are responding to this event. Within {{ProjAlertParts.Report.STATE}}, {{ProjAlertParts.Report.DEP_RAPDEPL_GAGE}} rapidly-deployable streamgages,

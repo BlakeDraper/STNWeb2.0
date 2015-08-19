@@ -50,6 +50,7 @@
         return $resource(rootURL + '/Contacts/:id.json',
             {}, {
                 query: {},
+                getContactModel: {method: 'GET', isArray: true },
                 getAll: { method: 'GET', isArray: true },
                 update: { method: 'PUT', cache: false, isArray: false },
                 addReportContact: {method: 'POST', cache: false, isArray: false, url: rootURL + '/Contacts/AddReportContact'},
@@ -349,7 +350,8 @@
                 getReportByEvSt: { method: 'GET', isArray: true },
                 getDailyReportTots: {method: 'GET', url: rootURL + '/ReportingMetrics/DailyReportTotals'},
                 getMemberReports: { method: 'GET', isArray: true, url: rootURL + '/Members/:memberId/Reports.json' },
-                getFilteredReports: {method: 'GET', isArray: true, url: rootURL + '/ReportingMetrics/FilteredReports.json'},
+                getFilteredReports: { method: 'GET', isArray: true, url: rootURL + '/ReportingMetrics/FilteredReports.json' },
+                getReportwithContacts: {method: 'GET', isArray: true, url: rootURL + '/ReportResource/FilteredReportModel.json'},
                 getReportsCSV: {method: 'GET', url: rootURL + '/ReportingMetrics/FilteredReports.csv'},
                 getAll: { method: 'GET', isArray: true },
                 update: { method: 'PUT', cache: false, isArray: false },
