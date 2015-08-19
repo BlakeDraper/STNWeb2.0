@@ -181,7 +181,6 @@
     <Content Include="partials\Map.html" />
     <Content Include="partials\Approval.html" />
     <Content Include="partials\Member\memberHolderView.html" />
-    <Content Include="partials\Reporting.html" />
     <Content Include="partials\Settings.html" />
     <Content Include="partials\SiteSearch.html" />
     <Content Include="partials\homeBase.html" />
@@ -202,6 +201,9 @@
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="partials\Sites\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

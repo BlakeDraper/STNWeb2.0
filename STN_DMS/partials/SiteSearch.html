@@ -1,3 +1,72 @@
-﻿<div class="panel panel-primary">
-    <h3>{{ssearch}}</h3>
+﻿<h3>Site Search</h3>
+
+<hr />
+
+<div>Search for Sites by one or more parameters. Clicking Search with no parameters set will return all sites.</div>
+<br />
+<form name="approvalForm">
+    <div class="row">
+        <!--<label class="col-md-1 control-label" for="inputEVENT_ID">Events:</label>-->
+        <div class="col-md-3">
+            <select class="form-control" id="inputEVENT_ID" name="EVENT_ID" ng-model="Chosen.event"
+                    ng-options="e.EVENT_ID as (e.EVENT_NAME + ' --- ' + (e.EVENT_START_DATE | date: 'MM/dd/yyyy') + ' to ' + ((e.EVENT_END_DATE || '-Not Set-') | date: 'MM/dd/yyyy'))  for e in events | orderBy: '-EVENT_START_DATE'">
+                <option value="">Events</option>
+            </select>
+        </div>
+
+        <!--<label class="col-md-1 control-label" for="inputSTATE">States:</label>-->
+        <div class="col-md-3">
+            <select class="form-control" id="inputSTATE_ABBREV" name="STATE_ABBREV" ng-model="Chosen.state"
+                    ng-options="s.STATE_ABBREV as s.STATE_NAME for s in states">
+                <option value="">States</option>
+            </select>
+        </div>
+
+
+        <!--<label class="col-md-1 control-label" for="inputSENSOR_TYPE_ID">Sensor Types:</label>-->
+        <div class="col-md-3">
+            <select class="form-control" id="inputSENSOR_TYPE_ID" name="SENSOR_TYPE_ID" ng-model="Chosen.sensor"
+                    ng-options="s.SENSOR_TYPE_ID as s.SENSOR for s in senTypes | orderBy: 'SENSOR'">
+                <option value="">Sensor Types</option>
+            </select>
+        </div>
+
+        <!--<label class="col-md-1 control-label" for="inputNETWORK_NAME_ID">Network Names</label>-->
+        <div class="col-md-3">
+            <select class="form-control" id="inputNETWORK_NAME_ID" name="NETWORK_NAME_ID" ng-model="Chosen.network"
+                    ng-options="n.NETWORK_NAME_ID as n.NAME for n in netNames | orderBy: 'NAME'">
+                <option value="">Network Names</option>
+            </select>
+        </div>
+    </div>
+
+    <br />
+
+    <div class="row">
+        <div class="span6" style="text-align:center">
+            <button class="btn btn-primary large" ng-click="searchSites()">
+                Search
+            </button>
+        </div>
+    </div>
+</form>
+
+<div ng-show="siteResponse" class="col-md-5 panel panel-default" style="padding:0;margin:1em;">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            Sites:
+        </h3>
+    </div>
+    <div class="panel-body">
+        <div ng-show="siteList.length > 0">
+            <ul>
+                <li style="list-style:none;" ng-repeat="s in siteList">
+                    <span>{{s.SITE_ID}}, {{s.SITE_NO}}</span>
+                </li>
+            </ul>
+        </div>
+        <div ng-show="siteList.length == 0">
+            <span>No Sites returned from query.</span>
+        </div>
+    </div>
 </div>

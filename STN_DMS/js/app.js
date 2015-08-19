@@ -80,12 +80,6 @@
                         stateList: function (s) {
                             return s.getAll().$promise;
                         },
-                        m: 'MEMBER',
-                        memberList: function (m, $http, getCreds) {
-                            $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
-                            $http.defaults.headers.common['Accept'] = 'application/json';
-                            return m.getAll().$promise;
-                        },
                         i: 'INSTRUMENT',
                         instrumentList: function (i) {
                             return i.getAll().$promise;
@@ -102,11 +96,29 @@
                 .state("siteSearch", {
                     url: "/SiteSearch",
                     templateUrl: "partials/SiteSearch.html",
-                    controller: "SiteSearchCtrl"
+                    controller: "SiteSearchCtrl",
+                    resolve: {
+                        e: 'EVENT',
+                        eventList: function (e) {
+                            return e.getAll().$promise;
+                        },
+                        s: 'STATE',
+                        stateList: function (s) {
+                            return s.getAll().$promise;
+                        },
+                        sensT: 'SENSOR_TYPE',
+                        sensorTypes: function (sensT) {
+                            return sensT.getAll().$promise;
+                        },
+                        netwN: 'NETWORK_NAME',
+                        networkNames: function (netwN) {
+                            return netwN.getAll().$promise;
+                        }
+                    }
                 })
                 //#endregion
 
-                ////#region reporting (abstract)
+                //#region reporting (abstract)
                 .state("reporting", {
                     url: "/Reporting",
                     abstract: true,
@@ -126,11 +138,16 @@
                             return r.getAll().$promise;
                         },
                         m: 'MEMBER',
-                        thisMember: function (m, getUserID, $http, getCreds) {
-                            var mID = getUserID();
+                        //loggedInMember: function (m, getUserID, $http, getCreds) {
+                        //    var mID = getUserID();
+                        //    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                        //    $http.defaults.headers.common['Accept'] = 'application/json';
+                        //    return m.query({ id: mID }).$promise;
+                        //},
+                        allMembers: function (m, $http, getCreds){
                             $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
                             $http.defaults.headers.common['Accept'] = 'application/json';
-                            return m.query({ id: mID }).$promise;
+                            return m.getAll().$promise;
                         },
                         et: 'EVENT_TYPE', 
                         allEventTypes: function(et) {

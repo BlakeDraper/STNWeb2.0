@@ -67,10 +67,10 @@
                         <input class="form-control" id="inputAGENCY_NAME" name="AGENCY_NAME" type="text" placeholder="" ng-model="newAg.AGENCY_NAME" required />
                     </div>
                     <!--&nbsp;
-                    <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip"
-                          title="Describe your project data and where it resides (USGS NWIS, the Water Quality Portal, Access database, Excel spreadsheet, etc.). If your project uses multiple systems at different locations, enter each as a separate Data entry."
-                          data-placement="right" tooltip>
-                    </span>-->
+            <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip"
+                  title="Describe your project data and where it resides (USGS NWIS, the Water Quality Portal, Access database, Excel spreadsheet, etc.). If your project uses multiple systems at different locations, enter each as a separate Data entry."
+                  data-placement="right" tooltip>
+            </span>-->
                 </div>
 
                 <div class="form-group">
@@ -90,7 +90,9 @@
                 <div class="form-group">
                     <label class="col-md-3 control-label" for="inputSTATE">State:</label>
                     <div class="col-md-6">
-                        <input class="form-control" id="inputSTATE" name="STATE" type="text" placeholder="" ng-model="newAg.STATE" />
+                        <select class="form-control" id="inputSTATE" name="STATE" ng-model="newAg.STATE" ng-options="s.STATE_ABBREV as s.STATE_ABBREV for s in stateList | orderBy: 'STATE_NAME'">
+                            <option value=""></option>
+                        </select>
                     </div>
                 </div>
 
