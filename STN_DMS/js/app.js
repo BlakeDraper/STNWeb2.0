@@ -53,6 +53,14 @@
                         e: 'EVENT',
                         eventList: function (e) {
                             return e.getAll().$promise;
+                        },
+                        a: 'AGENCY',
+                        agencyList: function (a) {
+                            return a.getAll().$promise;
+                        },
+                        r: 'ROLE',
+                        roleList: function (r) {
+                            return r.getAll().$promise;
                         }
                     }
                 })
@@ -137,18 +145,6 @@
                         allReports: function (r) {
                             return r.getAll().$promise;
                         },
-                        m: 'MEMBER',
-                        //loggedInMember: function (m, getUserID, $http, getCreds) {
-                        //    var mID = getUserID();
-                        //    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
-                        //    $http.defaults.headers.common['Accept'] = 'application/json';
-                        //    return m.query({ id: mID }).$promise;
-                        //},
-                        allMembers: function (m, $http, getCreds){
-                            $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
-                            $http.defaults.headers.common['Accept'] = 'application/json';
-                            return m.getAll().$promise;
-                        },
                         et: 'EVENT_TYPE', 
                         allEventTypes: function(et) {
                             return et.getAll().$promise;
@@ -211,12 +207,6 @@
                     templateUrl: "partials/Member/memberHolderView.html",
                     controller: "memberCtrl",
                     resolve: {
-                        m: 'MEMBER',
-                        allMembers: function (m, $http, getCreds) {
-                            $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
-                            $http.defaults.headers.common['Accept'] = 'application/json';
-                            return m.getAll().$promise;
-                        },
                         r: 'ROLE',
                         allRoles: function(r){
                             return r.getAll().$promise;
@@ -272,13 +262,7 @@
                         es: 'EVENT_STATUS',
                         allEventStats: function (es) {
                             return es.getAll().$promise;
-                        },
-                        ec: 'MEMBER',
-                        allMembers: function (ec, $http, getCreds) {
-                            $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
-                            $http.defaults.headers.common['Accept'] = 'application/json';
-                            return ec.getRoleMembers({ roleId: 1 }).$promise;
-                        }
+                        }                       
                     }
                 })//#endregion events
                 

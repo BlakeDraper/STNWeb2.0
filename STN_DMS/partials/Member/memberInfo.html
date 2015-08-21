@@ -1,8 +1,8 @@
 ﻿<!-- If this is the user logged -->
-<form ng-show="matchingUsers || accountUser.Role == 'Admin'" class="form-horizontal" id="accountForm" name="accountForm">
+<form ng-show="matchingUsers || loggedInUser.Role == 'Admin'" class="form-horizontal" id="accountForm" name="accountForm">
     <fieldset>
         <legend>ACCOUNT INFORMATION</legend>
-        <div ng-if="(accountUser.Role == 'Admin' && aMember.MEMBER_ID != undefined) && !matchingUsers">
+        <div ng-if="(loggedInUser.Role == 'Admin' && aMember.MEMBER_ID != undefined) && !matchingUsers">
             <button class="btn btn-danger" ng-click="DeleteMember(aMember)">Delete Member</button>
         </div>
         <!-- First Name -->
@@ -29,10 +29,10 @@
         <div class="form-group required">
             <label class="col-md-3 control-label req" for="inputUSERNAME">Username:</label>
             <div class="col-md-3">
-                <input ng-show="Member.MEMBER_ID == undefined" class="form-control" id="inputUSERNAME" name="USERNAME" ng-model="aMember.USERNAME"
+                <input ng-show="aMember.MEMBER_ID == undefined" class="form-control" id="inputUSERNAME" name="USERNAME" ng-model="aMember.USERNAME"
                        type="text" placeholder="User Name" ng-model-options="{ updateOn: 'blur' }" ng-change="SaveOnBlur()"
                        required />
-                <span ng-hide="Member.MEMBER_ID != undefined">{{Member.USERNAME}}</span>
+                <span ng-show="aMember.MEMBER_ID != undefined">{{aMember.USERNAME}}</span>
             </div>
 
         </div>
@@ -58,7 +58,7 @@
                         required>
                     <option value="">Select Role</option>
                 </select>
-                <span ng-show="aMember.MEMBER_ID != undefined" ">{{accountUser.Role}}</span>
+                <span ng-show="aMember.MEMBER_ID != undefined" ">{{aMember.Role}}</span>
             </div>
         </div>
 
@@ -217,7 +217,7 @@
 </form>
 
 <!-- If this isn't the user logged in -->
-<form ng-show="!matchingUsers && accountUser.Role != 'Admin'" class="form-horizontal" name="noForm">
+<form ng-show="!matchingUsers && loggedInUser.Role != 'Admin'" class="form-horizontal" name="noForm">
     <fieldset>
         <legend>ACCOUNT INFORMATION</legend>
 
@@ -248,7 +248,7 @@
         <!-- Role-->
         <div class="form-group">
             <label class="col-md-3 control-label">Role:</label>
-            <div class="col-md-6"><span>{{accountUser.Role}}</span></div>
+            <div class="col-md-6"><span>{{loggedInUser.Role}}</span></div>
         </div>
     </fieldset>
 </form>

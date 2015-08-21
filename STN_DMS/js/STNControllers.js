@@ -3,7 +3,7 @@
     'use strict';
 
     var STNControllers = angular.module('STNControllers',
-        ['ngInputModified', 'ui.unique', 'ui.validate', 'angular.filter', 'xeditable', 'checklist-model']);
+        ['ngInputModified', 'ui.unique', 'ui.validate', 'angular.filter', 'xeditable', 'checklist-model', 'ngTagsInput']);
 
     //#region FILTERS
     //#endregion FILTERS
@@ -245,8 +245,8 @@
     //#endregion NAV Controller
 
     //#region Home Controller
-    STNControllers.controller('HomeCtrl', ['$scope', '$location', '$rootScope', '$http', 'eventList', 'INSTRUMENT', 'HWM', 'MEMBER', 'COLLECT_TEAM', 'checkCreds', 'deleteCreds', 'getCreds', 'setSessionEvent', 'setSessionTeam', HomeCtrl]);
-    function HomeCtrl($scope, $location, $rootScope, $http, eventList, INSTRUMENT, HWM, MEMBER, COLLECT_TEAM, checkCreds, deleteCreds, getCreds, setSessionEvent, setSessionTeam) {
+    STNControllers.controller('HomeCtrl', ['$scope', '$location', '$rootScope', '$http', '$modal', 'eventList', 'agencyList', 'roleList', 'INSTRUMENT', 'HWM', 'MEMBER', 'COLLECT_TEAM', 'checkCreds', 'deleteCreds', 'getCreds', 'getUserID', 'setSessionEvent', 'setSessionTeam', HomeCtrl]);
+    function HomeCtrl($scope, $location, $rootScope, $http, $modal, eventList, agencyList, roleList, INSTRUMENT, HWM, MEMBER, COLLECT_TEAM, checkCreds, deleteCreds, getCreds, getUserID, setSessionEvent, setSessionTeam) {
         if (!checkCreds()) {
             $scope.auth = false;
             $location.path('/login');
@@ -254,6 +254,8 @@
             //good to go
             $scope.ChooseEvent = {};
             $scope.allEvents = eventList;
+            $scope.allAgencies = agencyList;
+            $scope.allRoles = roleList;
             $scope.evID = 0;
             $scope.ShowEventCounts = false;
             $scope.stat1Back = false; $scope.stat2Back = false; $scope.stat3Back = false;
@@ -275,6 +277,8 @@
                     $scope.totInstrs = $scope.depInstrs + $scope.retInstrs + $scope.lostInstrs;
                     //get teams
                     COLLECT_TEAM.getEventTeams({ Eventid: $scope.evID }, function success(data) {
+                        //TODO:get members for each team to add to model for display and teamdetail click
+
                         $scope.CollectTeams = data;
                         $scope.teamsBack = true;
                        
@@ -282,12 +286,14 @@
                         alert("Error: " + errorResponse.statusText);
                     }).$promise;
                     $scope.ShowEventCounts = true;
+                    $(".page-loading").addClass("hidden");
                 }
             }
 
             //event was chosen
             $scope.EventChosen = function () {
                 //clear all totals
+                $(".page-loading").removeClass("hidden");
                 $scope.totInstrs = 0; $scope.totHWMs = 0;
                 $scope.depInstrs = 0; $scope.retInstrs = 0; $scope.lostInstrs = 0;
                 $scope.hwms = 0; $scope.people = 0;
@@ -354,8 +360,118 @@
             $scope.teamClick = function (t) {
                 setSessionTeam(this.t.COLLECT_TEAM_ID, this.t.DESCRIPTION);
                 $rootScope.sessionTeam = "You are on Team: " + this.t.DESCRIPTION + ".";
+            }   
+
+            //view details of this team
+            $scope.showTeamMembers = function (t) {
+                COLLECT_TEAM.getTeamMembers({ id: t.COLLECT_TEAM_ID }, function success(response) {
+                    var fullMemberInfoList = [];
+                    for (var x = 0; x < response.length; x++) {
+                        var member = response[x];
+                        member.agency = $scope.allAgencies.filter(function (a) { return a.AGENCY_ID == member.AGENCY_ID; })[0].AGENCY_NAME;
+                        member.role = $scope.allRoles.filter(function (r) { return r.ROLE_ID == member.ROLE_ID; })[0].ROLE_NAME;
+                        fullMemberInfoList.push(member);
+                    };
+                    openModalInstance(fullMemberInfoList);
+                });
+
+                var openModalInstance = function(mList) {
+                    //modal
+                    var modalInstance = $modal.open({
+                        templateUrl: 'TeamMembers.html',
+                        size: 'md',
+                        //windowClass: 'rep-dialog',
+                        resolve: {
+                            TeamMembers: function () {
+                                return mList;
+                            }
+                        },
+                        controller: function ($scope, $modalInstance, TeamMembers) {
+                            $scope.TeamMemberList = TeamMembers;
+                            $scope.ok = function () {
+                                $modalInstance.dismiss('cancel');
+                            };
+                        }
+                    });
+                    modalInstance.result.then(function () {
+                        //nothing
+
+                    });
+                    //end modal
+                };
+            };//end showTeamMembers click
+
+            $scope.AddNewTeam = function () {
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Accept'] = 'application/json';
+                MEMBER.getAll().$promise.then(function (response) {
+                    for (var x = 0; x < response.length; x++) {
+                        response.selected = false;
+                    };
+                    $scope.memberList = response;
+                    var modalInstance = $modal.open({
+                        templateUrl: 'NewTeamCreate.html',
+                        size: 'md',
+                        //windowClass: 'rep-dialog',
+                        resolve: {
+                            AllMembers: function () {
+                                return $scope.memberList;
+                            }
+                        },
+                        controller: function ($scope, $http, $modalInstance, AllMembers) {
+                            $scope.members = AllMembers;
+                            $scope.newTeam = {};
+                            $scope.loadMembers = function (query) {
+                                return $http.get('members.json');
+                            }
+                            $scope.CreateTeam = function () {
+                                $modalInstance.close($scope.newTeam)
+                            }
+                            
+                            $scope.cancel = function () {
+                                $modalInstance.dismiss('cancel');
+                            };
+                        }
+                    });
+                    modalInstance.result.then(function (newCreateTeam) {
+                        //post the new team
+                        var test = newCreateTeam;
+                        var collectTeamToPost = {};
+                        var createdNewTeam = {};
+                        collectTeamToPost.DESCRIPTION = newCreateTeam.TEAM_NAME;
+                        //post this collection team
+                        $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                        $http.defaults.headers.common['Accept'] = 'application/json';
+                        COLLECT_TEAM.save(collectTeamToPost).$promise.then(function (newTeam) {
+                            toastr.success("Team Created");
+                            $scope.CollectTeams.push(newTeam);
+                            $scope.teamsBack = true;
+                            //createdNewTeam = newTeam;
+                            //add the logged in member to list of team members
+                            var loggedInMember = $scope.memberList.filter(function (m) { return m.MEMBER_ID == getUserID(); })[0];
+                            newCreateTeam.MEMBER_WITH.push(loggedInMember);
+                            
+                            for (var m = 0; m < newCreateTeam.MEMBER_WITH.length; m++) {
+                                //remove selected prop
+                                delete newCreateTeam.MEMBER_WITH[m].selected;
+                                //post a member_team for each
+                                COLLECT_TEAM.addMember({ id: newTeam.COLLECT_TEAM_ID }, newCreateTeam.MEMBER_WITH[m],
+                                    function success(response) {
+                                        toastr.success("Member Added to Team");
+                                    }, function error(errorResponse) {
+                                        alert("Error adding Member to Team: " + errorResponse.statusText);
+                                    }
+                                );//end addMember
+                            };//end foreach post member                            
+                        }, function (errorResponse) {
+                            toast.error("Error creating Team: " + errorResponse.statusText);
+                        });//end then
+                    });
+                    //end modal
+                });
+
             }
-        }
+        }//end good to go
     }
     //#endregion Home Controller
 
@@ -470,8 +586,8 @@
     //#endregion Site Search Controller
 
     //#region Reporting Controller
-    STNControllers.controller('ReportingCtrl', ['$scope', '$q', '$rootScope', '$location', '$state', '$http', '$modal', 'incompleteReports', 'allMembers', 'allEvents', 'allStates', 'allReports', 'allEventTypes', 'allEventStatus', 'allAgencies', 'REPORT', 'CONTACT', 'MEMBER', 'checkCreds', 'getCreds', 'getUserID', ReportingCtrl]);
-    function ReportingCtrl($scope, $q, $rootScope, $location, $state, $http, $modal, incompleteReports, allMembers, allEvents, allStates, allReports, allEventTypes, allEventStatus, allAgencies, REPORT, CONTACT, MEMBER, checkCreds, getCreds, getUserID) {
+    STNControllers.controller('ReportingCtrl', ['$scope', '$q', '$rootScope', '$location', '$state', '$http', '$modal', 'incompleteReports', 'allEvents', 'allStates', 'allReports', 'allEventTypes', 'allEventStatus', 'allAgencies', 'REPORT', 'CONTACT', 'MEMBER', 'checkCreds', 'getCreds', 'getUserID', ReportingCtrl]);
+    function ReportingCtrl($scope, $q, $rootScope, $location, $state, $http, $modal, incompleteReports, allEvents, allStates, allReports, allEventTypes, allEventStatus, allAgencies, REPORT, CONTACT, MEMBER, checkCreds, getCreds, getUserID) {
         if (!checkCreds()) {
             $scope.auth = false;
             $location.path('/login');
@@ -549,8 +665,10 @@
                 $scope.MemberLoggedIn.AGENCY_NAME = memberAgency.AGENCY_NAME;
                 $scope.MemberLoggedIn.AGENCY_ADDRESS = memberAgency.ADDRESS + ", " + memberAgency.CITY + " " + memberAgency.STATE + " " + memberAgency.ZIP;
             }).$promise;
-            
-            $scope.members = allMembers;
+            MEMBER.getAll().$promise.then(function (response) {
+                $scope.members = response;
+            });
+
             $scope.agencies = allAgencies;
             $scope.eventTypes = allEventTypes;
             $scope.eventStats = allEventStatus;
@@ -1200,8 +1318,8 @@
     //#endregion Settings Controller
 
     //#region member Controller (abstract)
-    STNControllers.controller('memberCtrl', ['$scope', '$location', '$state', '$http', '$filter', 'MEMBER', 'allMembers', 'allRoles', 'allAgencies', 'checkCreds', 'setCreds', 'getCreds', 'getUserRole', 'getUsersNAME', 'getUserID', memberCtrl]);
-    function memberCtrl($scope, $location, $state, $http, $filter, MEMBER, allMembers, allRoles, allAgencies, checkCreds, setCreds, getCreds, getUserRole, getUsersNAME, getUserID) {
+    STNControllers.controller('memberCtrl', ['$scope', '$location', '$state', '$http', '$filter', 'MEMBER', 'allRoles', 'allAgencies', 'checkCreds', 'setCreds', 'getCreds', 'getUserRole', 'getUsersNAME', 'getUserID', memberCtrl]);
+    function memberCtrl($scope, $location, $state, $http, $filter, MEMBER, allRoles, allAgencies, checkCreds, setCreds, getCreds, getUserRole, getUsersNAME, getUserID) {
         if (!checkCreds()) {
             $scope.auth = false;
             $location.path('/login');
@@ -1225,26 +1343,29 @@
                 }
             };
 
-            $scope.accountUser = {};
-            $scope.accountUser.Name = getUsersNAME(); //User's NAME
-            $scope.accountUser.ID = getUserID();
-            $scope.accountUser.Role = getUserRole();
+            $scope.loggedInUser = {};
+            $scope.loggedInUser.Name = getUsersNAME(); //User's NAME
+            $scope.loggedInUser.ID = getUserID();
+            $scope.loggedInUser.Role = getUserRole();
 
             $scope.roleList = allRoles;
             $scope.agencyList = allAgencies;
-            $scope.memberList = [];
-            for (var x = 0; x < allMembers.length; x++) {
-                var M = {};
-                M.MEMBER_ID = allMembers[x].MEMBER_ID;
-                M.Name = allMembers[x].FNAME + " " + allMembers[x].LNAME;
-                var ag = $scope.agencyList.filter(function (a) { return a.AGENCY_ID == allMembers[x].AGENCY_ID; })[0];
-                var ro = $scope.roleList.filter(function (r) { return r.ROLE_ID == allMembers[x].ROLE_ID; })[0];
-                M.Agency = ag.AGENCY_NAME;
-                M.Role = ro.ROLE_NAME;
+            $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+            $http.defaults.headers.common['Accept'] = 'application/json';
+            MEMBER.getAll().$promise.then(function (response) {
+                $scope.memberList = [];
+                for (var x = 0; x < response.length; x++) {
+                    var M = {};
+                    M.MEMBER_ID = response[x].MEMBER_ID;
+                    M.Name = response[x].FNAME + " " + response[x].LNAME;
+                    var ag = $scope.agencyList.filter(function (a) { return a.AGENCY_ID == response[x].AGENCY_ID; })[0];
+                    var ro = $scope.roleList.filter(function (r) { return r.ROLE_ID == response[x].ROLE_ID; })[0];
+                    M.Agency = ag.AGENCY_NAME;
+                    M.Role = ro.ROLE_NAME;
 
-                $scope.memberList.push(M);
-            }
-           
+                    $scope.memberList.push(M);
+                }
+            });           
         }
     }
     //#endregion  member Controller (abstract)
@@ -1296,7 +1417,6 @@
                     }, function error(errorResponse) {
                         toastr.error("Error: " + errorResponse.statusText);
                     }).$promise.then(function () {
-                        $scope.$apply();
                         $location.path('/Members/MembersList').replace();
                     });
                 });
@@ -1314,9 +1434,10 @@
             if (thisMember != undefined) {
 
                 //check to see if the acct User is the same as the user they are looking at
-                $scope.matchingUsers = $stateParams.id == $scope.accountUser.ID ? true : false;            
+                $scope.matchingUsers = $stateParams.id == $scope.loggedInUser.ID ? true : false;
 
                 $scope.aMember = thisMember;
+                $scope.aMember.Role = $scope.roleList.filter(function (r) { return r.ROLE_ID == $scope.aMember.ROLE_ID })[0].ROLE_NAME;
                 $scope.changePass = false;
                 
                 //change to the user made, put it .. fired on each blur after change made to field
@@ -1348,8 +1469,10 @@
                         MEMBER.changePW({ username: $scope.aMember.USERNAME, newPass: $scope.pass.newP },
                             function success(response) {
                                 toastr.success("Password Updated");
-                                //update creds
-                                setCreds($scope.aMember.USERNAME, $scope.pass.newP, $scope.accountUser.Name, $scope.aMember.ROLE_ID, $scope.aMember.MEMBER_ID);
+                                //update creds ONLY IF user logged in is == this updating member
+                                if ($scope.aMember.MEMBER_ID == $scope.loggedInUser.MEMBER_ID) {
+                                    setCreds($scope.aMember.USERNAME, $scope.pass.newP, $scope.loggedInUser.Name, $scope.aMember.ROLE_ID, $scope.aMember.MEMBER_ID);
+                                }
                                 $scope.changePass = false;
                                 $scope.pass.newP = '';
                                 $scope.pass.confirmP = '';
@@ -1385,7 +1508,6 @@
                             nm.Role = ro.ROLE_NAME;                            
                             $scope.memberList.push(nm);
                         }).$promise.then(function () {
-                            $scope.$apply();
                             $location.path('/Members/MembersList').replace();                            
                         });
                         
@@ -1397,8 +1519,8 @@
     //#endregion memberInfo Controller
 
     //#region event Controller (abstract)
-    STNControllers.controller('eventCtrl', ['$scope', '$location', '$state', '$http', '$filter', 'EVENT', 'allEvents', 'allEventTypes', 'allEventStats', 'allMembers', 'checkCreds', 'setCreds', 'getCreds', 'getUserRole', 'getUsersNAME', 'getUserID', eventCtrl]);
-    function eventCtrl($scope, $location, $state, $http, $filter, EVENT, allEvents, allEventTypes, allEventStats, allMembers, checkCreds, setCreds, getCreds, getUserRole, getUsersNAME, getUserID) {
+    STNControllers.controller('eventCtrl', ['$scope', '$location', '$state', '$http', '$filter', 'EVENT', 'MEMBER', 'allEvents', 'allEventTypes', 'allEventStats', 'checkCreds', 'setCreds', 'getCreds', 'getUserRole', 'getUsersNAME', 'getUserID', eventCtrl]);
+    function eventCtrl($scope, $location, $state, $http, $filter, EVENT, MEMBER, allEvents, allEventTypes, allEventStats, checkCreds, setCreds, getCreds, getUserRole, getUsersNAME, getUserID) {
         if (!checkCreds()) {
             $scope.auth = false;
             $location.path('/login');
@@ -1426,24 +1548,25 @@
 
             $scope.eventTypeList = allEventTypes;
             $scope.eventStatList = allEventStats;
-            $scope.eventCoordList = allMembers;
+            $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+            $http.defaults.headers.common['Accept'] = 'application/json';
+            MEMBER.getRoleMembers({ roleId: 1 }).$promise.then(function (response) {
+                $scope.eventCoordList = response;
+                $scope.eventList = [];
+                for (var x = 0; x < allEvents.length; x++) {
+                    var E = {};
+                    E.EVENT_ID = allEvents[x].EVENT_ID;
+                    E.Name = allEvents[x].EVENT_NAME;
+                    E.Type = $scope.eventTypeList.filter(function (a) { return a.EVENT_TYPE_ID == allEvents[x].EVENT_TYPE_ID; })[0].TYPE;
+                    E.Status = $scope.eventStatList.filter(function (r) { return r.EVENT_STATUS_ID == allEvents[x].EVENT_STATUS_ID; })[0].STATUS;
+                    var coord = $scope.eventCoordList.filter(function (c) { return c.MEMBER_ID == allEvents[x].EVENT_COORDINATOR; })[0];                   
+                    E.StartDate = allEvents[x].EVENT_START_DATE;
+                    E.EndDate = allEvents[x].EVENT_END_DATE;
+                    E.Coord = coord != undefined ? coord.FNAME + " " + coord.LNAME : "";
 
-            $scope.eventList = [];
-            for (var x = 0; x < allEvents.length; x++) {
-                var E = {};
-                E.EVENT_ID = allEvents[x].EVENT_ID;
-                E.Name = allEvents[x].EVENT_NAME;
-                var type = $scope.eventTypeList.filter(function (a) { return a.EVENT_TYPE_ID == allEvents[x].EVENT_TYPE_ID; })[0];
-                var stat = $scope.eventStatList.filter(function (r) { return r.EVENT_STATUS_ID == allEvents[x].EVENT_STATUS_ID; })[0];
-                var coord = $scope.eventCoordList.filter(function (c) { return c.MEMBER_ID == allEvents[x].EVENT_COORDINATOR; })[0];
-                E.Type = type.TYPE;
-                E.Status = stat.STATUS;
-                E.StartDate = allEvents[x].EVENT_START_DATE;
-                E.EndDate = allEvents[x].EVENT_END_DATE;
-                E.Coord = coord != undefined ? coord.FNAME + " " + coord.LNAME : "";
-
-                $scope.eventList.push(E);
-            }            
+                    $scope.eventList.push(E);
+                }            
+            });            
         }
     }
     //#endregion  event Controller (abstract)
@@ -1499,11 +1622,9 @@
                         var delEv = {}; 
                         delEv.EVENT_ID = nameToRemove.EVENT_ID;
                         delEv.Name = nameToRemove.EVENT_NAME;
-                        var type = $scope.eventTypeList.filter(function (a) { return a.EVENT_TYPE_ID == nameToRemove.EVENT_TYPE_ID; })[0];
-                        var stat = $scope.eventStatList.filter(function (r) { return r.EVENT_STATUS_ID == nameToRemove.EVENT_STATUS_ID; })[0];
+                        delEv.Type = $scope.eventTypeList.filter(function (a) { return a.EVENT_TYPE_ID == nameToRemove.EVENT_TYPE_ID; })[0].TYPE;
+                        delEv.Status = $scope.eventStatList.filter(function (r) { return r.EVENT_STATUS_ID == nameToRemove.EVENT_STATUS_ID; })[0].STATUS;
                         var coord = $scope.eventCoordList.filter(function (c) { return c.MEMBER_ID == nameToRemove.EVENT_COORDINATOR; })[0];
-                        delEv.Type = type.TYPE;
-                        delEv.Status = stat.STATUS;
                         delEv.StartDate = nameToRemove.EVENT_START_DATE;
                         delEv.EndDate = nameToRemove.EVENT_END_DATE;
                         delEv.Coord = coord != undefined ? coord.FNAME + " " + coord.LNAME : "";
@@ -1519,7 +1640,6 @@
                     }, function error(errorResponse) {
                         toastr.error("Error: " + errorResponse.statusText);
                     }).$promise.then(function () {
-                        $scope.$apply();
                         $location.path('/Events/EventsList').replace();
                     });
                 });
@@ -1529,11 +1649,9 @@
 
             if (thisEvent != undefined) {
                 $scope.anEvent = thisEvent;
-                var ET = $scope.eventTypeList.filter(function (a) { return a.EVENT_TYPE_ID == thisEvent.EVENT_TYPE_ID; })[0];
-                var ES = $scope.eventStatList.filter(function (r) { return r.EVENT_STATUS_ID == thisEvent.EVENT_STATUS_ID; })[0];
-                var EC = $scope.eventCoordList.filter(function (c) { return c.MEMBER_ID == thisEvent.EVENT_COORDINATOR; })[0];
-                $scope.thisEventType = ET.TYPE;
-                $scope.thisEventStatus = ES.STATUS;
+                $scope.thisEventType = $scope.eventTypeList.filter(function (a) { return a.EVENT_TYPE_ID == thisEvent.EVENT_TYPE_ID; })[0].TYPE;
+                $scope.thisEventStatus = $scope.eventStatList.filter(function (r) { return r.EVENT_STATUS_ID == thisEvent.EVENT_STATUS_ID; })[0].STATUS;
+                var EC = $scope.eventCoordList.filter(function (c) { return c.MEMBER_ID == thisEvent.EVENT_COORDINATOR; })[0];               
                 $scope.thisEventCoord = EC != undefined ? EC.FNAME + " " + EC.LNAME : "";
 
                 //change to the user made, put it .. fired on each blur after change made to field
@@ -1563,18 +1681,14 @@
                             var E = {};
                             E.EVENT_ID = response.EVENT_ID;
                             E.Name = response.EVENT_NAME;
-                            var type = $scope.eventTypeList.filter(function (a) { return a.EVENT_TYPE_ID == response.EVENT_TYPE_ID; })[0];
-                            var stat = $scope.eventStatList.filter(function (r) { return r.EVENT_STATUS_ID == response.EVENT_STATUS_ID; })[0];
+                            E.Type = $scope.eventTypeList.filter(function (a) { return a.EVENT_TYPE_ID == response.EVENT_TYPE_ID; })[0].TYPE;
+                            E.Status = $scope.eventStatList.filter(function (r) { return r.EVENT_STATUS_ID == response.EVENT_STATUS_ID; })[0].STATUS;
                             var coord = $scope.eventCoordList.filter(function (c) { return c.MEMBER_ID == response.EVENT_COORDINATOR; })[0];
-                            E.Type = type.TYPE;
-                            E.Status = stat.STATUS;
                             E.StartDate = response.EVENT_START_DATE;
                             E.EndDate = response.EVENT_END_DATE;
                             E.Coord = coord!= undefined ? coord.FNAME + " " + coord.LNAME : "";
-
                             $scope.eventList.push(E);
                         }).$promise.then(function () {
-                            $scope.$apply();
                             $location.path('/Events/EventsList').replace();
                         });
 
