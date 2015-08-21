@@ -25,8 +25,10 @@
                 query: {},                 
                 getAll: { method: 'GET', isArray: true },
                 getEventTeams: { method: 'GET', isArray: true, url: rootURL + '/Events/:Eventid/Teams.json' },
+                getTeamMembers: {method: 'GET', isArray: true, url: rootURL + '/CollectionTeams/:id/Members.json'},
                 update: { method: 'PUT', cache: false, isArray: false },
                 save: { method: 'POST', cache: false, isArray: false },
+                addMember: {method: 'POST', isArray: true, cache:false, url: rootURL + '/CollectionTeams/:id/AddMember.json'},
                 delete: { method: 'DELETE', cache: false, isArray: false }
             });
     }]);

@@ -61,6 +61,7 @@
   <ItemGroup>
     <Content Include="css\bootstrap-theme.css.map" />
     <Content Include="css\bootstrap.css.map" />
+    <Content Include="css\ng-tags-input.min.css" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -80,6 +81,7 @@
     <Content Include="js\vendor\angular.min.js.map" />
     <Content Include="js\vendor\checklist-model.js" />
     <Content Include="js\vendor\errors.json" />
+    <Content Include="js\vendor\ng-tags-input.min.js" />
     <Content Include="js\vendor\version.json" />
   </ItemGroup>
   <ItemGroup>
@@ -195,6 +197,7 @@
   <ItemGroup>
     <Content Include="Web.config" />
     <Content Include="js\vendor\ui-bootstrap-tpls-0.13.3.min.js" />
+    <None Include="Properties\PublishProfiles\STNWeb2.0.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
