@@ -358,7 +358,14 @@
             }//end of EventChosen
 
             $scope.teamClick = function (t) {
+                //remove selected from all but this one (only 1 radio button selected at a time)
+                for (var x = 0; x < $scope.CollectTeams.length; x++) {
+                    if ($scope.CollectTeams[x].COLLECT_TEAM_ID != this.t.COLLECT_TEAM_ID) {
+                        $scope.CollectTeams[x].selected = false;
+                    }
+                }
                 setSessionTeam(this.t.COLLECT_TEAM_ID, this.t.DESCRIPTION);
+
                 $rootScope.sessionTeam = "You are on Team: " + this.t.DESCRIPTION + ".";
             }   
 
