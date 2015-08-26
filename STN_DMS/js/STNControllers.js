@@ -1230,7 +1230,7 @@
                 })[0];
                 $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
                 $http.defaults.headers.common['Accept'] = 'application/json';
-                if (yesterdayRpt.length > 0) {
+                if (yesterdayRpt != undefined && yesterdayRpt.length > 0) {
                     // PERSONNEL populating
                     $scope.newReport.SW_YEST_FIELDPERS = yesterdayRpt.SW_TOD_FIELDPERS;
                     $scope.newReport.WQ_YEST_FIELDPERS = yesterdayRpt.WQ_TOD_FIELDPERS;
@@ -1239,7 +1239,13 @@
 
                     // CONTACTS populating 
                     getReportContacts(yesterdayRpt.REPORTING_METRICS_ID);
-                }//end if
+                }//end if yesterdayRpt != undefined
+                else {
+                    $scope.newReport.SW_YEST_FIELDPERS = 0;
+                    $scope.newReport.WQ_YEST_FIELDPERS = 0;
+                    $scope.newReport.SW_YEST_OFFICEPERS = 0;
+                    $scope.newReport.WQ_YEST_OFFICEPERS = 0;
+                }
                 //now get totals for all sensors and hwms to populate in this newReport
                 REPORT.getDailyReportTots({ Date: $scope.newReport.REPORT_DATE, Event: $scope.newReport.EVENT_ID, State: $scope.newReport.STATE }, function success(response6) {
                     //only care about the counts
