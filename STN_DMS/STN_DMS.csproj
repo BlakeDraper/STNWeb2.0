@@ -145,6 +145,7 @@
     <Content Include="js\vendor\ui-utils.js" />
     <Content Include="js\vendor\xeditable.js" />
     <Content Include="js\vendor\xeditable.min.js" />
+    <Content Include="partials\file.html" />
     <Content Include="partials\Reporting\completedReportView.html" />
     <Content Include="partials\Reporting\generateReport.html" />
     <Content Include="partials\Reporting\reportDash.html" />
@@ -188,6 +189,17 @@
     <Content Include="partials\homeBase.html" />
     <Content Include="partials\entryView.html" />
     <Content Include="partials\login.html" />
+    <Content Include="partials\Sites\Site.html" />
+    <Content Include="partials\Sites\siteInfoView.html" />
+    <Content Include="scripts\FileAPI.flash.swf" />
+    <Content Include="scripts\FileAPI.js" />
+    <Content Include="scripts\FileAPI.min.js" />
+    <Content Include="js\vendor\ng-file-upload-all.js" />
+    <Content Include="js\vendor\ng-file-upload-all.min.js" />
+    <Content Include="js\vendor\ng-file-upload-shim.js" />
+    <Content Include="js\vendor\ng-file-upload-shim.min.js" />
+    <Content Include="js\vendor\ng-file-upload.js" />
+    <Content Include="js\vendor\ng-file-upload.min.js" />
     <Content Include="services\businessServices.js" />
     <Content Include="services\STNResource.js" />
   </ItemGroup>
@@ -197,6 +209,7 @@
   <ItemGroup>
     <Content Include="Web.config" />
     <Content Include="js\vendor\ui-bootstrap-tpls-0.13.3.min.js" />
+    <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\STNWeb2.0.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -205,9 +218,7 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="partials\Sites\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
