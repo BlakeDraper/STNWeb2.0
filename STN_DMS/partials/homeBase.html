@@ -1,4 +1,5 @@
 ﻿<div class="">
+    <!--<div><a ui-sref="fileUpload">Upload file</a></div>-->
     <div style="border:red 1px solid;padding:5px;margin-bottom:10px">
         <span style="font-family:'BryantBold';font-size:large;">Important usage notes and instructions</span>
         <div style="margin:5px">
@@ -69,49 +70,48 @@
         <h3 class="modal-title">Team Members</h3>
     </div>
     <div class="modal-body">
-        <div>
-            <div ng-repeat="tm in TeamMemberList" class="panel panel-default">
-                <div class="panel-heading">MEMBER: {{tm.FNAME}} {{tm.LNAME}}</div>
-                <div class="panel-body">
-                    <div class="col-md-12">
-                        <label class="col-md-5">User Name:</label>
-                        <span class="col-md-6">{{tm.USERNAME}}</span>
-                    </div>
-                    <div class="col-md-12">
-                        <label class="col-md-5">Agency:</label>
-                        <span class="col-md-7">{{tm.agency}}</span>
-                    </div>
-                    <div class="col-md-12">
-                        <label class="col-md-5">Role:</label>
-                        <span class="col-md-7">{{tm.role}}</span>
-                    </div>
-                    <div class="col-md-12">
-                        <label class="col-md-5">Phone:</label>
-                        <span class="col-md-7">{{tm.PHONE}}</span>
-                    </div>
-                    <div class="col-md-12">
-                        <label class="col-md-5">Email:</label>
-                        <span class="col-md-7">{{tm.EMAIL}}</span>
-                    </div>
-                    <div class="col-md-12">
-                        <label class="col-md-5">RSS Feed:</label>
-                        <span class="col-md-7">{{tm.RSSFEED}}</span>
-                    </div>
-                    <div class="col-md-12">
-                        <label class="col-md-5">Emergency Contact Name:</label>
-                        <span class="col-md-7">{{tm.EMERGENCY_CONTACT_NAME}}</span>
-                    </div>
-                    <div class="col-md-12">
-                        <label class="col-md-5">Emergency Contact Phone:</label>
-                        <span class="col-md-7">{{tm.EMERGENCY_CONTACT_PHONE}}</span>
-                    </div>
+        <div ng-repeat="tm in TeamMemberList" class="panel panel-default">
+            <div class="panel-heading">MEMBER: {{tm.FNAME}} {{tm.LNAME}}</div>
+            <div class="panel-body">
+                <div class="col-md-12">
+                    <label class="col-md-5">User Name:</label>
+                    <span class="col-md-6">{{tm.USERNAME}}</span>
+                </div>
+                <div class="col-md-12">
+                    <label class="col-md-5">Agency:</label>
+                    <span class="col-md-7">{{tm.agency}}</span>
+                </div>
+                <div class="col-md-12">
+                    <label class="col-md-5">Role:</label>
+                    <span class="col-md-7">{{tm.role}}</span>
+                </div>
+                <div class="col-md-12">
+                    <label class="col-md-5">Phone:</label>
+                    <span class="col-md-7">{{tm.PHONE}}</span>
+                </div>
+                <div class="col-md-12">
+                    <label class="col-md-5">Email:</label>
+                    <span class="col-md-7">{{tm.EMAIL}}</span>
+                </div>
+                <div class="col-md-12">
+                    <label class="col-md-5">RSS Feed:</label>
+                    <span class="col-md-7">{{tm.RSSFEED}}</span>
+                </div>
+                <div class="col-md-12">
+                    <label class="col-md-5">Emergency Contact Name:</label>
+                    <span class="col-md-7">{{tm.EMERGENCY_CONTACT_NAME}}</span>
+                </div>
+                <div class="col-md-12">
+                    <label class="col-md-5">Emergency Contact Phone:</label>
+                    <span class="col-md-7">{{tm.EMERGENCY_CONTACT_PHONE}}</span>
                 </div>
             </div>
-            <br clear="all" />
         </div>
-        <div class="modal-footer">
-            <button class="btn btn-primary" ng-click="ok()">OK</button>
-        </div>
+        <br clear="all" />
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">OK</button>
+    </div>
 </script>
 
 <!-- Modal for Creating New Team -->
@@ -142,7 +142,7 @@
                     </div>
                 </div>
             </div>
-            <br clear="all"/>
+            <br clear="all" />
             <div class="form-group">
                 <label class="col-md-4 control-label req" for="inputTEAM_NAME">Team Name:</label>
                 <div class="col-md-6">

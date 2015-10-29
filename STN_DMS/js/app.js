@@ -74,6 +74,24 @@
                 })
                 //#endregion
 
+                 //#region file page
+                .state("fileUpload", {
+                    url: "/File",
+                    templateUrl: "partials/file.html",
+                    controller: "FileCtrl",
+                    resolve: {
+                        ft: 'FILE_TYPE',
+                        fileTypeList: function (ft) {
+                            return ft.getAll().$promise;
+                        },
+                        a: 'AGENCY',
+                        agencyList: function (a) {
+                            return a.getAll().$promise;
+                        }
+                    }
+                })
+                //#endregion
+
                 //#region approval page
                 .state("approval", {
                     url: "/Approval",
@@ -567,7 +585,197 @@
                  
                 //#endregion all lookup htmls
                 
+                //#region site (abstract)
+                .state("site", {
+                    url: "/Site/:id",
+                    abstract: true,
+                    templateUrl: "partials/Sites/Site.html",
+                    controller: "SiteCtrl",
+                    resolve: {
+                        //#region site stuff
+                        s: 'SITE',
+                        thisSite: function (s, $stateParams) {
+                            if ($stateParams.id > 0) {
+                                return s.query({id: $stateParams.id}).$promise;
+                            }
+                        },
+                        thisSiteNetworkNames: function (s, $stateParams){
+                            if ($stateParams.id > 0) {
+                                return s.getSiteNetworkNames({id: $stateParams.id}).$promise;
+                            }
+                        },
+                        thisSiteNetworkTypes: function (s, $stateParams){
+                            if ($stateParams.id > 0) {
+                                return s.getSiteNetworkTypes({id: $stateParams.id}).$promise;
+                            }
+                        },
+                        thisSiteHousings: function (s, $stateParams){
+                            if ($stateParams.id > 0) {
+                                return s.getSiteHousings({ id: $stateParams.id }).$promise;
+                            }
+                        },
+                        hd: 'HORIZONTAL_DATUM',
+                        allHorDatums: function (hd) {
+                            return hd.getAll().$promise;
+                        },
+                        hcm: 'HORIZONTAL_COLL_METHODS',
+                        allHorCollMethods: function (hcm) {
+                            return hcm.getAll().$promise;
+                        },
+                        st: 'STATE',
+                        allStates: function (st) {
+                            return st.getAll().$promise;
+                        },
+                        c: 'COUNTIES',
+                        allCounties: function (c) {
+                            return c.getAll().$promise;
+                        },
+                        ht: 'HOUSING_TYPE',
+                        allHousingTypes: function (ht) {
+                            return ht.getAll().$promise;
+                        },
+                        nn: 'NETWORK_NAME',
+                        allNetworkNames: function (nn) {
+                            return nn.getAll().$promise;
+                        },
+                        nt: 'NETWORK_TYPE',
+                        allNetworkTypes: function (nt) {
+                            return nt.getAll().$promise;
+                        },
+                        dt: 'DEPLOYMENT_TYPE',
+                        allDeployTypes: function (dt) {
+                            return dt.getAll().$promise;
+                        },
+                        sd: 'SENSOR_DEPLOYMENT',
+                        allSensDeps: function (sd){
+                            return sd.getAll().$promise;
+                        },
+                        dp: 'DEPLOYMENT_PRIORITY',
+                        allDeployPriorities: function (dp) {
+                            return dp.getAll().$promise;
+                        }//,
+                        //#endregion site stuff
+                   /*     //#region op stuff
+                        opt: 'OP_TYPE',
+                        allOPTypes: function (opt) {
+                            return opt.getAll().$promise;
+                        },
+                        vertDats: 'VERTICAL_DATUM',
+                        allVertDatums: function (vertDats) {
+                            return vertDats.getAll().$promise;
+                        },
+                        vertColMet: 'VERTICAL_COLL_METHOD',
+                        allVertColMethods: function (vertCoMet) {
+                            return vertCoMet.getAll().$promise;
+                        },
+                        opQual: 'OP_QUALITY',
+                        allOPQualities: function (opQual) {
+                            return opQual.getAll().$promise;
+                        },
+                        //#endregion op stuff
+                        //#region sensor stuff
+                        e: 'EVENT',
+                        allEvents: function (e) {
+                            return e.getAll().$promise;
+                        },
+                        sent: 'SENSOR_TYPE',
+                        allSensorTypes: function (sent) {
+                            return sent.getAll().$promise;
+                        },
+                        sb: 'SENSOR_BRAND',
+                        allSensorBrands: function (sb){
+                            return sb.getAll().$promise;
+                        },                       
+                        //#endregion sensor stuff
+                        //#region hwm stuff
+                        hwmt: 'HWM_TYPE',
+                        allHWMTypes: function (hwmt) {
+                            return hwmt.getAll().$promise;
+                        },
+                        hq: 'HWM_QUALITY',
+                        allHWMQualities: function (hq){
+                            return hq.getAll().$promise;
+                        },
+                        m: 'MARKER',
+                        allMarkers: function (m){
+                            return m.getAll().$promise;
+                        }, 
+                        //#endregion hwm stuff
+                        //#region file
+                        ft: 'FILE_TYPE',
+                        allFileTypes: function(ft){
+                            return ft.getAll().$promise;
+                        },
+                        a: 'AGENCY',
+                        allAgencies: function(a){
+                            return a.getAll().$promise;
+                        }
+                        //#endregion file*/
+                    }
+                })
+                //#endregion site (abstract)
 
+                //#region site.info
+                .state("site.info", {
+                    url: "/Details",
+                    templateUrl: "partials/Sites/siteInfoView.html"                    
+                })//#endregion site.info
+
+                //#region site.OP
+                .state("site.OP", {
+                    url: "/ObjectivePoint/:id",
+                    templateUrl: "partials/Sites/siteOPView.html",
+                    controller: "ObjectivePointCtrl",
+                    resolve: {
+                        op: 'OBJECTIVE_POINT',
+                        thisOP: function (op, $stateParams){
+                            if ($stateParams.id > 0) {
+                                return op.query({id: $stateParams.id}).$promise;
+                            }
+                        }
+                    }
+                })
+                //#endregion site.OP
+        
+                //#region site.Sensor
+                .state("site.Sensor", {
+                    url: "/Sensor/:id",
+                    templateUrl: "partials/Sites/siteSensorView.html",
+                    controller: "SensorCtrl",
+                    resolve: {
+                        ins: 'INSTRUMENT',
+                        thisInstrument: function (inst, $stateParams){
+                            if ($stateParams.id > 0) {
+                                return inst.query({id: $stateParams.id}).$promise;
+                            }
+                        },
+                        instStat: 'INSTRUMENT_STATUS',
+                        theseInstruStats: function (instStat, $stateParams) {
+                            if ($stateParams.id > 0) {
+                                instStat.getInstrumentStatusLog({id: $stateParams.id}).$promise;
+                            }
+                        }
+                    }
+                })
+                //#endregion site.Sensor
+
+                //#region site.HWM
+                .state("site.HWM", {
+                    url: "/HWM/:id",
+                    templateUrl: "partials/Sites/siteHWMView.html",
+                    controller: "HWMCtrl",
+                    resolve: {
+                        hwm: 'HWM',
+                        thisHWM: function (hwm, $stateParams){
+                            if ($stateParams.id > 0) {
+                                return hwm.query({id: $stateParams.id}).$promise;
+                            }
+                        }
+                    }
+                })
+                //#endregion site.HWM
+
+                
             $locationProvider.html5Mode(false).hashPrefix('!');
             //$locationProvider.html5Mode({ enabled: true, requireBase: false });
         }

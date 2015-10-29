@@ -14,7 +14,7 @@
     <link href="css/isteven-multi-select.css" rel="stylesheet" />
     <link href="css/xeditable.css" rel="stylesheet" />
     <link href="css/ng-tags-input.min.css" rel="stylesheet" />
-
+    
     <!--library scripts-->
     <script src="js/vendor/jquery-1.10.2.min.js"></script>
     <script src="js/vendor/angular.js"></script>
@@ -36,7 +36,10 @@
     <script src="js/vendor/jquery.inputmask.js"></script>    
     <script src="//cdnjs.cloudflare.com/ajax/libs/angular-filter/0.4.7/angular-filter.js"></script>
     <script src="js/vendor/ng-tags-input.min.js"></script>
-   
+    <script src="//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script> <!-- used for the address find on site create page-->
+
+    <script src="js/vendor/ng-file-upload-all.min.js"></script> <!-- upload files to s3 -->
+    <script src="js/vendor/ng-file-upload.min.js"></script>
     <script src="js/vendor/checklist-model.js"></script><!--used as multiselect checkboxes on sensorType page-->
 
 
@@ -87,6 +90,14 @@
                         <!--<li><a style="color:#000" ui-sref="account({uID:userID})" ui-sref-active="active">Your account</a></li>
                         <li><a style="color:#000" ui-sref="help" ui-sref-active="active">FAQs/Help</a></li>-->
                     </ul>
+
+                    <div class="span6" style="text-align:center">
+                        <a ui-sref="site.info({id: 0})">
+                            <button class="btn btn-primary large">
+                                Create Site
+                            </button>
+                        </a>
+                    </div>
                 </div>
 
             </div>
