@@ -180,8 +180,8 @@
             $http.post(uploadUrl, fd, {
                 transformRequest: angular.identity,
                 headers: { 'Content-Type': undefined }
-            })
-        }
+            });
+        };
     }]);
 
     //#region HORIZONTAL_COLL_METHODS
@@ -270,8 +270,8 @@
             {}, {
                 query: {},
                 getAll: { method: 'GET', isArray: true, url: rootURL + '/Instruments/GetAll.json' },
-                getstatusInstruments: { method: 'GET', isArray: true, url: rootURL + '/Instruments.json/' },
-                getInstrumentStatusLog: {method: 'GET', isArray: true, url: rootURL + '/Instruments/:id/InstrumentStatusLog'},
+                getstatusInstruments: { method: 'GET', isArray: true, url: rootURL + '/Instruments.json/' }, //CurrentStatus: 1, Event: $scope.evID 
+                getInstrumentStatus: {method: 'GET', url: rootURL + '/Instruments/:id/InstrumentStatus.json'},
                 update: { method: 'PUT', cache: false, isArray: false },
                 save: { method: 'POST', cache: false, isArray: false },
                 delete: { method: 'DELETE', cache: false, isArray: false }
@@ -443,54 +443,6 @@
     }]);
     //#endregion of SENSOR_BRAND
 
-    //#region SITE
-    STNResource.factory('SITE', ['$resource', function ($resource) {
-        return $resource(rootURL + '/Sites/:id.json',
-            {}, {
-                query: {},
-                getAll: { method: 'GET', isArray: true },
-                getSiteLandOwner: { method: 'GET', url: rootURL + '/Sites/:id/LandOwner.json' },
-                getSiteNetworkTypes: { method: 'GET', isArray: true, url: rootURL + '/sites/:id/networkTypes.json' },
-                postSiteNetworkType: {method: 'POST', cache: false, isArray:true, url: rootURL + '/sites/:id/AddNetworkType'},
-                deleteSiteNetworkType: { method: 'POST', cache: false, isArray: false, url: rootURL + '/sites/:id/removeNetworkType' },
-                getSiteNetworkNames: { method: 'GET', isArray: true, url: rootURL + '/sites/:id/networkNames.json' },
-                postSiteNetworkName: { method: 'POST', cache: false, isArray: true, url: rootURL + '/sites/:id/AddNetworkName' },
-                deleteSiteNetworkName: { method: 'POST', cache: false, isArray: false, url: rootURL + '/sites/:id/removeNetworkName' },
-                getSiteHousings: { method: 'GET', isArray: true, url: rootURL + '/sites/:id/SiteHousings.json' },
-                postSiteHousing: {method: 'POST', cache: false, isArray:true, url: rootURL + '/site/:id/AddSiteSiteHousing'},
-                update: { method: 'PUT', cache: false, isArray: false },
-                save: { method: 'POST', cache: false, isArray: false },
-                delete: { method: 'DELETE', cache: false, isArray: false }
-            });
-    }]);
-    //#endregion of SITE
-
-    //#region STATE
-    STNResource.factory('STATE', ['$resource', function ($resource) {
-        return $resource(rootURL + '/States/:id.json',
-            {}, {
-                query: {},
-                getAll: { method: 'GET', isArray: true },
-                update: { method: 'PUT', cache: false, isArray: false },
-                save: { method: 'POST', cache: false, isArray: false },
-                delete: { method: 'DELETE', cache: false, isArray: false }
-            });
-    }]);
-    //#endregion of STATE
-
-    //#region STATUS_TYPE
-    STNResource.factory('STATUS_TYPE', ['$resource', function ($resource) {
-        return $resource(rootURL + '/StatusTypes/:id.json',
-            {}, {
-                query: {},
-                getAll: { method: 'GET', isArray: true },
-                update: { method: 'PUT', cache: false, isArray: false },
-                save: { method: 'POST', cache: false, isArray: false },
-                delete: { method: 'DELETE', cache: false, isArray: false }
-            });
-    }]);
-    //#endregion of STATUS_TYPE
-
     //#region SENSOR_DEPLOYMENT
     STNResource.factory('SENSOR_DEPLOYMENT', ['$resource', function ($resource) {
         return $resource(rootURL + '/SensorDeployments/:id.json',
@@ -520,9 +472,39 @@
     }]);
     //#endregion of SENSOR_TYPE
 
-    //#region SENSOR_BRAND
-    STNResource.factory('SENSOR_BRAND', ['$resource', function ($resource) {
-        return $resource(rootURL + '/SensorBrands/:id.json',
+    //#region SITE
+    STNResource.factory('SITE', ['$resource', function ($resource) {
+        return $resource(rootURL + '/Sites/:id.json',
+            {}, {
+                query: {},
+                getAll: { method: 'GET', isArray: true },
+                //landowner
+                getSiteLandOwner: { method: 'GET', url: rootURL + '/Sites/:id/LandOwner.json' },
+                //Site NetworkTypes
+                getSiteNetworkTypes: { method: 'GET', isArray: true, url: rootURL + '/sites/:id/networkTypes.json' },
+                postSiteNetworkType: {method: 'POST', cache: false, isArray:true, url: rootURL + '/sites/:id/AddNetworkType'},
+                deleteSiteNetworkType: { method: 'POST', cache: false, isArray: false, url: rootURL + '/sites/:id/removeNetworkType' },
+                //Site Network Names
+                getSiteNetworkNames: { method: 'GET', isArray: true, url: rootURL + '/sites/:id/networkNames.json' },
+                postSiteNetworkName: { method: 'POST', cache: false, isArray: true, url: rootURL + '/sites/:id/AddNetworkName' },
+                deleteSiteNetworkName: { method: 'POST', cache: false, isArray: false, url: rootURL + '/sites/:id/removeNetworkName' },
+                //Site Housings
+                getSiteHousings: { method: 'GET', isArray: true, url: rootURL + '/sites/:id/SiteHousings.json' },
+                postSiteHousing: {method: 'POST', cache: false, isArray:true, url: rootURL + '/site/:id/AddSiteSiteHousing.json'},
+                //Site Objective Points
+                getSiteOPs: { method: 'GET', isArray: true, url: rootURL + '/Sites/:id/ObjectivePoints.json' },
+                getSiteSensors: { method: 'GET', isArray: true, url: rootURL + '/Sites/:id/Instruments.json' },
+                //just the Site
+                update: { method: 'PUT', cache: false, isArray: false },
+                save: { method: 'POST', cache: false, isArray: false },
+                delete: { method: 'DELETE', cache: false, isArray: false }
+            });
+    }]);
+    //#endregion of SITE
+
+    //#region STATE
+    STNResource.factory('STATE', ['$resource', function ($resource) {
+        return $resource(rootURL + '/States/:id.json',
             {}, {
                 query: {},
                 getAll: { method: 'GET', isArray: true },
@@ -531,7 +513,7 @@
                 delete: { method: 'DELETE', cache: false, isArray: false }
             });
     }]);
-    //#endregion of SENSOR_BRAND
+    //#endregion of STATE
 
     //#region SITE_HOUSING
     STNResource.factory('SITE_HOUSING', ['$resource', function ($resource) {
@@ -545,7 +527,6 @@
             });
     }]);
     //#endregion of SITE_HOUSING
-
 
     //#region STATUS_TYPE
     STNResource.factory('STATUS_TYPE', ['$resource', function ($resource) {

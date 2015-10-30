@@ -6,7 +6,7 @@
 </style>
 <form class="form-horizontal" name="siteForm">
     <fieldset>
-        <legend>Site Information</legend>
+        <!--<legend>Site Information</legend>-->
         <!--Site Description*-->
         <div class="form-group required">
             <label class="col-md-3 control-label req" for="inputSITE_DESCRIPTION">Site Description:</label>
@@ -168,7 +168,7 @@
 
         <!--Site Housing section-->
         <div class="form-group">
-            <div style="padding:0" class="panel panel-default col-md-8 col-md-offset-1">
+            <div style="padding:0" class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Site Housing</h3>
                 </div>
@@ -288,7 +288,7 @@
             <div class="col-md-6">
                 <ul style="padding-left:0">
                     <li style="list-style:none;" ng-repeat="ps in ProposedSens">
-                        <input ng-disabled="disableSensorParts" type="checkbox" ng-model="ps.selected" ng-click="" ng-value="{{ps.selected}}" />
+                        <input ng-disabled="disableSensorParts" type="checkbox" ng-model="ps.selected" ng-value="{{ps.selected}}" />
                         <span>{{ps.METHOD}}</span>
                     </li>
                 </ul>
@@ -309,12 +309,13 @@
             <label class="col-md-3 control-label" for="inputLANDOWNERBTN">Landowner Contact:</label>
             <div class="col-md-6">
                 <button type="button" ng-click="showLandOwnerPart()" class="btn btn-primary">Add Landowner</button>
+               <!-- <button type="button" ng-click="collapseLandowner = !collapseLandowner" class="btn btn-primary">Add Landowner</button>-->
             </div>
         </div>
 
-        <!--start Landowner contact area-->
-        <div class="panel panel-default col-md-8 col-md-offset-1" style="padding:0" ng-show="addLandowner">
-            <div class="panel panel-default">
+        <!--start Landowner contact area -->
+        <div ng-show="addLandowner">
+            <div class="panel panel-default col-md-8 col-md-offset-1" style="padding:0">
                 <div class="panel-heading">Land Owner Information</div>
                 <div class="panel-body">
                     <!--First Name:-->
@@ -396,7 +397,7 @@
                 </div>
             </div>
         </div>
-        <br clear="all"/>
+        <br clear="all" />
         <!--end Landowner contact area-->
         <!--Access Permission Granted-->
         <div class="form-group">
