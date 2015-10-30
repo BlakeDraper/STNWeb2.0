@@ -1,0 +1,22 @@
+﻿<div class="panel panel-default" style="padding:0;margin:1em;">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            Sensors
+        </h3>
+    </div>
+    <div class="panel-body">
+        <div>Add Proposed Sensor:<button type="button" class="btn btn-default" ng-click="showProposed = !showProposed">+</button></div>
+        <div ng-show="showProposed">
+            <ul style="padding-left:0">
+                <li style="list-style:none;" ng-repeat="ps in deployTypeList">
+                    <input type="checkbox" ng-model="ps.selected" ng-click="" ng-value="{{ps.selected}}" />
+                    <span>{{ps.METHOD}}</span>
+                </li>
+            </ul>
+        </div>
+        <ul>
+            <li ng-repeat="s in SiteSensors">{{s.STATUS}}, {{s.INSTRUMENT_ID}}</li>
+        </ul>
+
+    </div>
+</div>

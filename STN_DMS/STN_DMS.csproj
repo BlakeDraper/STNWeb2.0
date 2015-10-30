@@ -79,6 +79,7 @@
     <Content Include="js\vendor\angular-sanitize.min.js.map" />
     <Content Include="js\vendor\angular-touch.min.js.map" />
     <Content Include="js\vendor\angular.min.js.map" />
+    <Content Include="js\vendor\angular.js" />
     <Content Include="js\vendor\checklist-model.js" />
     <Content Include="js\vendor\errors.json" />
     <Content Include="js\vendor\ng-tags-input.min.js" />
@@ -126,7 +127,6 @@
     <Content Include="js\vendor\angular-touch.js" />
     <Content Include="js\vendor\angular-touch.min.js" />
     <Content Include="js\vendor\angular-ui-router.js" />
-    <Content Include="js\vendor\angular.js" />
     <Content Include="js\vendor\angular.min.js" />
     <Content Include="js\vendor\bootstrap-multiselect.js" />
     <Content Include="js\vendor\bootstrap-table.js" />
@@ -189,8 +189,10 @@
     <Content Include="partials\homeBase.html" />
     <Content Include="partials\entryView.html" />
     <Content Include="partials\login.html" />
+    <Content Include="partials\Sites\siteOPList.html" />
     <Content Include="partials\Sites\Site.html" />
     <Content Include="partials\Sites\siteInfoView.html" />
+    <Content Include="partials\Sites\siteSensorList.html" />
     <Content Include="scripts\FileAPI.flash.swf" />
     <Content Include="scripts\FileAPI.js" />
     <Content Include="scripts\FileAPI.min.js" />

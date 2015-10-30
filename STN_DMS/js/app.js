@@ -4,27 +4,20 @@
         ['ngResource', 'ui.router', 'ngCookies', 'ui.mask', 'ui.bootstrap', 'isteven-multi-select',
             'STNResource', 'STNControllers', 'STNBusinessServices']);
     
-    app.run(function ($rootScope, $location, getUserRole, getUserID) {
-        
-        $rootScope
-            .$on('$stateChangeStart',
-                function (event, toState, toParams, fromState, fromParams) {
-                    
-                    $("#ui-view").html("");
-                    $(".page-loading").removeClass("hidden");
+    app.run(function ($rootScope) {        
+        $rootScope.$on('$stateChangeStart', function (event, toState) {
+            $("#ui-view").html("");
+            $(".page-loading").removeClass("hidden");
+            //check to see if they are going to project info
+            if (toState.url == "/") {
+                //make username focus
+                $("#userNameFocus").focus();
+            }
+        });
 
-                    //check to see if they are going to project info
-                    if (toState.url == "/") {
-                        //make username focus
-                        $("#userNameFocus").focus();
-                    };
-                });
-
-        $rootScope
-            .$on('$stateChangeSuccess',
-                function (event, toState, toParams, fromState, fromParams) {
-                    $(".page-loading").addClass("hidden");
-                });
+        $rootScope.$on('$stateChangeSuccess', function () {
+            $(".page-loading").addClass("hidden");
+        });
     });
 
     //app.config(function that defines the config code. 'ui.select', 'ngSanitize',
@@ -144,6 +137,7 @@
                 })
                 //#endregion
 
+                //#region reporting
                 //#region reporting (abstract)
                 .state("reporting", {
                     url: "/Reporting",
@@ -163,8 +157,8 @@
                         allReports: function (r) {
                             return r.getAll().$promise;
                         },
-                        et: 'EVENT_TYPE', 
-                        allEventTypes: function(et) {
+                        et: 'EVENT_TYPE',
+                        allEventTypes: function (et) {
                             return et.getAll().$promise;
                         },
                         es: 'EVENT_STATUS',
@@ -175,11 +169,11 @@
                         allAgencies: function (ag) {
                             return ag.getAll().$promise;
                         },
-                        incompleteReports: function (r, getUserID, $http, getCreds) {
+                        incompleteReports: function (r, getUserID) {
                             var mID = getUserID();
                             return r.getMemberReports({ memberId: mID }).$promise;
                         }
-                    }                        
+                    }
                 })
                 //#endregion reporting (abstract)
 
@@ -207,17 +201,19 @@
                 //#region reporting.GenerateReport
                 .state("reporting.generateReport", {
                     url: "/GenerateReport",
-                    templateUrl: "partials/Reporting/generateReport.html"                    
+                    templateUrl: "partials/Reporting/generateReport.html"
                 })//#endregion reporting.GenerateReport
-          
+                //#endregion reporting
+
                 //#region settings 
                 .state("settings", {
-                    url: "/Settings",                    
+                    url: "/Settings",
                     templateUrl: "partials/Settings.html",
                     controller: "SettingsCtrl"
                 })
                 //#endregion settings
-                
+
+                //#region members
                 //#region members (abstract)
                 .state("members", {
                     url: "/Members",
@@ -226,16 +222,16 @@
                     controller: "memberCtrl",
                     resolve: {
                         r: 'ROLE',
-                        allRoles: function(r){
+                        allRoles: function (r) {
                             return r.getAll().$promise;
                         },
                         a: 'AGENCY',
-                        allAgencies: function(a){
+                        allAgencies: function (a) {
                             return a.getAll().$promise;
                         }
                     }
                 })//#endregion members
-                
+
                 //#region members.MembersList
                 .state("members.MembersList", {
                     url: "/MembersList",
@@ -250,7 +246,7 @@
                     controller: "memberInfoCtrl",
                     resolve: {
                         m: 'MEMBER',
-                        thisMember: function (m, $stateParams, $http, getCreds) {                           
+                        thisMember: function (m, $stateParams, $http, getCreds) {
                             var memberId = $stateParams.id;
                             if (memberId > 0) {
                                 $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
@@ -261,7 +257,9 @@
                         }
                     }
                 })//#endregion members.MemberInfo
+                //#endregion members
 
+                //#region events
                 //#region events
                 .state("events", {
                     url: "/Events",
@@ -270,7 +268,7 @@
                     controller: "eventCtrl",
                     resolve: {
                         e: 'EVENT',
-                        allEvents: function (e) { 
+                        allEvents: function (e) {
                             return e.getAll().$promise;
                         },
                         et: 'EVENT_TYPE',
@@ -280,10 +278,10 @@
                         es: 'EVENT_STATUS',
                         allEventStats: function (es) {
                             return es.getAll().$promise;
-                        }                       
+                        }
                     }
                 })//#endregion events
-                
+
                 //#region events.EventsList
                 .state("events.EventsList", {
                     url: "/EventsList",
@@ -307,7 +305,9 @@
                         }
                     }
                 })//#endregion events.EventInfo
+                //#endregion events
 
+                //#region resources
                 //#region resources
                 .state("resources", {
                     url: "/Resources",
@@ -330,7 +330,7 @@
                         d: 'DEPLOYMENT_PRIORITY',
                         allDeployPriorities: function (d) {
                             return d.getAll().$promise;
-                        },                        
+                        },
                         es: 'EVENT_STATUS',
                         allEventStats: function (es) {
                             return es.getAll().$promise;
@@ -354,7 +354,7 @@
                         ht: 'HOUSING_TYPE',
                         allHouseTypes: function (ht) {
                             return ht.getAll().$promise;
-                        },                        
+                        },
                         hq: 'HWM_QUALITY',
                         allHWMqualities: function (hq) {
                             return hq.getAll().$promise;
@@ -372,23 +372,23 @@
                             return m.getAll().$promise;
                         },
                         nn: 'NETWORK_NAME',
-                        allNetworkNames: function(nn) {
+                        allNetworkNames: function (nn) {
                             return nn.getAll().$promise;
                         },
                         opq: 'OP_QUALITY',
-                        allObjPtQualities: function(opq) {
+                        allObjPtQualities: function (opq) {
                             return opq.getAll().$promise;
                         },
                         opt: 'OP_TYPE',
-                        allObjPtTypes: function(opt) {
+                        allObjPtTypes: function (opt) {
                             return opt.getAll().$promise;
                         },
                         sb: 'SENSOR_BRAND',
-                        allSensorBrands: function(sb) {
+                        allSensorBrands: function (sb) {
                             return sb.getAll().$promise;
                         },
                         dt: 'DEPLOYMENT_TYPE',
-                        allDeploymentTypes: function(dt) {
+                        allDeploymentTypes: function (dt) {
                             return dt.getAll().$promise;
                         },
                         sstat: 'STATUS_TYPE',
@@ -396,19 +396,19 @@
                             return sstat.getAll().$promise;
                         },
                         st: 'SENSOR_TYPE',
-                        allSensorTypes: function(st) {
+                        allSensorTypes: function (st) {
                             return st.getAll().$promise;
                         },
                         nt: 'NETWORK_TYPE',
-                        allNetworkTypes: function(nt) {
+                        allNetworkTypes: function (nt) {
                             return nt.getAll().$promise;
                         },
                         vcm: 'VERTICAL_COLL_METHOD',
-                        allVerticalCollMethods: function(vcm) {
+                        allVerticalCollMethods: function (vcm) {
                             return vcm.getAll().$promise;
                         },
                         vd: 'VERTICAL_DATUM',
-                        allVerticalDatums: function(vd) {
+                        allVerticalDatums: function (vd) {
                             return vd.getAll().$promise;
                         }
                     }
@@ -428,7 +428,7 @@
                     templateUrl: "partials/Resources/PageContent/Agency.html"
                 })
                 //#endregion resources.ResourcesList.agency
-   
+
                 //#region resources.ResourcesList.ContactType
                 .state("resources.ResourcesList.ContactType", {
                     url: "/ContactTypes",
@@ -442,7 +442,7 @@
                     templateUrl: "partials/Resources/PageContent/DepPriority.html"
                 })
                 //#endregion resources.ResourcesList.DepPriority
-                
+
                 //#region resources.ResourcesList.EventStatus
                 .state("resources.ResourcesList.EventStatus", {
                     url: "/EventStatus",
@@ -470,7 +470,7 @@
                     templateUrl: "partials/Resources/PageContent/HorCollMethd.html"
                 })
                 //#endregion resources.ResourcesList.HorCollMethd
-        
+
                 //#region resources.ResourcesList.HorDatum
                 .state("resources.ResourcesList.HorDatum", {
                     url: "/HorizontalDatums",
@@ -484,21 +484,21 @@
                     templateUrl: "partials/Resources/PageContent/HousingType.html"
                 })
                 //#endregion resources.ResourcesList.HousingType
-                
+
                 //#region resources.ResourcesList.HWMQual
                 .state("resources.ResourcesList.HWMQual", {
                     url: "/HWMQualities",
                     templateUrl: "partials/Resources/PageContent/HWMQual.html"
                 })
                 //#endregion resources.ResourcesList.HWMQual
-                
+
                 //#region resources.ResourcesList.HWMType
                 .state("resources.ResourcesList.HWMType", {
                     url: "/HWMTypes",
                     templateUrl: "partials/Resources/PageContent/HWMType.html"
                 })
                 //#endregion resources.ResourcesList.HWMType
-                
+
                 //#region resources.ResourcesList.InstrCollCondition
                 .state("resources.ResourcesList.InstrCollCondition", {
                     url: "/InstrCollConditions",
@@ -512,14 +512,14 @@
                     templateUrl: "partials/Resources/PageContent/Marker.html"
                 })
                 //#endregion resources.ResourcesList.Marker
-                
+
                 //#region resources.ResourcesList.NetworkNames
                 .state("resources.ResourcesList.NetworkNames", {
                     url: "/NetworkNames",
                     templateUrl: "partials/Resources/PageContent/NetworkNames.html"
                 })
                 //#endregion resources.ResourcesList.NetworkNames
-                 
+
                 //#region resources.ResourcesList.OPquality
                 .state("resources.ResourcesList.OPquality", {
                     url: "/ObjPointQualities",
@@ -533,7 +533,7 @@
                     templateUrl: "partials/Resources/PageContent/OPType.html"
                 })
                 //#endregion resources.ResourcesList.OPType
-        
+
                 //#region resources.ResourcesList.SensorBrand
                 .state("resources.ResourcesList.SensorBrand", {
                     url: "/SensorBrands",
@@ -547,21 +547,21 @@
                     templateUrl: "partials/Resources/PageContent/DepType.html"
                 })
                 //#endregion resources.ResourcesList.DepType
-                
+
                 //#region resources.ResourcesList.StatusType
                 .state("resources.ResourcesList.StatusType", {
                     url: "/StatusTypes",
                     templateUrl: "partials/Resources/PageContent/StatusType.html"
                 })
                 //#endregion resources.ResourcesList.StatusType
-                
+
                 //#region resources.ResourcesList.SensorType
                 .state("resources.ResourcesList.SensorType", {
                     url: "/SensorTypes",
                     templateUrl: "partials/Resources/PageContent/SensorType.html"
                 })
                 //#endregion resources.ResourcesList.SensorType
-                
+
                 //#region resources.ResourcesList.NetworkType
                 .state("resources.ResourcesList.NetworkType", {
                     url: "/NetworkTypes",
@@ -575,43 +575,56 @@
                     templateUrl: "partials/Resources/PageContent/VertCollMethod.html"
                 })
                 //#endregion resources.ResourcesList.VertCollMethod
-                
+
                 //#region resources.ResourcesList.VertDatum
                 .state("resources.ResourcesList.VertDatum", {
                     url: "/VerticalDatums",
                     templateUrl: "partials/Resources/PageContent/VertDatum.html"
                 })
             //#endregion resources.ResourcesList.VertDatum
-                 
+
                 //#endregion all lookup htmls
-                
+                //#endregion resources
+
                 //#region site (abstract)
                 .state("site", {
                     url: "/Site/:id",
                     abstract: true,
                     templateUrl: "partials/Sites/Site.html",
-                    controller: "SiteCtrl",
+                    controller: function ($scope, $stateParams) {
+                        $scope.siteID = $stateParams.id;
+                    },
                     resolve: {
                         //#region site stuff
                         s: 'SITE',
                         thisSite: function (s, $stateParams) {
                             if ($stateParams.id > 0) {
-                                return s.query({id: $stateParams.id}).$promise;
+                                return s.query({ id: $stateParams.id }).$promise;
                             }
                         },
-                        thisSiteNetworkNames: function (s, $stateParams){
+                        thisSiteNetworkNames: function (s, $stateParams) {
                             if ($stateParams.id > 0) {
-                                return s.getSiteNetworkNames({id: $stateParams.id}).$promise;
+                                return s.getSiteNetworkNames({ id: $stateParams.id }).$promise;
                             }
                         },
-                        thisSiteNetworkTypes: function (s, $stateParams){
+                        thisSiteNetworkTypes: function (s, $stateParams) {
                             if ($stateParams.id > 0) {
-                                return s.getSiteNetworkTypes({id: $stateParams.id}).$promise;
+                                return s.getSiteNetworkTypes({ id: $stateParams.id }).$promise;
                             }
                         },
-                        thisSiteHousings: function (s, $stateParams){
+                        thisSiteHousings: function (s, $stateParams) {
                             if ($stateParams.id > 0) {
                                 return s.getSiteHousings({ id: $stateParams.id }).$promise;
+                            }
+                        },
+                        thisSiteOPs: function (s, $stateParams) {
+                            if ($stateParams.id > 0) {
+                                return s.getSiteOPs({ id: $stateParams.id }).$promise;
+                            }
+                        },
+                        thisSiteSensors: function (s, $stateParams) {
+                            if ($stateParams.id > 0) {
+                                return s.getSiteSensors({ id: $stateParams.id }).$promise;
                             }
                         },
                         hd: 'HORIZONTAL_DATUM',
@@ -647,15 +660,15 @@
                             return dt.getAll().$promise;
                         },
                         sd: 'SENSOR_DEPLOYMENT',
-                        allSensDeps: function (sd){
+                        allSensDeps: function (sd) {
                             return sd.getAll().$promise;
                         },
                         dp: 'DEPLOYMENT_PRIORITY',
                         allDeployPriorities: function (dp) {
                             return dp.getAll().$promise;
-                        }//,
+                        },
                         //#endregion site stuff
-                   /*     //#region op stuff
+                        //#region op stuff                        
                         opt: 'OP_TYPE',
                         allOPTypes: function (opt) {
                             return opt.getAll().$promise;
@@ -665,8 +678,8 @@
                             return vertDats.getAll().$promise;
                         },
                         vertColMet: 'VERTICAL_COLL_METHOD',
-                        allVertColMethods: function (vertCoMet) {
-                            return vertCoMet.getAll().$promise;
+                        allVertColMethods: function (vertColMet) {
+                            return vertColMet.getAll().$promise;
                         },
                         opQual: 'OP_QUALITY',
                         allOPQualities: function (opQual) {
@@ -674,105 +687,122 @@
                         },
                         //#endregion op stuff
                         //#region sensor stuff
-                        e: 'EVENT',
+                        /*e: 'EVENT',
                         allEvents: function (e) {
                             return e.getAll().$promise;
                         },
                         sent: 'SENSOR_TYPE',
                         allSensorTypes: function (sent) {
                             return sent.getAll().$promise;
-                        },
-                        sb: 'SENSOR_BRAND',
-                        allSensorBrands: function (sb){
-                            return sb.getAll().$promise;
-                        },                       
+                        },*/
+                        statT: 'STATUS_TYPE',
+                        allStatusTypes: function (statT) {
+                            return statT.getAll().$promise;
+                        }//,
+                        //sb: 'SENSOR_BRAND',
+                        //allSensorBrands: function (sb){
+                        //    return sb.getAll().$promise;
+                        //}//,                       
                         //#endregion sensor stuff
                         //#region hwm stuff
-                        hwmt: 'HWM_TYPE',
-                        allHWMTypes: function (hwmt) {
-                            return hwmt.getAll().$promise;
-                        },
-                        hq: 'HWM_QUALITY',
-                        allHWMQualities: function (hq){
-                            return hq.getAll().$promise;
-                        },
-                        m: 'MARKER',
-                        allMarkers: function (m){
-                            return m.getAll().$promise;
-                        }, 
+                        //hwmt: 'HWM_TYPE',
+                        //allHWMTypes: function (hwmt) {
+                        //    return hwmt.getAll().$promise;
+                        //},
+                        //hq: 'HWM_QUALITY',
+                        //allHWMQualities: function (hq){
+                        //    return hq.getAll().$promise;
+                        //},
+                        //m: 'MARKER',
+                        //allMarkers: function (m){
+                        //    return m.getAll().$promise;
+                        //}, 
                         //#endregion hwm stuff
                         //#region file
-                        ft: 'FILE_TYPE',
-                        allFileTypes: function(ft){
-                            return ft.getAll().$promise;
-                        },
-                        a: 'AGENCY',
-                        allAgencies: function(a){
-                            return a.getAll().$promise;
-                        }
-                        //#endregion file*/
+                        /*   ft: 'FILE_TYPE',
+                           allFileTypes: function(ft){
+                               return ft.getAll().$promise;
+                           },
+                           a: 'AGENCY',
+                           allAgencies: function(a){
+                               return a.getAll().$promise;
+                           }*/
+                           //#endregion file
                     }
                 })
                 //#endregion site (abstract)
 
                 //#region site.info
-                .state("site.info", {
-                    url: "/Details",
-                    templateUrl: "partials/Sites/siteInfoView.html"                    
-                })//#endregion site.info
-
-                //#region site.OP
-                .state("site.OP", {
-                    url: "/ObjectivePoint/:id",
-                    templateUrl: "partials/Sites/siteOPView.html",
-                    controller: "ObjectivePointCtrl",
-                    resolve: {
-                        op: 'OBJECTIVE_POINT',
-                        thisOP: function (op, $stateParams){
-                            if ($stateParams.id > 0) {
-                                return op.query({id: $stateParams.id}).$promise;
-                            }
+                .state("site.dashboard", {
+                    url: "/SiteDashboard",
+                    views: {
+                        'aSite': {
+                            controller: 'SiteCtrl',
+                            templateUrl: 'partials/Sites/siteInfoView.html'
+                        },
+                        'op': {
+                            controller: 'ObjectivePointCtrl',
+                            templateUrl: 'partials/Sites/siteOPList.html'
+                        },
+                        'sensor': {
+                            controller: 'SensorCtrl',
+                            templateUrl: 'partials/Sites/siteSensorList.html'
                         }
                     }
-                })
+                });//#endregion site.info
+
+                //#region site.OP
+                //.state("site.OP", {
+                //    url: "/ObjectivePoint/:id",
+                //    templateUrl: "partials/Sites/siteOPView.html",
+                //    controller: "ObjectivePointCtrl",
+                //    resolve: {
+                //        op: 'OBJECTIVE_POINT',
+                //        thisOP: function (op, $stateParams){
+                //            if ($stateParams.id > 0) {
+                //                return op.query({id: $stateParams.id}).$promise;
+                //            }
+                //        }
+                //    }
+                //})
                 //#endregion site.OP
         
                 //#region site.Sensor
-                .state("site.Sensor", {
-                    url: "/Sensor/:id",
-                    templateUrl: "partials/Sites/siteSensorView.html",
-                    controller: "SensorCtrl",
-                    resolve: {
-                        ins: 'INSTRUMENT',
-                        thisInstrument: function (inst, $stateParams){
-                            if ($stateParams.id > 0) {
-                                return inst.query({id: $stateParams.id}).$promise;
-                            }
-                        },
-                        instStat: 'INSTRUMENT_STATUS',
-                        theseInstruStats: function (instStat, $stateParams) {
-                            if ($stateParams.id > 0) {
-                                instStat.getInstrumentStatusLog({id: $stateParams.id}).$promise;
-                            }
-                        }
-                    }
-                })
+                //.state("site.Sensor", {
+                //    url: "/Sensor/:id",
+                //    templateUrl: "partials/Sites/siteSensorView.html",
+                //    controller: "SensorCtrl",
+                //    resolve: {
+                //        ins: 'INSTRUMENT',
+                //        thisInstrument: function (inst, $stateParams){
+                //            if ($stateParams.id > 0) {
+                //                return inst.query({id: $stateParams.id}).$promise;
+                //            }
+                //        },
+                //        instStat: 'INSTRUMENT_STATUS',
+                //        theseInstruStats: function (instStat, $stateParams) {
+                //            if ($stateParams.id > 0) {
+                //                instStat.getInstrumentStatusLog({id: $stateParams.id}).$promise;
+                //            }
+                //        }
+                //    }
+                //})
                 //#endregion site.Sensor
 
                 //#region site.HWM
-                .state("site.HWM", {
-                    url: "/HWM/:id",
-                    templateUrl: "partials/Sites/siteHWMView.html",
-                    controller: "HWMCtrl",
-                    resolve: {
-                        hwm: 'HWM',
-                        thisHWM: function (hwm, $stateParams){
-                            if ($stateParams.id > 0) {
-                                return hwm.query({id: $stateParams.id}).$promise;
-                            }
-                        }
-                    }
-                })
+                //.state("site.HWM", {
+                //    url: "/HWM/:id",
+                //    templateUrl: "partials/Sites/siteHWMView.html",
+                //    controller: "HWMCtrl",
+                //    resolve: {
+                //        hwm: 'HWM',
+                //        thisHWM: function (hwm, $stateParams){
+                //            if ($stateParams.id > 0) {
+                //                return hwm.query({id: $stateParams.id}).$promise;
+                //            }
+                //        }
+                //    }
+                //})
                 //#endregion site.HWM
 
                 

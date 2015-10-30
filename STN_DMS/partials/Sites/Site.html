@@ -1,1 +1,208 @@
-﻿<div ui-view></div>
+﻿<div><h2 style="margin-top:0">Site Dashboard</h2></div>
+<hr />
+<div class="col-md-8">
+    <div ui-view="aSite"></div>
+</div>
+<div ng-if="siteID > 0">
+    <div class="col-md-4">
+        <div ui-view="op"></div>
+        <div ui-view="sensor"></div>
+    </div>
+</div>
+
+<!-- MODALs for Objective Point-->
+<script type="text/ng-template" id="OPmodal.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Objective Point</h3>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal" name="OPForm">
+            <fieldset>
+
+                <div class="form-group required" ng-class="{'has-error':OPForm.OP_TYPE_ID.$invalid && OPForm.OP_TYPE_ID.$dirty}">
+                    <label class="col-md-3 control-label req" for="inputOP_TYPE_ID">Type:</label>
+                    <div class="col-md-6">
+                        <select class="form-control" id="inputOP_TYPE_ID" name="OP_TYPE_ID" ng-model="OP.OP_TYPE_ID"
+                                ng-options="opt.OBJECTIVE_POINT_TYPE_ID as opt.OP_TYPE for opt in OPTypeList" required>
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group required" ng-class="{'has-error':OPForm.NAME.$invalid && OPForm.NAME.$dirty}">
+                    <label class="col-md-3 control-label req" for="inputNAME">Name:</label>
+                    <div class="col-md-6">
+                        <input class="form-control" id="inputNAME" name="NAME" ng-model="OP.NAME" type="text" required />
+                    </div>
+                </div>
+
+                <div class="form-group required" ng-class="{'has-error':OPForm.DESCRIPTION.$invalid && OPForm.DESCRIPTION.$dirty}">
+                    <label class="col-md-3 control-label req" for="inputDESCRIPTION">Description:</label>
+                    <div class="col-md-6">
+                        <textarea class="form-control" id="inputDESCRIPTION" type="text" rows="3" ng-model="OP.DESCRIPTION" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="inputCONTROL">Control Identifier:</label>
+                    <div class="col-md-6">
+                        <button class="btn btn-default" ng-click="showControlIDinput= !showControlIDinput">Add New Identifier</button>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="showControlIDinput">
+                    <label class="col-md-3 control-label">""</label>
+                    <div class="col-md-6">
+                        <input class="form-control" id="inputOPControl" name="OPControl" ng-model="OP.CONTROLID" type="text" />
+                        <label class="radio-inline">
+                            <input type="radio" name="CONTROLID" ng-model="OP.ACCESS_GRANTED" value="PID" /> PID
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="CONTROLID" ng-model="OP.ACCESS_GRANTED" value="Other" /> Other
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="inputLATITUDE_DD">Latitude:</label>
+                    <div class="col-md-6">
+                        <input class="form-control" ng-keypress="isNum($event)" name="LATITUDE_DD" id="inputLATITUDE_DD" ng-model="OP.LATITUDE_DD" type="text" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="inputLONGITUDE_DD">Longitude:</label>
+                    <div class="col-md-6">
+                        <input class="form-control" ng-keypress="isNum($event)" id="inputlongitude_dd" name="LONGITUDE_DD" ng-model="OP.LONGITUDE_DD" type="text" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="inputHDATUM_ID">Horizontal Datum:</label>
+                    <div class="col-md-6">
+                        <select class="form-control" id="inputHDATUM_ID" name="HDATUM_ID" ng-model="OP.HDATUM_ID"
+                                ng-options="hd.DATUM_ID as hd.DATUM_NAME for hd in HDList">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="inputHCOLLECT_METHOD_ID">Horizontal Collection Method:</label>
+                    <div class="col-md-6">
+                        <select class="form-control" id="inputHCOLLECT_METHOD_ID" name="HCOLLECT_METHOD_ID" ng-model="OP.HCOLLECT_METHOD_ID"
+                                ng-options="hcm.HCOLLECT_METHOD_ID as hcm.HCOLLECT_METHOD for hcm in HCollectMethodList">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label">""</label>
+                    <div class="col-md-6">                        
+                        <label class="radio-inline">
+                            <input type="radio" name="FTorMETER" ng-model="OP.FTorMETER" value="ft" /> ft
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="FTorMETER" ng-model="OP.FTorMETER" value="meter" /> meter
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="inputELEV_FT">Elevation:</label>
+                    <div class="col-md-6">
+                        <input class="form-control" ng-keypress="isNum($event)" id="ELEV_FT" name="ELEV_FT" ng-model="OP.ELEV_FT" type="text" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="inputVDATUM_ID">Vertical Datum:</label>
+                    <div class="col-md-6">
+                        <select class="form-control" id="inputVDATUM_ID" name="VDATUM_ID" ng-model="OP.VDATUM_ID"
+                                ng-options="vd.DATUM_ID as vd.DATUM_ABBREVIATION for vd in VDatumList">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="inputVCOLLECT_METHOD_ID">Vertical Collection Method:</label>
+                    <div class="col-md-6">
+                        <select class="form-control" id="inputVCOLLECT_METHOD_ID" name="VCOLLECT_METHOD_ID" ng-model="OP.VCOLLECT_METHOD_ID"
+                                ng-options="vcm.VCOLLECT_METHOD_ID as vcm.VCOLLECT_METHOD for vcm in VCollectMethodList">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label">""</label>
+                    <div class="col-md-6">
+                        <label class="radio-inline">
+                            <input type="radio" name="FTorCM" ng-model="OP.FTorCM" value="ft" /> +/-ft
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="FTorCM" ng-model="OP.FTorCM" value="meter" /> +/- cm
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="inputUNCERTAINTY">Uncertainty:</label>
+                    <div class="col-md-6">
+                        <input class="form-control" ng-keypress="isNum($event)" id="UNCERTAINTY" name="UNCERTAINTY" ng-model="OP.UNCERTAINTY" type="text" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="inputOP_QUALITY_ID">Quality:</label>
+                    <div class="col-md-6">
+                        <select class="form-control" id="inputOP_QUALITY_ID" name="OP_QUALITY_ID" ng-model="OP.OP_QUALITY_ID"
+                                ng-options="opq.OP_QUALITY_ID as opq.QUALITY for opq in OPQualityList">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="inputOP_NOTES">Objective Point Notes:</label>
+                    <div class="col-md-6">
+                        <textarea class="form-control" id="inputOP_NOTES" type="text" rows="3" ng-model="OP.OP_NOTES" required />
+                    </div>
+                </div>
+
+                <div class="form-group required">
+                    <label class="col-md-3 control-label req" for="inputDATE_ESTABLISHED">Date Established:</label>
+                    <div class="col-md-6 input-group">
+                        <input datepicker-append-to-body="true" class="form-control" id="inputDATE_ESTABLISHED" name="de" type="text" datepicker-popup="MMMM dd, yyyy"
+                               is-open="datepickrs.de" ng-model="OP.DATE_ESTABLISHED" required />
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" ng-click="open($event, 'de')">
+                                <i class="glyphicon glyphicon-calendar" />
+                            </button>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="inputDATE_RECOVERED">Date Established:</label>
+                    <div class="col-md-6 input-group">
+                        <input datepicker-append-to-body="true" class="form-control" id="inputDATE_RECOVERED" name="dr" type="text" datepicker-popup="MMMM dd, yyyy"
+                               is-open="datepickrs.dr" ng-model="OP.DATE_RECOVERED" required />
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" ng-click="open($event, 'dr')">
+                                <i class="glyphicon glyphicon-calendar" />
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">OK</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    </div>
+</script>

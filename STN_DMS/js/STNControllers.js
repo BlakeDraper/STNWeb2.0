@@ -92,13 +92,13 @@
                 //remove the default formatter from the input directive to prevent conflict
                 controller.$formatters.shift();
             }
-        }
+        };
     });
     
     STNControllers.directive('focus', function () {
         return function (scope, element, attributes) {
             element[0].focus();
-        }
+        };
     });
 
     STNControllers.directive('backButton', function () {
@@ -112,7 +112,7 @@
                     scope.$apply();
                 }
             }
-        }
+        };
     });
 
     //validate password
@@ -142,7 +142,7 @@
                 });
             }
         };
-    }])
+    }]);
 
     STNControllers.directive('sameAs', function ($parse) {
         return {
@@ -212,7 +212,7 @@
                     // or scope[attrs.ngModel] = el.val() if your expression doesn't contain dot.
                 });
             }
-        }
+        };
     });
     
     //bind file upload file to a model scope var
@@ -223,13 +223,13 @@
                 var model = $parse(attrs.fileModel);
                 var modelSetter = model.assign;
 
-                element.bind('change', function() {
-                    scope.$apply(function() {
+                element.bind('change', function () {
+                    scope.$apply(function () {
                         modelSetter(scope, element[0].files[0]);
-                    })
-                })
-            }   
-        }
+                    });
+                });
+            }
+        };
     }]);
 
     //STNControllers.directive('datetimez', function () {
@@ -285,7 +285,7 @@
             deleteCreds();
             $rootScope.isAuth.val = false;
             $location.path('/login');
-        }
+        };
     }
     //#endregion NAV Controller
 
@@ -327,14 +327,14 @@
 
                         $scope.CollectTeams = data;
                         $scope.teamsBack = true;
-                       
+
                     }, function error(errorResponse) {
                         alert("Error: " + errorResponse.statusText);
                     }).$promise;
                     $scope.ShowEventCounts = true;
                     $(".page-loading").addClass("hidden");
                 }
-            }
+            };
 
             //event was chosen
             $scope.EventChosen = function () {
@@ -350,7 +350,7 @@
                 //set event to session cookie
                 $scope.evID = this.ChooseEvent.id;
                 var eventName = $scope.allEvents.filter(function (x) { return x.EVENT_ID == $scope.evID; })[0];
-                setSessionEvent($scope.evID,eventName.EVENT_NAME);
+                setSessionEvent($scope.evID, eventName.EVENT_NAME);
                 $rootScope.sessionEvent = "For Event: " + eventName.EVENT_NAME + ".";
 
                 //get all the instrument stat counts
@@ -400,8 +400,8 @@
                     alert("Error: " + errorResponse.statusText);
                 }).$promise;
 
-               
-            }//end of EventChosen
+
+            };//end of EventChosen
 
             $scope.teamClick = function (t) {
                 //remove selected from all but this one (only 1 radio button selected at a time)
@@ -413,7 +413,7 @@
                 setSessionTeam(this.t.COLLECT_TEAM_ID, this.t.DESCRIPTION);
 
                 $rootScope.sessionTeam = "You are on Team: " + this.t.DESCRIPTION + ".";
-            }   
+            };
 
             //view details of this team
             $scope.showTeamMembers = function (t) {
@@ -424,7 +424,7 @@
                         member.agency = $scope.allAgencies.filter(function (a) { return a.AGENCY_ID == member.AGENCY_ID; })[0].AGENCY_NAME;
                         member.role = $scope.allRoles.filter(function (r) { return r.ROLE_ID == member.ROLE_ID; })[0].ROLE_NAME;
                         fullMemberInfoList.push(member);
-                    };
+                    }
                     openModalInstance(fullMemberInfoList);
                 });
 
@@ -460,7 +460,7 @@
                 MEMBER.getAll().$promise.then(function (response) {
                     for (var x = 0; x < response.length; x++) {
                         response.selected = false;
-                    };
+                    }
                     $scope.memberList = response;
                     var modalInstance = $modal.open({
                         templateUrl: 'NewTeamCreate.html',
@@ -476,11 +476,11 @@
                             $scope.newTeam = {};
                             $scope.loadMembers = function (query) {
                                 return $http.get('members.json');
-                            }
+                            };
                             $scope.CreateTeam = function () {
-                                $modalInstance.close($scope.newTeam)
-                            }
-                            
+                                $modalInstance.close($scope.newTeam);
+                            };
+
                             $scope.cancel = function () {
                                 $modalInstance.dismiss('cancel');
                             };
@@ -503,7 +503,7 @@
                             //add the logged in member to list of team members
                             var loggedInMember = $scope.memberList.filter(function (m) { return m.MEMBER_ID == getUserID(); })[0];
                             newCreateTeam.MEMBER_WITH.push(loggedInMember);
-                            
+
                             for (var m = 0; m < newCreateTeam.MEMBER_WITH.length; m++) {
                                 //remove selected prop
                                 delete newCreateTeam.MEMBER_WITH[m].selected;
@@ -515,7 +515,7 @@
                                         alert("Error adding Member to Team: " + errorResponse.statusText);
                                     }
                                 );//end addMember
-                            };//end foreach post member                            
+                            }//end foreach post member                            
                         }, function (errorResponse) {
                             toast.error("Error creating Team: " + errorResponse.statusText);
                         });//end then
@@ -523,7 +523,7 @@
                     //end modal
                 });
 
-            }
+            };
         }//end good to go
     }
     //#endregion Home Controller
@@ -540,7 +540,7 @@
     }
     //#endregion Map Controller
 
-    //#region Map Controller
+    //#region File Controller
     STNControllers.controller('FileCtrl', ['$scope', '$location', 'Upload', 'multipartForm', 'checkCreds', 'getUserID', 'getUsersNAME', 'fileTypeList', 'agencyList', FileCtrl]);
     function FileCtrl($scope, $location, Upload, multipartForm, checkCreds, getUserID, getUsersNAME, fileTypeList, agencyList) {
         if (!checkCreds()) {
@@ -560,7 +560,7 @@
             $scope.datepickrs = {
                 projStDate: false,
                 projEndDate: false
-            }
+            };
             $scope.open = function ($event, which) {
                 $event.preventDefault();
                 $event.stopPropagation();
@@ -572,7 +572,7 @@
 
             $scope.fileTypeChange = function () {
                 $scope.fileType = $scope.aFile.FILETYPE_ID;
-            }
+            };
 
             //  lat/long =is number
             $scope.isNum = function (evt) {
@@ -593,7 +593,7 @@
                     $scope.toggleCaptionPreview = true;
                     $scope.photoCaption = "This is the photo caption.";
                 }
-            }
+            };
 
             $scope.zones = [{ name: 'UTC' }, { name: 'PST' }, { name: 'MST' }, { name: 'CST' }, { name: 'EST' }];
             $scope.elevationStats = {};
@@ -621,14 +621,14 @@
 
                     //getCreds() before post https://www.youtube.com/watch?v=vLHgpOG1cW4
                     multipartForm.post(fileParts);
-                    
+
                 }
-            }
+            };
             
 
         }
     }
-    //#endregion Map Controller
+    //#endregion File Controller
 
     //#region Approval Controller
     STNControllers.controller('ApprovalCtrl', ['$scope', '$location', '$http', 'eventList', 'stateList', 'instrumentList', 'MEMBER', 'allSensorTypes',
@@ -761,7 +761,7 @@
                     $(".page-loading").removeClass("hidden");
                     alert("Error: " + errorResponse.statusText);
                 });
-            }//end searchSites click action
+            };//end searchSites click action
 
             //add each state to an array to be joined in the GET
             $scope.stateClick = function (data) {
@@ -774,7 +774,7 @@
                         $scope.chosenStates.splice(ind, 1);
                     }
                 }
-            }
+            };
 
             //clear the filter choices (start over)
             $scope.clearFilters = function () {
@@ -786,11 +786,11 @@
                 };
                 $scope.Chosen = {};
                 $scope.chosenStates = [];
-              
+
                 angular.forEach($scope.states, function (st) {
                     st.selected = false;
                 });
-            }
+            };
         }
     }
     //#endregion Site Search Controller
@@ -834,7 +834,7 @@
             $scope.datepickrs = {
                 projStDate: false,
                 projEndDate: false
-            }            
+            };
             $scope.open = function ($event, which) {
                 $event.preventDefault();
                 $event.stopPropagation();
@@ -862,7 +862,7 @@
             $scope.WaterStaff = {};
             $scope.disabled = true;
             $scope.needToComplete = false;
-            $scope.memberIncompletes = incompleteReports.filter(function (ir) { return ir.COMPLETE == 0 });
+            $scope.memberIncompletes = incompleteReports.filter(function (ir) { return ir.COMPLETE == 0; });
             $scope.events = allEvents;
             $scope.states = allStates;
             $scope.reports = allReports;
@@ -898,16 +898,16 @@
                 angular.forEach($scope.Statemodel.value, function (state) {
                     names.push(state.STATE_NAME); abbrevs.push(state.STATE_ABBREV);
                 });
-                
+
                 $scope.StateNames = names.join(', '); $scope.StateAbbrevs = abbrevs.join(',');
-            }
+            };
 
             $scope.MetricDisplayModel = []; //hold all reportModels for 'Display Metrics Summary'
             //clicked Display Metrics Summary, show content in new tab
             $scope.displayMetricSum = function (valid) {
                 if (valid == true) {
                     //#region scopes needed for this action
-                    $scope.MetricDisplayModel =[];
+                    $scope.MetricDisplayModel = [];
                     $scope.GenRepEventModel = {};
                     $scope.totalRow = {}; //model to hold totals for tables last row
                     $scope.totalRow.notAcctForEmps = 0; $scope.totalRow.cumPField = 0; $scope.totalRow.yesPField = 0; $scope.totalRow.todPField = 0;
@@ -947,10 +947,10 @@
                             var thisRPModel = {};
                             thisRPModel.report = result[x]; var YesSWFsum = 0; var YesWQFsum = 0; var YesSWOsum = 0; var YesWQOsum = 0;
                             //cumulative person days totals
-                            for (var t = 0; t < result.length; t++) { YesSWFsum += result[t].SW_YEST_FIELDPERS; };
-                            for (var t = 0; t < result.length; t++) { YesWQFsum += result[t].WQ_YEST_FIELDPERS; };
-                            for (var t = 0; t < result.length; t++) { YesSWOsum += result[t].SW_YEST_OFFICEPERS; };
-                            for (var t = 0; t < result.length; t++) { YesWQOsum += result[t].WQ_YEST_OFFICEPERS; };
+                            for (var a = 0; a < result.length; a++) { YesSWFsum += result[a].SW_YEST_FIELDPERS; }
+                            for (var b = 0; b < result.length; b++) { YesWQFsum += result[b].WQ_YEST_FIELDPERS; }
+                            for (var c = 0; c < result.length; c++) { YesSWOsum += result[c].SW_YEST_OFFICEPERS; }
+                            for (var d = 0; d < result.length; d++) { YesWQOsum += result[d].WQ_YEST_OFFICEPERS; }
 
                             thisRPModel.FieldPYesSWTot = YesSWFsum;
                             thisRPModel.FieldPYesWQTot = YesWQFsum;
@@ -971,23 +971,23 @@
                             $scope.totalRow.boat += (thisRPModel.report.SW_BOATS_DEPL + thisRPModel.report.WQ_BOATS_DEPL);
                             $scope.totalRow.other += (thisRPModel.report.SW_OTHER_DEPL + thisRPModel.report.WQ_OTHER_DEPL);
 
-                            $scope.totalRow.gageVisits += thisRPModel.report.GAGE_VISIT; $scope.totalRow.gagesDown += thisRPModel.report.GAGE_DOWN; 
+                            $scope.totalRow.gageVisits += thisRPModel.report.GAGE_VISIT; $scope.totalRow.gagesDown += thisRPModel.report.GAGE_DOWN;
                             $scope.totalRow.disCtoDate += thisRPModel.report.TOT_DISCHARGE_MEAS; $scope.totalRow.disCPlanned += thisRPModel.report.PLAN_DISCHARGE_MEAS;
-                            $scope.totalRow.CheckMeasToDate += thisRPModel.report.TOT_CHECK_MEAS; $scope.totalRow.CheckMeasPlanned += thisRPModel.report.PLAN_CHECK_MEAS; 
+                            $scope.totalRow.CheckMeasToDate += thisRPModel.report.TOT_CHECK_MEAS; $scope.totalRow.CheckMeasPlanned += thisRPModel.report.PLAN_CHECK_MEAS;
                             $scope.totalRow.indMeas = thisRPModel.report.PLAN_INDIRECT_MEAS; $scope.totalRow.ratExt = thisRPModel.report.RATING_EXTENS;
-                            $scope.totalRow.peaksOfRec += thisRPModel.report.GAGE_PEAK_RECORD; $scope.totalRow.QWGageVis += thisRPModel.report.QW_GAGE_VISIT; 
-                            $scope.totalRow.contQWGageVis =thisRPModel.report.QW_CONT_GAGEVISIT; $scope.totalRow.contQWGageDown = thisRPModel.report.QW_GAGE_DOWN;
+                            $scope.totalRow.peaksOfRec += thisRPModel.report.GAGE_PEAK_RECORD; $scope.totalRow.QWGageVis += thisRPModel.report.QW_GAGE_VISIT;
+                            $scope.totalRow.contQWGageVis = thisRPModel.report.QW_CONT_GAGEVISIT; $scope.totalRow.contQWGageDown = thisRPModel.report.QW_GAGE_DOWN;
                             $scope.totalRow.disQWSamples += thisRPModel.report.QW_DISCR_SAMPLES; $scope.totalRow.sedSamples += thisRPModel.report.COLL_SEDSAMPLES;
 
-                            $scope.totalRow.rdgPlan += thisRPModel.report.PLAN_RAPDEPL_GAGE; $scope.totalRow.rdgDep += thisRPModel.report.DEP_RAPDEPL_GAGE; 
+                            $scope.totalRow.rdgPlan += thisRPModel.report.PLAN_RAPDEPL_GAGE; $scope.totalRow.rdgDep += thisRPModel.report.DEP_RAPDEPL_GAGE;
                             $scope.totalRow.rdgRec += thisRPModel.report.REC_RAPDEPL_GAGE; $scope.totalRow.rdgLost += thisRPModel.report.LOST_RAPDEPL_GAGE;
-                            $scope.totalRow.waterPlan += thisRPModel.report.PLAN_WTRLEV_SENSOR; $scope.totalRow.waterDep += thisRPModel.report.DEP_WTRLEV_SENSOR; 
+                            $scope.totalRow.waterPlan += thisRPModel.report.PLAN_WTRLEV_SENSOR; $scope.totalRow.waterDep += thisRPModel.report.DEP_WTRLEV_SENSOR;
                             $scope.totalRow.waterRec += thisRPModel.report.REC_WTRLEV_SENSOR; $scope.totalRow.waterLost += thisRPModel.report.LOST_WTRLEV_SENSOR;
-                            $scope.totalRow.wavePlan += thisRPModel.report.PLAN_WV_SENS; $scope.totalRow.waveDep += thisRPModel.report.DEP_WV_SENS; 
+                            $scope.totalRow.wavePlan += thisRPModel.report.PLAN_WV_SENS; $scope.totalRow.waveDep += thisRPModel.report.DEP_WV_SENS;
                             $scope.totalRow.waveRec += thisRPModel.report.REC_WV_SENS; $scope.totalRow.waveLost += thisRPModel.report.LOST_WV_SENS;
-                            $scope.totalRow.baroPlan += thisRPModel.report.PLAN_BAROMETRIC; $scope.totalRow.baroDep += thisRPModel.report.DEP_BAROMETRIC; 
+                            $scope.totalRow.baroPlan += thisRPModel.report.PLAN_BAROMETRIC; $scope.totalRow.baroDep += thisRPModel.report.DEP_BAROMETRIC;
                             $scope.totalRow.baroRec += thisRPModel.report.REC_BAROMETRIC; $scope.totalRow.baroLost += thisRPModel.report.LOST_BAROMETRIC;
-                            $scope.totalRow.metPlan += thisRPModel.report.PLAN_METEOROLOGICAL; $scope.totalRow.metDep += thisRPModel.report.DEP_METEOROLOGICAL; 
+                            $scope.totalRow.metPlan += thisRPModel.report.PLAN_METEOROLOGICAL; $scope.totalRow.metDep += thisRPModel.report.DEP_METEOROLOGICAL;
                             $scope.totalRow.metRec += thisRPModel.report.REC_METEOROLOGICAL; $scope.totalRow.metLost += thisRPModel.report.LOST_METEOROLOGICAL;
                             $scope.totalRow.hwmFlag += thisRPModel.report.HWM_FLAGGED; $scope.totalRow.hwmCol = thisRPModel.report.HWM_COLLECTED;
 
@@ -999,7 +999,7 @@
                         $scope.GenRepEventModel.EventType = $scope.eventTypes.filter(function (et) { return et.EVENT_TYPE_ID == $scope.EventName.EVENT_TYPE_ID; })[0];
                         $scope.GenRepEventModel.EventStat = $scope.eventStats.filter(function (es) { return es.EVENT_STATUS_ID == $scope.EventName.EVENT_STATUS_ID; })[0];
                         //3. event Coordinator info
-                        $scope.GenRepEventModel.Coordinator = $scope.members.filter(function (m) { return m.MEMBER_ID == $scope.GenRepEventModel.Event.EVENT_COORDINATOR })[0];
+                        $scope.GenRepEventModel.Coordinator = $scope.members.filter(function (m) { return m.MEMBER_ID == $scope.GenRepEventModel.Event.EVENT_COORDINATOR; })[0];
                         $scope.GenRepEventModel.CoordAgency = $scope.agencies.filter(function (a) { return a.AGENCY_ID == $scope.GenRepEventModel.Coordinator.AGENCY_ID; })[0];
 
                         //modal
@@ -1022,7 +1022,7 @@
                                 $scope.Report = thisReport;
                                 $scope.Event = thisEvent;
                                 $scope.totals = theTotalRow;
-                                $scope.ok = function () {                                    
+                                $scope.ok = function () {
                                     $modalInstance.dismiss('cancel');
                                 };
                             }
@@ -1032,7 +1032,7 @@
                         });//end modal
                     });
                 }//end if valid = true
-            }
+            };
            
             //clicked Display Contacts Summary, show content in new tab
             $scope.displayContactsSum = function (valid) {
@@ -1046,7 +1046,7 @@
                     });
                     var abbrevString = abbrevs.join(', ');
                     var thisDate = $scope.formatDate($scope.genSummary.SUM_DATE);
-                    $scope.reportModel = [];                   
+                    $scope.reportModel = [];
                     //all filtered reports 
                     $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
                     $http.defaults.headers.common['Accept'] = 'application/json';
@@ -1069,7 +1069,7 @@
                             rep.genC = result[x].ReportContacts.filter(function (x) { return x.TYPE == "General"; })[0];
                             rep.inlC = result[x].ReportContacts.filter(function (x) { return x.TYPE == "Inland Flood"; })[0];
                             rep.coastC = result[x].ReportContacts.filter(function (x) { return x.TYPE == "Coastal Flood"; })[0];
-                            rep.waterC = result[x].ReportContacts.filter(function (x) { return x.TYPE == "Water Quality"; })[0];                           
+                            rep.waterC = result[x].ReportContacts.filter(function (x) { return x.TYPE == "Water Quality"; })[0];
                             $scope.reportModel.push(rep);
                         } //end for loop 
 
@@ -1091,7 +1091,7 @@
                                         $scope.GenRepEventModel.EventType = $scope.eventTypes.filter(function (et) { return et.EVENT_TYPE_ID == $scope.EventName.EVENT_TYPE_ID; })[0];
                                         $scope.GenRepEventModel.EventStat = $scope.eventStats.filter(function (es) { return es.EVENT_STATUS_ID == $scope.EventName.EVENT_STATUS_ID; })[0];
                                         //3. event Coordinator info
-                                        $scope.GenRepEventModel.Coordinator = $scope.members.filter(function (m) {return m.MEMBER_ID == $scope.EventName.EVENT_COORDINATOR})[0];
+                                        $scope.GenRepEventModel.Coordinator = $scope.members.filter(function (m) { return m.MEMBER_ID == $scope.EventName.EVENT_COORDINATOR; })[0];
                                         $scope.GenRepEventModel.CoordAgency = $scope.agencies.filter(function (a) { return a.AGENCY_ID == $scope.GenRepEventModel.Coordinator.AGENCY_ID; })[0];
                                         return $scope.GenRepEventModel;
                                     }
@@ -1108,9 +1108,9 @@
                                 //nothing
                             });
                         }; //end modal
-                    });                   
+                    });
                 } //end if valid
-            }
+            };
 
             //clicked generate csv
             $scope.getCSVfile = function (valid) {
@@ -1121,11 +1121,11 @@
                     REPORT.getReportsCSV({ Event: $scope.genSummary.EVENT_ID, States: $scope.StateAbbrevs, Date: $scope.genSummary.SUM_DATE }).$promise.then(function (result) {
                         var blob = new Blob([result.data], { type: "text/plain;charset=utf-8" });
                         saveAs(blob, "report.csv");
-                    }), function() { 
-                        console.log('error'); 
-                    }; 
+                    }), function () {
+                        console.log('error');
+                    };
                 }
-            }//#endregion Generate Report tab
+            };//#endregion Generate Report tab
         }
     }
     
@@ -1185,7 +1185,7 @@
                 returnList.push(rep);
             }
             return returnList;
-        };
+        }
 
         var todayReports = $scope.reportsToDate.filter(function (todayrep) {
             var reportDate = new Date(todayrep.REPORT_DATE).setHours(0, 0, 0, 0);
@@ -1202,7 +1202,7 @@
         //give me the reports done on this date
         $scope.getReportsByDate = function () {
             if ($scope.THIS_DATE.date != undefined) {
-                var formatDate = new Date($scope.THIS_DATE.date).setHours(0, 0, 0, 0)
+                var formatDate = new Date($scope.THIS_DATE.date).setHours(0, 0, 0, 0);
                 var thisDateReports = $scope.reportsToDate.filter(function (tdate) {
                     var reportDate = new Date(tdate.REPORT_DATE).setHours(0, 0, 0, 0);
                     return new Date(reportDate).getTime() == new Date(formatDate).getTime();
@@ -1211,9 +1211,9 @@
                 $scope.pickAdateReports = true;
             } else {
                 alert("Pick a date first.");
-            };
+            }
 
-        }
+        };
 
         //complete the report button clicked -- send back to submit with report populated
         $scope.CompleteThisReport = function (rep) {
@@ -1231,11 +1231,11 @@
             }).$promise.then(function () {
                 $state.go('reporting.submitReport');
             });
-        }
+        };
 
         //project alert text in modal
         $scope.getProjectAlertText = function (rep) {
-            
+
             //need: 
             //1. thisReport
             $scope.ProjectAlertParts = {};
@@ -1252,10 +1252,10 @@
             $scope.ProjectAlertParts.stateCount = 0;
             angular.forEach(test, function (er) {
                 $scope.ProjectAlertParts.stateCount++;
-            })
+            });
             //6. this event
             $scope.ProjectAlertParts.Event = $scope.events.filter(function (e) { return e.EVENT_ID == rep.EVENT_ID; })[0];
-                
+
             //modal
             var modalInstance = $modal.open({
                 templateUrl: $scope.ProjectAlertParts.Event.EVENT_TYPE_ID == 1 ? 'FloodPA.html' : 'HurricanePA.html',
@@ -1272,7 +1272,7 @@
                 //nothing to do here
             });
             //end modal
-        }
+        };
 
     }
 
@@ -1295,7 +1295,7 @@
             var thisEvent = $scope.events.filter(function (e) { return e.EVENT_ID == evID; })[0];
             name = thisEvent.EVENT_NAME;
             return name;
-        }
+        };
 
         //#region GET Report Contacts
         var getReportContacts = function (reportID) {
@@ -1360,7 +1360,7 @@
                 }
             }
             $scope.memberIncompletes.splice(index, 1);
-        }
+        };
 
         //Post/Put the Report and Report Contacts. Called twice (from within Modal (incomplete) and outside (complete))
         var PostPutReportAndReportContacts = function () {
@@ -1424,7 +1424,7 @@
                 var yesterdayRpt = $scope.reports.filter(function (r) {
                     var repDate = new Date(r.REPORT_DATE).setHours(0, 0, 0, 0);
                     return (r.EVENT_ID == $scope.newReport.EVENT_ID && r.STATE == $scope.newReport.STATE) &&
-                        (new Date(repDate).getTime()) == (previousDay.getTime())
+                        (new Date(repDate).getTime()) == (previousDay.getTime());
                 })[0];
                 $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
                 $http.defaults.headers.common['Accept'] = 'application/json';
@@ -1501,15 +1501,15 @@
         };
 
         //incomplete report was clicked, go get it and the contacts for it
-        $scope.getIncompleteReport = function (reportID) {
-            var reportID = this.ir.REPORTING_METRICS_ID;
-            REPORT.query({ id: reportID }, function success(response) {
+        $scope.getIncompleteReport = function () {
+            var reportId = this.ir.REPORTING_METRICS_ID;
+            REPORT.query({ id: reportId }, function success(response) {
                 $scope.newReport = response;
                 $scope.fullReportForm.submit.$setDirty();
                 //get contacts 
-                getReportContacts(reportID);
+                getReportContacts(reportId);
             }).$promise;
-        }         
+        };
     }
     //#endregion Reporting Controller
 
@@ -1523,7 +1523,7 @@
             $scope.settings = "Welcome to the new STN Settings Page!!";
             $scope.changeView = function (view) {
                 $state.go(view);
-            }
+            };
         }
     }
     //#endregion Settings Controller
@@ -1611,10 +1611,10 @@
                 });
                 modalInstance.result.then(function (nameToRemove) {
                     //yes, remove this keyword
-                    var test;                   
+                    var test;
                     //DELETE it
                     $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
-                    
+
                     MEMBER.deleteMember({ id: nameToRemove.MEMBER_ID }, function success(response) {
                         var delMem = {};
                         delMem.MEMBER_ID = nameToRemove.MEMBER_ID;
@@ -1632,7 +1632,7 @@
                     });
                 });
                 //end modal
-            }
+            };
             //#endregion DELETE Member click
 
             $scope.pass = {
@@ -1648,7 +1648,7 @@
                 $scope.matchingUsers = $stateParams.id == $scope.loggedInUser.ID ? true : false;
 
                 $scope.aMember = thisMember;
-                $scope.aMember.Role = $scope.roleList.filter(function (r) { return r.ROLE_ID == $scope.aMember.ROLE_ID })[0].ROLE_NAME;
+                $scope.aMember.Role = $scope.roleList.filter(function (r) { return r.ROLE_ID == $scope.aMember.ROLE_ID; })[0].ROLE_NAME;
                 $scope.changePass = false;
                 
                 //change to the user made, put it .. fired on each blur after change made to field
@@ -1665,7 +1665,7 @@
                             });
                         }
                     }
-                }//end SaveOnBlur
+                };//end SaveOnBlur
 
                 //password update section
                 $scope.changeMyPassBtn = function (evt) {
@@ -1692,8 +1692,8 @@
                                 toastr.error("Error: " + errorResponse.statusText);
                             }
                         );
-                    };
-                }
+                    }
+                };
 
                 $scope.DontChangePass = function () {
                     //nevermind,  clear input
@@ -1707,7 +1707,7 @@
                         $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
                         $http.defaults.headers.common['Accept'] = 'application/json';
 
-                        MEMBER.addMember({ pass: $scope.pass.confirmP}, $scope.aMember, function success(response) {
+                        MEMBER.addMember({ pass: $scope.pass.confirmP }, $scope.aMember, function success(response) {
                             toastr.success("Member Created");
                             //push this new member into the memberList
                             var nm = {};
@@ -1716,14 +1716,14 @@
                             var ag = $scope.agencyList.filter(function (a) { return a.AGENCY_ID == response.AGENCY_ID; })[0];
                             var ro = $scope.roleList.filter(function (r) { return r.ROLE_ID == response.ROLE_ID; })[0];
                             nm.Agency = ag.AGENCY_NAME;
-                            nm.Role = ro.ROLE_NAME;                            
+                            nm.Role = ro.ROLE_NAME;
                             $scope.memberList.push(nm);
                         }).$promise.then(function () {
-                            $location.path('/Members/MembersList').replace();                            
+                            $location.path('/Members/MembersList').replace();
                         });
-                        
+
                     }
-                }
+                };
             }
         }
     }
@@ -1795,7 +1795,7 @@
             $scope.datepickrs = {
                 //projStDate: false,
                 //projEndDate: false
-            }
+            };
             $scope.open = function ($event, which) {
                 $event.preventDefault();
                 $event.stopPropagation();
@@ -1830,7 +1830,7 @@
                     $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
 
                     EVENT.delete({ id: nameToRemove.EVENT_ID }, function success(response) {
-                        var delEv = {}; 
+                        var delEv = {};
                         delEv.EVENT_ID = nameToRemove.EVENT_ID;
                         delEv.Name = nameToRemove.EVENT_NAME;
                         delEv.Type = $scope.eventTypeList.filter(function (a) { return a.EVENT_TYPE_ID == nameToRemove.EVENT_TYPE_ID; })[0].TYPE;
@@ -1855,7 +1855,7 @@
                     });
                 });
                 //end modal
-            }
+            };
             //#endregion DELETE Event click
 
             if (thisEvent != undefined) {
@@ -1879,13 +1879,13 @@
                             });
                         }
                     }
-                }//end SaveOnBlur
+                };//end SaveOnBlur
 
             }//end if thisEvent != null
             else {
                 //this is a new event being created
                 $scope.save = function (valid) {
-                    if (valid) {                        
+                    if (valid) {
                         EVENT.save($scope.anEvent, function success(response) {
                             toastr.success("Event Created");
                             //push this new event into the eventList
@@ -1897,14 +1897,14 @@
                             var coord = $scope.eventCoordList.filter(function (c) { return c.MEMBER_ID == response.EVENT_COORDINATOR; })[0];
                             E.StartDate = response.EVENT_START_DATE;
                             E.EndDate = response.EVENT_END_DATE;
-                            E.Coord = coord!= undefined ? coord.FNAME + " " + coord.LNAME : "";
+                            E.Coord = coord != undefined ? coord.FNAME + " " + coord.LNAME : "";
                             $scope.eventList.push(E);
                         }).$promise.then(function () {
                             $location.path('/Events/EventsList').replace();
                         });
 
                     }
-                }//end $scope.save()
+                };//end $scope.save()
             }//end else (anEvent == undefined -new
         }//end else (checkCreds())
     }
@@ -1937,7 +1937,7 @@
             $scope.aSite = {}; $scope.originalSiteHousings = [];
             $scope.checked = ""; $scope.checkedName = "Not Defined"; //comparers for disabling network names if 'Not Defined' checked
             $scope.landowner = {};
-            $scope.addLandowner = false; //show landowner fields
+            $scope.addLandowner = false; //hide landowner fields
             $scope.disableSensorParts = false; //toggle to disable/enable sensor housing installed and add proposed sensor
             $scope.showSiteHouseTable = false;
             $scope.addedHouseType = []; //holder for when adding housing type to page from multiselect
@@ -1959,16 +1959,16 @@
                     //they checked "not defined"
                     for (var nn = 0; nn < $scope.NetNameList.length; nn++) {
                         //unselect all but not defined
-                        if ($scope.NetNameList[nn].NAME != "Not Defined") 
-                            $scope.NetNameList[nn].selected = false;                        
+                        if ($scope.NetNameList[nn].NAME != "Not Defined")
+                            $scope.NetNameList[nn].selected = false;
                     }
                     //make these match so rest get disabled
                     $scope.checked = "Not Defined";
                 }
                 //they they unchecked not define, unmatch vars so the other become enabled
-                if (n.NAME == "Not Defined" && n.selected == false) 
+                if (n.NAME == "Not Defined" && n.selected == false)
                     $scope.checked = "";
-            }
+            };
 
             //toggle dim on div for sensor not appropriate click
             $scope.dimAction = function () {
@@ -1977,7 +1977,7 @@
                     //clear radio and checkboxes if disabling
                     for (var x = 0; x < $scope.ProposedSens.length; x++) {
                         $scope.ProposedSens[x].selected = false;
-                    };
+                    }
                     $scope.aSite.IS_PERMANENT_HOUSING_INSTALLED = "No";
                 } else {
                     $scope.disableSensorParts = false;
@@ -1988,18 +1988,18 @@
             $scope.HouseTypeClick = function (ht) {
                 //add/remove house type and inputs to table row                
                 if (ht.selected == true) {
-                    var houseT = {TYPE_NAME: ht.TYPE_NAME, HOUSING_TYPE_ID: ht.HOUSING_TYPE_ID, LENGTH: ht.LENGTH, MATERIAL: ht.MATERIAL, NOTES: ht.NOTES, AMOUNT: 1};
+                    var houseT = { TYPE_NAME: ht.TYPE_NAME, HOUSING_TYPE_ID: ht.HOUSING_TYPE_ID, LENGTH: ht.LENGTH, MATERIAL: ht.MATERIAL, NOTES: ht.NOTES, AMOUNT: 1 };
                     $scope.addedHouseType.push(houseT);
                     $scope.showSiteHouseTable = true;
                 }
                 if (ht.selected == false) {
-                    var i = $scope.addedHouseType.indexOf($scope.addedHouseType.filter(function (h) { return h.TYPE_NAME == ht.TYPE_NAME })[0]);
+                    var i = $scope.addedHouseType.indexOf($scope.addedHouseType.filter(function (h) { return h.TYPE_NAME == ht.TYPE_NAME; })[0]);
                     $scope.addedHouseType.splice(i, 1);
                     if ($scope.addedHouseType.length == 0) {
                         $scope.showSiteHouseTable = false;
                     }
-                }                
-            }
+                }
+            };
 
             //get address parts and existing sites 
             $scope.getAddress = function () {
@@ -2044,7 +2044,7 @@
             // want to add a landowner contact
             $scope.showLandOwnerPart = function () {
                 $scope.addLandowner = true;
-            }
+            };
 
             // is this create new site or view existing??
             if (thisSite != undefined) {
@@ -2057,7 +2057,7 @@
                         //clear radio and checkboxes if disabling
                         for (var x = 0; x < $scope.ProposedSens.length; x++) {
                             $scope.ProposedSens[x].selected = false;
-                        };
+                        }
                         $scope.aSite.IS_PERMANENT_HOUSING_INSTALLED = "No";
                     }
                     //update countiesList with this state's counties
@@ -2084,17 +2084,17 @@
                             if ($scope.originalSiteHousings.length == 0)
                                 $scope.HousingTypeList[i].selected = false;
                         }
-                        for (var x = 0; x < $scope.originalSiteHousings.length; x++) {
+                        for (var z = 0; z < $scope.originalSiteHousings.length; z++) {
                             //for each housingtypelist..make selected = true for these                       
-                            var houseTypeName = $scope.HousingTypeList.filter(function (h) { return h.HOUSING_TYPE_ID == $scope.originalSiteHousings[x].HOUSING_TYPE_ID; })[0].TYPE_NAME;
+                            var houseTypeName = $scope.HousingTypeList.filter(function (h) { return h.HOUSING_TYPE_ID == $scope.originalSiteHousings[z].HOUSING_TYPE_ID; })[0].TYPE_NAME;
                             var houseT = {
                                 TYPE_NAME: houseTypeName,
-                                HOUSING_TYPE_ID: $scope.originalSiteHousings[x].HOUSING_TYPE_ID,
-                                SITE_HOUSING_ID: $scope.originalSiteHousings[x].SITE_HOUSING_ID,
-                                LENGTH: $scope.originalSiteHousings[x].LENGTH,
-                                MATERIAL: $scope.originalSiteHousings[x].MATERIAL,
-                                NOTES: $scope.originalSiteHousings[x].NOTES,
-                                AMOUNT: $scope.originalSiteHousings[x].AMOUNT
+                                HOUSING_TYPE_ID: $scope.originalSiteHousings[z].HOUSING_TYPE_ID,
+                                SITE_HOUSING_ID: $scope.originalSiteHousings[z].SITE_HOUSING_ID,
+                                LENGTH: $scope.originalSiteHousings[z].LENGTH,
+                                MATERIAL: $scope.originalSiteHousings[z].MATERIAL,
+                                NOTES: $scope.originalSiteHousings[z].NOTES,
+                                AMOUNT: $scope.originalSiteHousings[z].AMOUNT
                             };
                             $scope.addedHouseType.push(houseT);
                         }
@@ -2103,32 +2103,32 @@
                     //apply any site network names or types
                     if (thisSiteNetworkNames.length > 0) {
                         //for each $scope.NetNameList .. add .selected property = true/false if thissitenetworknames ==
-                        for (var i = 0; i < $scope.NetNameList.length; i++) {
-                            for (var y = 0; y < thisSiteNetworkNames.length; y++) {
-                                if (thisSiteNetworkNames[y].NETWORK_NAME_ID == $scope.NetNameList[i].NETWORK_NAME_ID) {
-                                    $scope.NetNameList[i].selected = true;
-                                    y = thisSiteNetworkNames.length;
+                        for (var a = 0; a < $scope.NetNameList.length; a++) {
+                            for (var e = 0; e < thisSiteNetworkNames.length; e++) {
+                                if (thisSiteNetworkNames[e].NETWORK_NAME_ID == $scope.NetNameList[a].NETWORK_NAME_ID) {
+                                    $scope.NetNameList[a].selected = true;
+                                    e = thisSiteNetworkNames.length;
                                 } else {
-                                    $scope.NetNameList[i].selected = false;
+                                    $scope.NetNameList[a].selected = false;
                                 }
                                 if (thisSiteNetworkNames.length == 0)
-                                    $scope.NetNameList[i].selected = false;
+                                    $scope.NetNameList[a].selected = false;
                             }
                         }
                     }//end if thisSiteNetworkNames != undefined
 
                     if (thisSiteNetworkTypes.length > 0) {
                         //for each $scope.NetTypeList .. add .selected property = true/false if thissitenetworktypes ==
-                        for (var i = 0; i < $scope.NetTypeList.length; i++) {
-                            for (var y = 0; y < thisSiteNetworkTypes.length; y++) {
-                                if (thisSiteNetworkTypes[y].NETWORK_TYPE_ID == $scope.NetTypeList[i].NETWORK_TYPE_ID) {
-                                    $scope.NetTypeList[i].selected = true;
-                                    y = thisSiteNetworkTypes.length;
+                        for (var ni = 0; ni < $scope.NetTypeList.length; ni++) {
+                            for (var ny = 0; ny < thisSiteNetworkTypes.length; ny++) {
+                                if (thisSiteNetworkTypes[ny].NETWORK_TYPE_ID == $scope.NetTypeList[ni].NETWORK_TYPE_ID) {
+                                    $scope.NetTypeList[ni].selected = true;
+                                    ny = thisSiteNetworkTypes.length;
                                 } else {
-                                    $scope.NetTypeList[i].selected = false;
+                                    $scope.NetTypeList[ni].selected = false;
                                 }
                                 if (thisSiteNetworkTypes.length == 0)
-                                    $scope.NetTypeList[i].selected = false;
+                                    $scope.NetTypeList[ni].selected = false;
                             }
                         }
                     }//end if thisSiteNetworkNames != undefined
@@ -2160,7 +2160,7 @@
                     $scope.updateCountyList = function (s) {
                         var thisState = allStates.filter(function (st) { return st.STATE_ABBREV == s; })[0];
                         $scope.CountyList = allCounties.filter(function (c) { return c.STATE_ID == thisState.STATE_ID; });
-                    }
+                    };
 
                     //site PUT
                     $scope.save = function (valid) {
@@ -2186,12 +2186,12 @@
                                     }, function error(errorResponse) { toastr.error("Error adding Landowner: " + errorResponse.statusText); });
                                 } else {
                                     PUTsite();
-                                }                                
+                                }
                             }
                         } else {
                             alert("Please populate all required fields.");
                         }
-                    }//end save
+                    };//end save
 
                     var PUTsite = function () {
                         SITE.update({ id: thisSite.SITE_ID }, $scope.aSite, function success(response) {
@@ -2202,7 +2202,7 @@
                             }//end for each old sitehouse (delete)
 
                             //clear this out after deleting all of them;
-                            setTimeout(function () { $scope.originalSiteHousings = [];  }, 3000); 
+                            setTimeout(function () { $scope.originalSiteHousings = []; }, 3000);
                             //now POST if any
                             for (var siteh = 0; siteh < $scope.addedHouseType.length; siteh++) {
                                 SITE.postSiteHousing({ id: $scope.aSite.SITE_ID }, $scope.addedHouseType[siteh], function success(okResponse) {
@@ -2217,7 +2217,7 @@
                             //update site networkNames (delete all and re-add)
                             for (var nn = 0; nn < $scope.NetNameList.length; nn++) {
                                 if ($scope.NetNameList[nn].selected == true) {
-                                    var test; //post it (if it's there already, it won't do anything)
+                                    //post it (if it's there already, it won't do anything)
                                     var NNtoAdd = { NETWORK_NAME_ID: $scope.NetNameList[nn].NETWORK_NAME_ID, NAME: $scope.NetNameList[nn].NAME };
                                     SITE.postSiteNetworkName({ id: $scope.aSite.SITE_ID }, NNtoAdd, function success(responseSNNames) {
                                         var nothingNeeded;
@@ -2236,7 +2236,7 @@
                             //update site networkTypes (delete all and re-add)
                             for (var nt = 0; nt < $scope.NetTypeList.length; nt++) {
                                 if ($scope.NetTypeList[nt].selected == true) {
-                                    var test; //post it (if it's there already, it won't do anything)
+                                    //post it (if it's there already, it won't do anything)
                                     var NTtoAdd = { NETWORK_TYPE_ID: $scope.NetTypeList[nt].NETWORK_TYPE_ID, NETWORK_TYPE_NAME: $scope.NetTypeList[nt].NETWORK_TYPE_NAME };
                                     SITE.postSiteNetworkType({ id: $scope.aSite.SITE_ID }, NTtoAdd, function success(responseSNTypes) {
                                         var nothingNeeded;
@@ -2258,7 +2258,7 @@
                             $location.path('/Site/' + thisSite.SITE_ID + '/Details').replace();//.notify(false);
                             $scope.apply;
                         });//end SITE.save(...
-                    } // end PUTsite()
+                    }; // end PUTsite()
                 } else {
                     //site != undefined but the site.SITE_ID is == this site doesn't exist
                     toastr.error("This site does not exist");
@@ -2302,7 +2302,7 @@
                                     toastr.error("Error posting landowner: " + errorResponse.statusText);
                                 });
                             } else {
-                                postSite();                                
+                                postSite();
                             }
                         } else {
                             postSite();
@@ -2310,7 +2310,7 @@
                     } else {
                         alert("Please populate all required fields.");
                     }
-                }
+                };
 
                 var postSite = function () {
                     //make sure longitude is < 0, otherwise * (-1),
@@ -2331,7 +2331,7 @@
                                 $(".page-loading").removeClass("hidden");
                                 toastr.error("Error added Site Housing: " + errorResponse.statusText);
                             }).$promise;
-                        };//end foreach addedHouseType
+                        }//end foreach addedHouseType
                         //now go deal with networkNames and networkTypes
                         POSTnetworks(createdSiteID);
                         
@@ -2352,8 +2352,8 @@
                                 $(".page-loading").removeClass("hidden");
                                 toastr.error("Error adding Network Name: " + errorResponse.statusText);
                             }).$promise;
-                        };//end if selected
-                    };//end for each netnamelist
+                        }//end if selected
+                    }//end for each netnamelist
 
                     //POST site_NetworkTypes 
                     //loop through $scope.NetTypeList for selected == true --post each
@@ -2367,8 +2367,8 @@
                                 $(".page-loading").removeClass("hidden");
                                 toastr.error("Error adding Network Type: " + errorResponse.statusText);
                             }).$promise;
-                        };//end if selected
-                    };//end for each nettypelist
+                        }//end if selected
+                    }//end for each nettypelist
 
                     //see if they checked any proposed sensors and POST those 
                     if ($scope.disableSensorParts == false) {
@@ -2389,20 +2389,95 @@
                                 }).$promise;
                             }//end if selected == true
                         }//end for each proposedSens
-                    }; //end if sensor parts aren't disabled
+                    } //end if sensor parts aren't disabled
                     //now update page
                     $timeout(function () {
                         $(".page-loading").addClass("hidden");
                         $location.path('/Site/' + newSiteId + '/Details').replace();//.notify(false);
                         $scope.apply;
                     }, 3000);
-                } //end POSTnetworks
+                }; //end POSTnetworks
                      
             }//end this is a new site create
         }//end else checkCreds is good
     }
 
     //#endregion SITE
+
+    //#region OBJECTIVE_POINT allVertDatums, allVertColMethods, allOPQualities
+    STNControllers.controller('ObjectivePointCtrl', ['$scope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'thisSite', 'thisSiteOPs', 'allOPTypes', 'allHorDatums', 'allHorCollMethods', 'allVertDatums', 'allVertColMethods', 'allOPQualities', ObjectivePointCtrl]);
+    function ObjectivePointCtrl($scope, $location, $state, $http, $modal, $filter, $timeout, checkCreds, thisSite, thisSiteOPs, allOPTypes, allHorDatums, allHorCollMethods, allVertDatums, allVertColMethods, allOPQualities) {
+        if (!checkCreds()) {
+            $scope.auth = false;
+            $location.path('/login');
+        } else {
+            //global vars
+            $scope.SiteObjectivePoints = thisSiteOPs;
+
+            $scope.showOPModal = function (OPclicked) {
+                var passAllLists = [allOPTypes, allHorDatums, allHorCollMethods, allVertDatums, allVertColMethods, allOPQualities];
+                
+            //    var test;
+            //    //make modal, passing allOPTypes, allHorDatums, allHorCollMethods, allVertDatums, allVertColMethods, allOPQualities, set showControlIDinput = false initially, 
+            //    //datepicker
+            //    //modal
+                var modalInstance = $modal.open({
+                    templateUrl: 'OPmodal.html',
+                    controller: 'OPmodalCtrl',
+                    size: 'lg',
+                    windowClass: 'rep-dialog',
+                    resolve: {  
+                        allDropdowns: function () {
+                            return passAllLists;
+                        },
+                        thisOP: function () { return OPclicked;}
+                    }
+                });
+                modalInstance.result.then(function (r) {
+                    //nothing to do here
+                });
+            };
+        }
+    }
+
+    //#endregion OBJECTIVE_POINT
+
+    //#region INSTRUMENT
+    STNControllers.controller('SensorCtrl', ['$scope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'thisSite', 'thisSiteSensors', 'allStatusTypes', 'allDeployTypes', 'allSensDeps', 'INSTRUMENT', SensorCtrl]);
+    function SensorCtrl($scope, $location, $state, $http, $modal, $filter, $timeout, checkCreds, thisSite, thisSiteSensors, allStatusTypes, allDeployTypes, allSensDeps, INSTRUMENT) {
+        if (!checkCreds()) {
+            $scope.auth = false;
+            $location.path('/login');
+        } else {
+            //global vars
+            $scope.statusTypeList = allStatusTypes;
+            $scope.deployTypeList = allDeployTypes;
+            $scope.sensDepTypes = allSensDeps;
+            $scope.showProposed = false; //they want to add a proposed sensor, open options
+
+            //for each sensor, need status and if proposed - need dep type
+            for (var x = 0; x < thisSiteSensors.length; x++) {
+                var ind = x;
+                INSTRUMENT.getInstrumentStatus({ id: thisSiteSensors[ind].INSTRUMENT_ID }, function success(response) {
+                    thisSiteSensors[ind].STATUS = allStatusTypes.filter(function (s) { return s.STATUS_TYPE_ID == response.STATUS_TYPE_ID; })[0].STATUS;
+                    //thisSiteSensors[ind].STATUS = response.STATUS_TYPE_ID;
+                }).$promise.then(function () {
+                    $scope.SiteSensors = thisSiteSensors;
+                });
+            }   
+            
+        } //end else not auth
+    }
+
+    //#endregion INSTRUMENT
+
+    //#region HWM
+
+    //#endregion HWM
+
+    //#region FILE
+
+    //#endregion FILE
 
     //#region resource Controller (abstract)
     STNControllers.controller('resourcesCtrl', ['$scope', '$location', '$state', '$http', '$filter', '$modal', 'AGENCY', 'CONTACT_TYPE', 'DEPLOYMENT_PRIORITY', 'EVENT_STATUS',
@@ -2522,7 +2597,7 @@
                     //logic for cancel
                 });
                 //end modal
-            }
+            };
             $scope.showStateAbbrev = function (a) {
                 var selected = [];
                 if (a.STATE) {
@@ -2609,7 +2684,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion ContactType Add/Update/Delete
 
             //#region deploymentPriority Add/Update/Delete
@@ -2683,7 +2758,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion deploymentPriority Add/Update/Delete
 
             //#region eventStatus Add/Update/Delete
@@ -2757,7 +2832,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion eventStatus Add/Update/Delete
 
             //#region EventType Add/Update/Delete
@@ -2837,7 +2912,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion EventType Add/Update/Delete
 
             //#region fileType Add/Update/Delete
@@ -2911,7 +2986,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion fileType Add/Update/Delete
 
             //#region HorCollMethods Add/Update/Delete
@@ -2966,7 +3041,7 @@
                     size: 'sm',
                     resolve: {
                         nameToRemove: function () {
-                            return hcm
+                            return hcm;
                         },
                         what: function () {
                             return "Horizontal Collection Method";
@@ -2985,7 +3060,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion HorCollMethods Add/Update/Delete
 
             //#region HorDatum Add/Update/Delete
@@ -3065,7 +3140,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion HorDatum Add/Update/Delete
 
             //#region houseType Add/Update/Delete
@@ -3139,7 +3214,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion housingType Add/Update/Delete
 
             //#region hwmQuality Add/Update/Delete
@@ -3213,7 +3288,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion eventStatus Add/Update/Delete
 
             //#region HwmType Add/Update/Delete
@@ -3293,7 +3368,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion HwmType Add/Update/Delete
 
             //#region InstColCond Add/Update/Delete
@@ -3367,7 +3442,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion InstColCond Add/Update/Delete
 
             //#region Marker Add/Update/Delete
@@ -3422,7 +3497,7 @@
                     size: 'sm',
                     resolve: {
                         nameToRemove: function () {
-                            return m
+                            return m;
                         },
                         what: function () {
                             return "Marker";
@@ -3441,7 +3516,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion Marker Add/Update/Delete
 
             //#region NetworkName Add/Update/Delete nn
@@ -3515,7 +3590,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion NetworkName Add/Update/Delete
 
             //#region OPQuality Add/Update/Delete
@@ -3595,7 +3670,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion OPQuality Add/Update/Delete
 
             //#region OPType Add/Update/Delete
@@ -3669,7 +3744,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion OPType Add/Update/Delete
 
             //#region SensorBrand Add/Update/Delete
@@ -3724,7 +3799,7 @@
                     size: 'sm',
                     resolve: {
                         nameToRemove: function () {
-                            return sb
+                            return sb;
                         },
                         what: function () {
                             return "Sensor Brand";
@@ -3743,7 +3818,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion SensorBrand Add/Update/Delete
 
             //#region DepType Add/Update/Delete
@@ -3823,7 +3898,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion DepType Add/Update/Delete
 
             //#region StatusType Add/Update/Delete
@@ -3897,13 +3972,13 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion StatusType Add/Update/Delete
 
             //#region SensorType Add/Update/Delete
             $scope.sensTypeList = allSensorTypes;// allSensorTypes; //senT
             $scope.newDepTypeRelating = [];
-            $scope.commaSepDepMETHODS = []
+            $scope.commaSepDepMETHODS = [];
             
             //add the deployment types
             $scope.formattedSensTypeList = [];
@@ -3929,7 +4004,7 @@
                     if (SenT.DepTypes.indexOf(s.DEPLOYMENT_TYPE_ID) >= 0) {
                         selected.push(s.METHOD);
                     }
-                })
+                });
                 return selected.length ? selected.join(', ') : "";
             };
             $scope.removeTheseDepTypes = []; //these are the ones to remove when they click save
@@ -3941,7 +4016,7 @@
                     angular.forEach(originalChecked, function (oc) {
                         if (nowChecked.indexOf(oc) < 0) {
                             //not there anymore
-                            var deleteDep = $scope.depTypeList.filter(function (dt) { return dt.DEPLOYMENT_TYPE_ID == oc })[0];
+                            var deleteDep = $scope.depTypeList.filter(function (dt) { return dt.DEPLOYMENT_TYPE_ID == oc; })[0];
                             //make sure you don't add it twice
                             if ($scope.removeTheseDepTypes.length > 0) {
                                 for (var d = 0; d < $scope.removeTheseDepTypes.length; d++) {
@@ -4049,10 +4124,10 @@
                     angular.forEach(DTs, function (dt) {
                         SENSOR_TYPE.addSensorDeploymentType({ id: id }, dt, function success(response1) {
                             toastr.success("Deployment Type is now related");
-                        }, function error (errorResponse1) {
+                        }, function error(errorResponse1) {
                             var what = errorResponse1.statusText;
                         });
-                    })
+                    });
                     toastr.success("Sensor Type Updated");
                 }, function error(errorResponse) {
                     retur = false;
@@ -4103,7 +4178,7 @@
                     SENSOR_TYPE.delete({ id: ST.SENSOR_TYPE_ID }, ST, function success(response) {
                         $scope.formattedSensTypeList.splice(index, 1);
                         //get the Deployment Types from the list of ids in data.DepTypes
-                        
+
                         toastr.success("Sensor Type Removed");
                     }, function error(errorResponse) {
                         toastr.error("Error: " + errorResponse.statusText);
@@ -4111,7 +4186,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion SensorType Add/Update/Delete
 
             //#region NetType Add/Update/Delete
@@ -4191,7 +4266,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion NetType Add/Update/Delete
 
             //#region VertColMeth Add/Update/Delete
@@ -4265,7 +4340,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion VertColMeth Add/Update/Delete
 
             //#region VertDatum Add/Update/Delete
@@ -4320,7 +4395,7 @@
                     size: 'sm',
                     resolve: {
                         nameToRemove: function () {
-                            return vd
+                            return vd;
                         },
                         what: function () {
                             return "Vertical Datum";
@@ -4339,7 +4414,7 @@
                 }, function () {
                     //logic for cancel
                 });//end modal
-            }
+            };
             //#endregion VertDatum Add/Update/Delete
             //#endregion ALL LOOKUPS (add/update/delete)
         }
@@ -4434,7 +4509,7 @@
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
-    };
+    }
 
     //popup confirm box
     STNControllers.controller('ConfirmReportModalCtrl', ['$scope', '$modalInstance', ConfirmReportModalCtrl]);
@@ -4447,7 +4522,7 @@
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
-    };
+    }
 
     STNControllers.controller('ReportModalCtrl', ['$scope', '$modalInstance', 'report', 'submitPerson', 'contacts', ReportModalCtrl]);
     function ReportModalCtrl($scope, $modalInstance, report,  submitPerson, contacts) {
@@ -4463,7 +4538,7 @@
         $scope.ok = function () {
             $modalInstance.dismiss('cancel');
         };
-    };
+    }
 
     STNControllers.controller('ProjAlertModalCtrl', ['$scope', '$modalInstance', 'ProjAlert', ProjAlertModalCtrl]);
     function ProjAlertModalCtrl($scope, $modalInstance, ProjAlert) {
@@ -4473,6 +4548,35 @@
         };
     }
     
+    STNControllers.controller('OPmodalCtrl', ['$scope', '$modalInstance', 'allDropdowns', 'thisOP', OPmodalCtrl]);
+    function OPmodalCtrl($scope, $modalInstance, allDropdowns, thisOP) {
+        $scope.OP = thisOP;
+        $scope.OPTypeList = allDropdowns[0];
+        $scope.HDList = allDropdowns[1];
+        $scope.HCollectMethodList = allDropdowns[2];
+        $scope.VDatumList = allDropdowns[3];
+        $scope.VCollectMethodList = allDropdowns[4];
+        $scope.OPQualityList = allDropdowns[5];
+        $scope.showControlIDinput = false;
+
+        //#region Datepicker
+        $scope.datepickrs = {
+            projStDate: false,
+            projEndDate: false
+        };
+        $scope.open = function ($event, which) {
+            $event.preventDefault();
+            $event.stopPropagation();
+
+            $scope.datepickrs[which] = true;
+        };
+
+        $scope.ok = function () {
+            $modalInstance.dismiss('cancel');
+        };
+
+        //#endregion Datepicker
+    }
     //#endregion MODALS
 
     //#region LOGIN/OUT
@@ -4540,8 +4644,8 @@
         $scope.logout = function () {
             deleteCreds();
             $location.path('/login');
-        }
-    };
+        };
+    }
     //#endregion LOGIN/OUT
 
 })();
