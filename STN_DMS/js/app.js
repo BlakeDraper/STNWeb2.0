@@ -5,10 +5,11 @@
             'STNResource', 'STNControllers', 'STNBusinessServices']);
     
     app.run(function ($rootScope) {        
-        $rootScope.$on('$stateChangeStart', function (event, toState) {
+        $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
             $("#ui-view").html("");
             $(".page-loading").removeClass("hidden");
             //check to see if they are going to project info
+            
             if (toState.url == "/") {
                 //make username focus
                 $("#userNameFocus").focus();
