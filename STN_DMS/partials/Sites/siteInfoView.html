@@ -1,10 +1,25 @@
-﻿<div class="panel panel-default" style="padding:0;margin:1em;">
-    <div class="panel-heading">
-        <span class="panel-title">Site</span>
+﻿<!--<div>
+    <h2 style="margin-top:0">Site {{aSite.SITE_NO}}</h2>
+</div>
+<hr />-->
+
+<accordion close-others="false">
+    <accordion-group is-open="status.mapOpen">
+        <accordion-heading>
+            <i style="margin-right:10px" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.mapOpen, 'glyphicon-chevron-right': !status.mapOpen}"></i>
+            <span>Map</span>
+            <a ui-sref="map" title="Go to this Site on the Map tab."><i class="pull-right glyphicon glyphicon-globe"></i></a>
+        </accordion-heading>
+        <!--<leaflet markers="markers" center="center"></leaflet>-->
+    </accordion-group>
+
+    <accordion-group is-open="status.siteOpen">
+        <accordion-heading>
+            <i style="margin-right:10px" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.siteOpen, 'glyphicon-chevron-right': !status.siteOpen}"></i>
+            <span>Site</span>
+        </accordion-heading>
         <button type="button" ng-if="aSite.SITE_ID != undefined" class="btn btn-primary pull-right" ng-click="openSiteCreate()">Edit Site</button>
         <button type="button" ng-if="aSite.SITE_ID == undefined" class="btn btn-primary pull-right" ng-click="openSiteCreate()">Create Site</button>
-    </div>
-    <div class="panel-body">
         <div ng-if="aSite.SITE_ID != undefined">
             <form class="form-horizontal">
                 <fieldset>
@@ -122,10 +137,10 @@
 
                     <!--Site Housing section-->
                     <!--<div style="padding:0" class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Site Housing</h3>
-            </div>
-            <div class="panel-body">-->
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Site Housing</h3>
+                    </div>
+                    <div class="panel-body">-->
                     <div class="form-group">
                         <label class="col-md-3 control-label" for="HOUSING_TYPE">Site Housing(s):</label>
                         <div ng-show="showSiteHouseTable">
@@ -152,7 +167,7 @@
                         </div>
                     </div>
                     <!-- end panel-body
-            </div>-->
+                    </div>-->
                     <hr />
                     <!--Priority-->
                     <div class="form-group">
@@ -192,7 +207,9 @@
                     <!--Sensor Not Appropriate-->
                     <div class="form-group">
                         <label class="col-md-3 control-label" for="inputSENSOR_NOT_APPROPRIATE">Check if Sensor is not Appropriate here:</label>
-                        <div class="col-md-6"><span>{{aSite.sensorNotAppr}}</span></div>
+                        <div class="col-md-6">
+                            <input type="checkbox" disabled="disabled" name="SENSOR_NOT_APPROPRIATE" ng-model="aSite.SENSOR_NOT_APPROPRIATE" ng-true-value="1" ng-false-value="0" />
+                        </div>
                     </div>
 
                     <!--Permanent Sensor Housing?-->
@@ -208,10 +225,10 @@
                             <span>{{aSite.Creator || "---"}}</span>
                         </div>
                     </div>
-                    <hr/>
+                    <hr />
                     <!--start Landowner contact area-->
                     <div class="form-group">
-                        <label class="col-md-4 control-label">Land Owner Information:</label>                        
+                        <label class="col-md-4 control-label">Land Owner Information:</label>
                     </div>
 
                     <div ng-show="addLandowner">
@@ -281,19 +298,17 @@
                 </fieldset>
             </form>
         </div>
-    </div>
-</div>
 
-
+    </accordion-group>
+</accordion>
 
 <style type="text/css">
-    .darkClass
-{
-   filter:alpha(opacity=50); /* IE */
-    opacity: 0.5; /* Safari, Opera */
-    -moz-opacity:0.50; /* FireFox */
-    z-index: 20;
-    background-repeat:no-repeat;
-    background-position:center;
-}
+    .darkClass {
+        filter: alpha(opacity=50); /* IE */
+        opacity: 0.5; /* Safari, Opera */
+        -moz-opacity: 0.50; /* FireFox */
+        z-index: 20;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
 </style>

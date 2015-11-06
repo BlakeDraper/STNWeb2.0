@@ -737,6 +737,10 @@
                 .state("site.dashboard", {
                     url: "/SiteDashboard",
                     views: {
+                        'siteNo': {
+                            controller: 'SiteCtrl',
+                            template: '<div><h2 style="margin-top:0">Site {{aSite.SITE_NO}}</h2></div><hr />' 
+                        },
                         'aSite': {
                             controller: 'SiteCtrl',
                             templateUrl: 'partials/Sites/siteInfoView.html'
@@ -748,6 +752,19 @@
                         'sensor': {
                             controller: 'SensorCtrl',
                             templateUrl: 'partials/Sites/siteSensorList.html'
+                        },
+                        'hwm': {
+                            controller: 'HWMCtrl',
+                            templateUrl: 'partials/Sites/siteHWMList.html'
+                        },
+                        'file': {
+                            controller: 'FileCtrl',
+                            templateUrl: 'partials/Sites/siteFileList.html'
+                        },
+                        'peak': {
+                            controller: 'PeakCtrl',
+                            templateUrl: 'partials/Sites/sitePeakList.html'
+
                         }
                     }
                 });//#endregion site.info

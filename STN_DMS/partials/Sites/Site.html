@@ -1,14 +1,25 @@
-﻿<div><h2 style="margin-top:0">Site Dashboard</h2></div>
-<hr />
+﻿<!-- Site title with number-->
+<div class="col-md-12">
+    <div ui-view="siteNo"></div>
+</div>
+
+<!-- Site with map above it -->
 <div class="col-md-8">
     <div ui-view="aSite"></div>
 </div>
+
+<!-- if there's a site, show the OP, Sensor, HWM, Files, and Peaks -->
 <div ng-if="siteID > 0">
     <div class="col-md-4">
         <div ui-view="op"></div>
         <div ui-view="sensor"></div>
+        <div ui-view="hwm"></div>
+        <div ui-view="file"></div>
+        <div ui-view="peak"></div>
     </div>
 </div>
+
+<!-- Style for 'graying' out proposed sensor parts -->
 <style type="text/css">
     .darkClass {
         filter: alpha(opacity=50); /* IE */
@@ -19,7 +30,8 @@
         background-position: center;
     }
 </style>
-<!-- MODALs for Objective Point-->
+
+<!-- MODAL for Objective Point-->
 <script type="text/ng-template" id="OPmodal.html">
     <div class="modal-header">
         <h3 class="modal-title">Objective Point</h3>
@@ -279,6 +291,7 @@
     </form>
 </script>
 
+<!-- MODAL for Site Create/edit-->
 <script type="text/ng-template" id="SITEmodal.html">
     <div class="modal-header">
         <h3 class="modal-title">Site</h3>
@@ -505,7 +518,7 @@
                                 </div>
                             </div>
                             <br clear="all" />
-                            <div ng-show="addedHouseType != undefined">
+                            <div ng-show="addedHouseType.length > 0">
                                 <table class="table">
                                     <thead>
                                         <tr>
