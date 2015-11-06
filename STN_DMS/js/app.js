@@ -628,6 +628,22 @@
                                 return s.getSiteSensors({ id: $stateParams.id }).$promise;
                             }
                         },
+                        thisSiteHWMs: function (s, $stateParams) {
+                            if ($stateParams.id > 0) {
+                                return s.getSiteHWMs({ id: $stateParams.id }).$promise;
+                            }
+                        },
+                        thisSiteFiles: function (s, $stateParams) {
+                            if ($stateParams.id > 0) {
+                                return s.getSiteFiles({ id: $stateParams.id }).$promise;
+                            }
+                        },
+                        thisSitePeaks: function (s, $stateParams) {
+                            if ($stateParams.id > 0) {
+                                return s.getSitePeaks({ id: $stateParams.id }).$promise;
+                            }
+                        },
+
                         hd: 'HORIZONTAL_DATUM',
                         allHorDatums: function (hd) {
                             return hd.getAll().$promise;

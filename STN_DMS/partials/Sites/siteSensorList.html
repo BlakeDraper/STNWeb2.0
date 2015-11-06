@@ -3,6 +3,7 @@
         <accordion-heading>
             <i style="margin-right:10px" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.sensorOpen, 'glyphicon-chevron-right': !status.sensorOpen}"></i>
             <span>Sensors</span>
+            <span class="badge pull-right">{{sensorCount.total}}</span>
         </accordion-heading>
         <div>Add Proposed Sensor:<button type="button" class="btn btn-default" ng-click="showProposed = !showProposed">+</button></div>
         <div ng-show="showProposed">
