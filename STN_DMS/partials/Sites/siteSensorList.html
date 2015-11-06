@@ -1,10 +1,9 @@
-﻿<div class="panel panel-default" style="padding:0;margin:1em;">
-    <div class="panel-heading">
-        <h3 class="panel-title">
-            Sensors
-        </h3>
-    </div>
-    <div class="panel-body">
+﻿<accordion close-others="false">
+    <accordion-group is-open="status.sensorOpen">
+        <accordion-heading>
+            <i style="margin-right:10px" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.sensorOpen, 'glyphicon-chevron-right': !status.sensorOpen}"></i>
+            <span>Sensors</span>
+        </accordion-heading>
         <div>Add Proposed Sensor:<button type="button" class="btn btn-default" ng-click="showProposed = !showProposed">+</button></div>
         <div ng-show="showProposed">
             <ul style="padding-left:0">
@@ -17,6 +16,4 @@
         <ul>
             <li ng-repeat="s in SiteSensors">{{s.STATUS}}, {{s.INSTRUMENT_ID}}</li>
         </ul>
-
-    </div>
-</div>
+    </accordion-group>

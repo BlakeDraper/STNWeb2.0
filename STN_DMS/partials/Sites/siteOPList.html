@@ -1,15 +1,15 @@
-﻿<div class="panel panel-default" style="padding:0;margin:1em;">
-    <div class="panel-heading">
-        <span class="panel-title">Objective Points</span>
+﻿<accordion close-others="false">
+    <accordion-group is-open="status.opOpen">
+        <accordion-heading>
+            <i style="margin-right:10px" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.opOpen, 'glyphicon-chevron-right': !status.opOpen}"></i>
+            <span>Objective Points</span>
+        </accordion-heading>
         <div class="btn-group pull-right">
             <div class="btn-group">
                 <button style="background:none" ng-click="showOPModal(0)" class="btn"><span class="glyphicon glyphicon-plus"></span></button>
             </div>
         </div>
-    </div>
-    <div class="panel-body">
         <ul>
             <li ng-repeat="op in SiteObjectivePoints"><a class="btn" ng-click="showOPModal(op)">{{op.NAME}}</a></li>
         </ul>
-    </div>
-</div>
+    </accordion-group>

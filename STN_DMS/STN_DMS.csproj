@@ -72,6 +72,7 @@
     <Content Include="js\vendor\angular-animate.min.js.map" />
     <Content Include="js\vendor\angular-aria.min.js.map" />
     <Content Include="js\vendor\angular-cookies.min.js.map" />
+    <Content Include="js\vendor\angular-leaflet-directive.js" />
     <Content Include="js\vendor\angular-loader.min.js.map" />
     <Content Include="js\vendor\angular-messages.min.js.map" />
     <Content Include="js\vendor\angular-resource.min.js.map" />
@@ -82,6 +83,7 @@
     <Content Include="js\vendor\angular.js" />
     <Content Include="js\vendor\checklist-model.js" />
     <Content Include="js\vendor\errors.json" />
+    <Content Include="js\vendor\angular-simple-logger.js" />
     <Content Include="js\vendor\ng-tags-input.min.js" />
     <Content Include="js\vendor\version.json" />
   </ItemGroup>
@@ -189,6 +191,9 @@
     <Content Include="partials\homeBase.html" />
     <Content Include="partials\entryView.html" />
     <Content Include="partials\login.html" />
+    <Content Include="partials\Sites\sitePeakList.html" />
+    <Content Include="partials\Sites\siteFileList.html" />
+    <Content Include="partials\Sites\siteHWMList.html" />
     <Content Include="partials\Sites\siteOPList.html" />
     <Content Include="partials\Sites\Site.html" />
     <Content Include="partials\Sites\siteInfoView.html" />
