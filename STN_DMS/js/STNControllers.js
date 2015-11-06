@@ -1927,11 +1927,11 @@
 
     //#region SITE
     STNControllers.controller('SiteCtrl', ['$scope', '$rootScope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'getCreds', 'getUserID',
-        'thisSite', 'thisSiteNetworkNames', 'thisSiteNetworkTypes', 'thisSiteHousings',
+        'thisSite', 'thisSiteNetworkNames', 'thisSiteNetworkTypes', 'thisSiteHousings', 'thisSiteOPs', 'thisSiteSensors', 'thisSiteHWMs', 'thisSiteFiles', 'thisSitePeaks',
         'SITE', 'LANDOWNER_CONTACT', 'MEMBER', 'DEPLOYMENT_TYPE', 'INSTRUMENT', 'INSTRUMENT_STATUS', 'SITE_HOUSING', 'NETWORK_NAME',
         'allHorDatums', 'allHorCollMethods', 'allStates', 'allCounties', 'allDeployPriorities', 'allHousingTypes', 'allNetworkNames', 'allNetworkTypes', 'allDeployTypes', 'allSensDeps', SiteCtrl]);
     function SiteCtrl($scope, $rootScope, $location, $state, $http, $modal, $filter, $timeout, checkCreds, getCreds, getUserID,
-        thisSite, thisSiteNetworkNames, thisSiteNetworkTypes, thisSiteHousings,
+        thisSite, thisSiteNetworkNames, thisSiteNetworkTypes, thisSiteHousings, thisSiteOPs, thisSiteSensors, thisSiteHWMs, thisSiteFiles, thisSitePeaks,
         SITE, LANDOWNER_CONTACT, MEMBER, DEPLOYMENT_TYPE, INSTRUMENT, INSTRUMENT_STATUS, SITE_HOUSING, NETWORK_NAME,
         allHorDatums, allHorCollMethods, allStates, allCounties, allDeployPriorities, allHousingTypes, allNetworkNames, allNetworkTypes, allDeployTypes, allSensDeps) {
         if (!checkCreds()) {
@@ -2003,7 +2003,8 @@
             if (thisSite != undefined) {
                 //#region existingSite
                 if (thisSite.SITE_ID != undefined) {
-                    $scope.aSite = thisSite;
+                    $scope.aSite = thisSite;                  
+
                     $scope.aSite.decDegORdms = 'dd';
                     $scope.aSite.HorizontalDatum = $scope.aSite.HDATUM_ID > 0 ? allHorDatums.filter(function (hd) { return hd.DATUM_ID == $scope.aSite.HDATUM_ID; })[0].DATUM_NAME : "---";
                     $scope.aSite.HorizontalCollectMethod = $scope.aSite.HCOLLECT_METHOD_ID != undefined && $scope.aSite.HCOLLECT_METHOD_ID > 0 ? allHorCollMethods.filter(function (hc) { return hc.HCOLLECT_METHOD_ID == $scope.aSite.HCOLLECT_METHOD_ID; })[0].HCOLLECT_METHOD : "---";
@@ -2122,6 +2123,7 @@
             $location.path('/login');
             } else {
             //global vars
+            $scope.opCount = { total: thisSiteOPs.length };
             $scope.SiteObjectivePoints = thisSiteOPs;
 
             $scope.showOPModal = function (OPclicked) {
@@ -2163,6 +2165,7 @@
             $location.path('/login');
         } else {
             //global vars
+            $scope.sensorCount = { total: thisSiteSensors.length };
             $scope.statusTypeList = allStatusTypes;
             $scope.deployTypeList = allDeployTypes;
             $scope.sensDepTypes = allSensDeps;
@@ -2185,37 +2188,40 @@
     //#endregion INSTRUMENT
 
     //#region HWM
-    STNControllers.controller('HWMCtrl', ['$scope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'thisSite', HWMCtrl]);
-    function HWMCtrl($scope, $location, $state, $http, $modal, $filter, $timeout, checkCreds, thisSite) {
+    STNControllers.controller('HWMCtrl', ['$scope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'thisSite', 'thisSiteHWMs', HWMCtrl]);
+    function HWMCtrl($scope, $location, $state, $http, $modal, $filter, $timeout, checkCreds, thisSite, thisSiteHWMs) {
         if (!checkCreds()) {
             $scope.auth = false;
             $location.path('/login');
         } else {
             //global vars
+            $scope.hwmCount = { total: thisSiteHWMs.length };
         }
     }
     //#endregion HWM
 
     //#region FILE
-    STNControllers.controller('FileCtrl', ['$scope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'thisSite', FileCtrl]);
-    function FileCtrl($scope, $location, $state, $http, $modal, $filter, $timeout, checkCreds, thisSite) {
+    STNControllers.controller('FileCtrl', ['$scope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'thisSite', 'thisSiteFiles', FileCtrl]);
+    function FileCtrl($scope, $location, $state, $http, $modal, $filter, $timeout, checkCreds, thisSite, thisSiteFiles) {
         if (!checkCreds()) {
             $scope.auth = false;
             $location.path('/login');
         } else {
             //global vars
+            $scope.fileCount = { total: thisSiteFiles.length };
         }
     }
     //#endregion FILE
 
     //#region PEAK
-    STNControllers.controller('PeakCtrl', ['$scope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'thisSite', PeakCtrl]);
-    function PeakCtrl($scope, $location, $state, $http, $modal, $filter, $timeout, checkCreds, thisSite) {
+    STNControllers.controller('PeakCtrl', ['$scope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'thisSite', 'thisSitePeaks', PeakCtrl]);
+    function PeakCtrl($scope, $location, $state, $http, $modal, $filter, $timeout, checkCreds, thisSite, thisSitePeaks) {
         if (!checkCreds()) {
             $scope.auth = false;
             $location.path('/login');
         } else {
             //global vars
+            $scope.peakCount = { total: thisSitePeaks.length };
         }
     }
     //#endregion PEAK
