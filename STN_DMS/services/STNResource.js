@@ -383,7 +383,8 @@
                 getAll: { method: 'GET', isArray: true },
                 update: { method: 'PUT', cache: false, isArray: false },
                 createOPControlID: { method: 'POST', cache: false, isArray: false, url: rootURL + "/ObjectivePoints/:id/AddOPControls" },
-                getOPControls: {method: 'GET', cache: false, isArray: true, url: rootURL + "/ObjectivePoints/:id/OPControls" },
+                getOPControls: { method: 'GET', cache: false, isArray: true, url: rootURL + "/ObjectivePoints/:id/OPControls" },
+                getOPFiles: {method: 'GET', cache: false, isArray: true, url: rootURL + "/ObjectivePoints/:id/Files"},
                 save: { method: 'POST', cache: false, isArray: false },
                 delete: { method: 'DELETE', cache: false, isArray: false }
             });

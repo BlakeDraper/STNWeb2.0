@@ -2157,6 +2157,7 @@
         } else {
             //global vars
             $scope.sensorCount = { total: thisSiteSensors.length };
+
             $scope.statusTypeList = allStatusTypes;
             $scope.deployTypeList = allDeployTypes;
             $scope.sensDepTypes = allSensDeps;
@@ -4308,7 +4309,8 @@
         $scope.addedIdentifiers = []; //holder for added Identifiers
         $scope.showControlIDinput = false; //initially hide the area containing added control Identifiers
         $scope.DMS = {}; //object for Deg Min Sec values
-
+        $scope.OPFiles = []; //holder for op files added
+        $scope.photoFiles = [];
         //make uncertainty cleared and disabled when 'unquantified' is checked
         $scope.UnquantChecked = function () {
             if ($scope.OP.UNQUANTIFIED == 1) 
@@ -4344,6 +4346,29 @@
                 $scope.addedIdentifiers = thisOPControls;
                 $scope.showControlIDinput = true;
             }
+            //see if there's any OPFiles
+            OBJECTIVE_POINT.getOPFiles({ id: $scope.OP.OBJECTIVE_POINT_ID }, function success(response) {
+                $scope.OPFiles = response;
+            }, function error(errorResponse) {
+                toastr.error("Error getting OP files: " + errorResponse.statusText);
+            });
+            
+            /*carousel TODO
+            $scope.myInterval = 5000;
+            $scope.noWrapSlides = false;
+            var slides = $scope.slides = [];
+            $scope.addSlide = function () {
+                var newWidth = 600 + slides.length + 1;
+                slides.push({
+                    image: '//placekitten.com/' + newWidth + '/300',
+                    text: ['More', 'Extra', 'Lots of', 'Surplus'][slides.length % 4] + ' ' +
+                      ['Cats', 'Kittys', 'Felines', 'Cutes'][slides.length % 4]
+                });
+            };
+            for (var i = 0; i < 4; i++) {
+                $scope.addSlide();
+            }*/
+
             //#endregion 
         } else {
             //#region new OP 
@@ -4588,6 +4613,7 @@
 
         //delete this OP from the SITE
         $scope.deleteOP = function () {
+            //TODO:: Delete the files for this OP too or reassign to the Site?? Services or client handling?
             var DeleteModalInstance = $modal.open({
                 templateUrl: 'removemodal.html',
                 controller: 'ConfirmModalCtrl',

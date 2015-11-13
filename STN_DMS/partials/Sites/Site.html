@@ -296,14 +296,34 @@
                     </div>
                 </div>
 
+                <div ng-if="OPFiles">
+                    <h3>Objective Point Files</h3>
+                    <!--<div style="height:140px;display:inline">
+                        <carousel interval="myInterval" no-wrap="noWrapSlides">
+                            <slide ng-repeat="slide in slides" active="slide.active">
+                                <img ng-src="{{slide.image}}" style="margin:auto;">
+                                <div class="carousel-caption">
+                                    <h4>Slide {{$index}}</h4>
+                                    <p>{{slide.text}}</p>
+                                </div>
+                            </slide>
+                        </carousel>
+                    </div>-->
+                    <!--<div ng-repeat="opf in OPFiles">
+                        <div ng-if="opf.FILETYPE_ID == 1">
+                            <h3>Photo Files</h3>
 
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" ng-if="OP.OBJECTIVE_POINT_ID != undefined" ng-click="save()">Save</button>
-                <button class="btn btn-danger" ng-if="OP.OBJECTIVE_POINT_ID != undefined" ng-click="deleteOP()">Delete</button>
-                <button class="btn btn-primary" ng-if="OP.OBJECTIVE_POINT_ID == undefined" ng-click="create()">Create</button>
-                <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
-            </div>
+                        </div>
+                    </div>-->
+                </div>
+
+
+                <div class="modal-footer">
+                    <button class="btn btn-primary" ng-if="OP.OBJECTIVE_POINT_ID != undefined" ng-click="save()">Save</button>
+                    <button class="btn btn-danger" ng-if="OP.OBJECTIVE_POINT_ID != undefined" ng-click="deleteOP()">Delete</button>
+                    <button class="btn btn-primary" ng-if="OP.OBJECTIVE_POINT_ID == undefined" ng-click="create()">Create</button>
+                    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+                </div>
         </fieldset>
     </form>
 </script>
