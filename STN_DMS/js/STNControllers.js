@@ -561,10 +561,8 @@
             $scope.aFile = {};
             $scope.toggleCaptionPreview = false;
             //#region Datepicker
-            $scope.datepickrs = {
-                projStDate: false,
-                projEndDate: false
-            };
+            $scope.datepickrs = {};
+
             $scope.open = function ($event, which) {
                 $event.preventDefault();
                 $event.stopPropagation();
@@ -841,10 +839,7 @@
             //#endregion changing tabs handler //////////////////////
 
             //#region Datepicker
-            $scope.datepickrs = {
-                projStDate: false,
-                projEndDate: false
-            };
+            $scope.datepickrs = {};
             $scope.open = function ($event, which) {
                 $event.preventDefault();
                 $event.stopPropagation();
@@ -1938,32 +1933,12 @@
             $scope.auth = false;
             $location.path('/login');
         } else {
-            //global vars
-            //$scope.HorizontalDatumList = allHorDatums;
-            //$scope.HorCollMethodList = allHorCollMethods;
-            //$scope.StateList = allStates;
-            ////$scope.CountyList = allCounties;
-            //$scope.HousingTypeList = allHousingTypes;
-            //$scope.DepPriorityList = allDeployPriorities;
-            //$scope.NetNameList = allNetworkNames;
-            //$scope.NetTypeList = allNetworkTypes;
-            //$scope.ProposedSens = allDeployTypes;
-            //$scope.SensorDeployment = allSensDeps;
             $rootScope.thisPage = "Site Dashboard";
             $scope.aSite = {};
             $scope.status = {
                 mapOpen: false, siteOpen: true, opOpen: false, sensorOpen: false, hwmOpen: false, filesOpen: false, peakOpen: false
             };
-            //$scope.DMS = {}; //holder of deg min sec values
-            //$scope.originalSiteHousings = [];
-            //$scope.checked = ""; $scope.checkedName = "Not Defined"; //comparers for disabling network names if 'Not Defined' checked
-            //$scope.landowner = {};
-            //$scope.addLandowner = false; //hide landowner fields
-            //$scope.disableSensorParts = false; //toggle to disable/enable sensor housing installed and add proposed sensor
-            //$scope.showSiteHouseTable = false;
             $scope.addedHouseType = []; //holder for when adding housing type to page from multiselect
-            //$scope.siteHousesModel = {};
-            
             
             //open modal to edit or create a site
             $scope.openSiteCreate = function () {
@@ -2104,11 +2079,8 @@
                 }
                     //#endregion existingSite
             } else {
-              
-
                 //open modal if new site for create
                 $scope.openSiteCreate();
-
             }
         }//end else checkCreds is good
     }
@@ -2116,46 +2088,65 @@
     //#endregion SITE
 
     //#region OBJECTIVE_POINT allVertDatums, allVertColMethods, allOPQualities
-    STNControllers.controller('ObjectivePointCtrl', ['$scope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'thisSite', 'thisSiteOPs', 'allOPTypes', 'allHorDatums', 'allHorCollMethods', 'allVertDatums', 'allVertColMethods', 'allOPQualities', ObjectivePointCtrl]);
-    function ObjectivePointCtrl($scope, $location, $state, $http, $modal, $filter, $timeout, checkCreds, thisSite, thisSiteOPs, allOPTypes, allHorDatums, allHorCollMethods, allVertDatums, allVertColMethods, allOPQualities) {
+    STNControllers.controller('ObjectivePointCtrl', ['$scope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'OBJECTIVE_POINT', 'thisSite', 'thisSiteOPs', 'allOPTypes', 'allHorDatums', 'allHorCollMethods', 'allVertDatums', 'allVertColMethods', 'allOPQualities', ObjectivePointCtrl]);
+    function ObjectivePointCtrl($scope, $location, $state, $http, $modal, $filter, $timeout, checkCreds, OBJECTIVE_POINT, thisSite, thisSiteOPs, allOPTypes, allHorDatums, allHorCollMethods, allVertDatums, allVertColMethods, allOPQualities) {
         if (!checkCreds()) {
             $scope.auth = false;
             $location.path('/login');
-            } else {
+        } else {
             //global vars
             $scope.opCount = { total: thisSiteOPs.length };
             $scope.SiteObjectivePoints = thisSiteOPs;
 
             $scope.showOPModal = function (OPclicked) {
                 var passAllLists =[allOPTypes, allHorDatums, allHorCollMethods, allVertDatums, allVertColMethods, allOPQualities];
+                var indexClicked = $scope.SiteObjectivePoints.indexOf(OPclicked);
 
-                    //modal
+                //modal
                 var modalInstance = $modal.open({
-                        templateUrl : 'OPmodal.html',
-                            controller: 'OPmodalCtrl',
-                                size: 'lg',
-                                backdrop: 'static',
-                            windowClass: 'rep-dialog',
-                            resolve: {
-                                allDropdowns: function () {
-                                    return passAllLists;
-                                },
-                                    thisOP: function () {
-                                    return OPclicked != 0 ? OPclicked: "empty";
+                    templateUrl : 'OPmodal.html',
+                    controller: 'OPmodalCtrl',
+                    size: 'lg',
+                    backdrop: 'static',
+                    windowClass: 'rep-dialog',
+                    resolve: {
+                        allDropdowns: function () {
+                            return passAllLists;
                         },
-                            opSite: function () {
-                                return thisSite;
+                        thisOP: function () {
+                            return OPclicked != 0 ? OPclicked: "empty";
+                        },
+                        thisOPControls: function () {
+                            if (OPclicked != 0) {
+                                return OBJECTIVE_POINT.getOPControls({id: OPclicked.OBJECTIVE_POINT_ID}).$promise;
                             }
+                        },
+                        opSite: function () {
+                            return thisSite;
                         }
-                        });
-                        modalInstance.result.then(function (r) {
-                            //nothing to do here
-                        });
-                        };
+                    }
+                });
+                modalInstance.result.then(function (createdOP) {
+                    //is there a new op or just closed modal
+                    if (createdOP[1] == 'created') {
+                        $scope.SiteObjectivePoints.push(createdOP[0]);
+                        $scope.opCount.total = $scope.SiteObjectivePoints.length;
+                    }
+                    if (createdOP[1] == 'updated') {
+                        //this is from edit -- refresh page?
+                        var indexClicked = $scope.SiteObjectivePoints.indexOf(OPclicked);
+                        $scope.SiteObjectivePoints[indexClicked] = createdOP[0];
+                    }
+                    if (createdOP[1] == 'deleted') {
+                        var indexClicked = $scope.SiteObjectivePoints.indexOf(OPclicked);
+                        $scope.SiteObjectivePoints.splice(indexClicked, 1);
+                        $scope.opCount.total = $scope.SiteObjectivePoints.length;
+                    }
+                });
+            };
         }
-        }
-
-            //#endregion OBJECTIVE_POINT
+    }
+    //#endregion OBJECTIVE_POINT
 
     //#region INSTRUMENT
     STNControllers.controller('SensorCtrl', ['$scope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'thisSite', 'thisSiteSensors', 'allStatusTypes', 'allDeployTypes', 'allSensDeps', 'INSTRUMENT', SensorCtrl]);
@@ -4173,6 +4164,7 @@
     //popup confirm box
     STNControllers.controller('ConfirmModalCtrl', ['$scope', '$modalInstance', 'nameToRemove', 'what', ConfirmModalCtrl]);
     function ConfirmModalCtrl($scope, $modalInstance, nameToRemove, what) {
+        //#region switch (long)
         switch (what) {
             case "Member":
                 $scope.nameToRmv = nameToRemove.FNAME + " " + nameToRemove.LNAME;
@@ -4246,7 +4238,11 @@
             case "Vertical Datum":
                 $scope.nameToRmv = nameToRemove.DATUM_ABBREVIATION;
                 break;
+            case "Objective Point":
+                $scope.nameToRmv = nameToRemove.NAME;
+                break;
         }
+        //#endregion
         
         $scope.what = what;
 
@@ -4296,32 +4292,9 @@
         };
     }
     
-    STNControllers.controller('OPmodalCtrl', ['$scope', '$modalInstance', 'allDropdowns', 'thisOP', 'opSite', OPmodalCtrl]);
-    function OPmodalCtrl($scope, $modalInstance, allDropdowns, thisOP, opSite) {
-        if (thisOP != "empty") {
-            //existing OP
-            $scope.OP = thisOP;
-
-        } else {
-            //new OP
-            $scope.OP = {};
-            $scope.OP.LATITUDE_DD = opSite.LATITUDE_DD;
-            $scope.OP.LONGITUDE_DD = opSite.LONGITUDE_DD;
-            $scope.OP.HDATUM_ID = opSite.HDATUM_ID;
-            //default today for establised date
-            var d = new Date();
-            var year = d.getFullYear();
-            var month = d.getMonth();
-            var day = ('0' + d.getDate()).slice(-2);
-            var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
-            $scope.OP.DATE_ESTABLISHED = monthNames[month] + " " + day + ", " + year;            
-        }
-
+    STNControllers.controller('OPmodalCtrl', ['$scope', '$http', '$modalInstance', '$modal', 'allDropdowns', 'thisOP', 'thisOPControls', 'opSite', 'getCreds', 'OBJECTIVE_POINT', 'OP_CONTROL_IDENTIFIER', OPmodalCtrl]);
+    function OPmodalCtrl($scope, $http, $modalInstance, $modal, allDropdowns, thisOP, thisOPControls, opSite, getCreds, OBJECTIVE_POINT, OP_CONTROL_IDENTIFIER) {
         //defaults for radio buttons
-        $scope.OP.decDegORdms = 'dd';
-        $scope.OP.FTorMETER = 'ft';
-        $scope.OP.FTorCM = 'ft';
-        $scope.thisOPsite = opSite;
         //dropdowns
         $scope.OPTypeList = allDropdowns[0];
         $scope.HDList = allDropdowns[1];
@@ -4329,24 +4302,72 @@
         $scope.VDatumList = allDropdowns[3];
         $scope.VCollectMethodList = allDropdowns[4];
         $scope.OPQualityList = allDropdowns[5];
-        //holder for added Identifiers
-        $scope.addedIdentifiers = [];
-        //initially hide the area containing added control Identifiers
-        $scope.showControlIDinput = false;
-        //object for Deg Min Sec values
-        $scope.DMS = {};
+        $scope.OP = {};
+        $scope.removeOPCarray = []; //holder if they remove any OP controls
+        $scope.thisOPsite = opSite; //this OP's SITE
+        $scope.addedIdentifiers = []; //holder for added Identifiers
+        $scope.showControlIDinput = false; //initially hide the area containing added control Identifiers
+        $scope.DMS = {}; //object for Deg Min Sec values
+
+        //make uncertainty cleared and disabled when 'unquantified' is checked
+        $scope.UnquantChecked = function () {
+            if ($scope.OP.UNQUANTIFIED == 1) 
+                $scope.OP.UNCERTAINTY = "";
+        }
+
+        //called a few times to format just the date (no time)
+        var makeAdate = function (d) {
+            var aDate = new Date();
+            if (d != "") {
+                //provided date
+                aDate = new Date(d);
+            }
+                
+            var year = aDate.getFullYear();
+            var month = aDate.getMonth();
+            var day = ('0' + aDate.getDate()).slice(-2);
+            var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            var dateWOtime = new Date(monthNames[month] + " " + day + ", " + year);
+            return dateWOtime;           
+        }
+               
+        if (thisOP != "empty") {
+            //#region existing OP
+            $scope.OP = thisOP;
+            //formatted as date for datepicker
+            $scope.OP.DATE_ESTABLISHED = makeAdate($scope.OP.DATE_ESTABLISHED);
+
+            if ($scope.OP.DATE_RECOVERED != null)
+                $scope.OP.DATE_RECOVERED = makeAdate($scope.OP.DATE_RECOVERED);            
+
+            if (thisOPControls.length > 0) {
+                $scope.addedIdentifiers = thisOPControls;
+                $scope.showControlIDinput = true;
+            }
+            //#endregion 
+        } else {
+            //#region new OP 
+            $scope.OP.LATITUDE_DD = opSite.LATITUDE_DD;
+            $scope.OP.LONGITUDE_DD = opSite.LONGITUDE_DD;
+            $scope.OP.HDATUM_ID = opSite.HDATUM_ID;
+            //default today for establised date
+            $scope.OP.DATE_ESTABLISHED = makeAdate("");
+            //#endregion
+        }
+
+        //default radios (has to come after OP is set one way or another)
+        $scope.OP.decDegORdms = 'dd';
+        $scope.OP.FTorMETER = 'ft';
+        $scope.OP.FTorCM = 'ft';
 
         //want to add identifier
         $scope.addNewIdentifier = function () {
-            $scope.addedIdentifiers.push({ IDENTIFIER: "", TYPE: "" });
+            $scope.addedIdentifiers.push({ OBJECTIVE_POINT_ID: $scope.OP.OBJECTIVE_POINT_ID, IDENTIFIER: "", IDENTIFIER_TYPE: "" });
             $scope.showControlIDinput = true;
         }
 
-        //#region Datepicker
-        $scope.datepickrs = {
-            projStDate: false,
-            projEndDate: false
-        };
+        //Datepicker
+        $scope.datepickrs = {};
         $scope.open = function ($event, which) {
             $event.preventDefault();
             $event.stopPropagation();
@@ -4354,13 +4375,12 @@
             $scope.datepickrs[which] = true;
         };
 
+        //cancel
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
 
-        //#endregion Datepicker
-
-        //  lat/long =is number
+        //lat/long =is number
         $scope.isNum = function (evt) {
             var theEvent = evt || window.event;
             var key = theEvent.keyCode || theEvent.which;
@@ -4433,7 +4453,7 @@
         //just need an OBJECTIVE_POINT object to post/put
         var trimOP = function (op) {
             var OBJ_PT = {
-                OBJECTIVE_POINT_ID: op.OBJECTIVE_POINT_ID != undefined ? op.OBJECTIVE_POINT : 0,
+                OBJECTIVE_POINT_ID: op.OBJECTIVE_POINT_ID != undefined ? op.OBJECTIVE_POINT_ID : 0,
                 NAME: op.NAME,
                 DESCRIPTION: op.DESCRIPTION,
                 ELEV_FT: op.ELEV_FT != undefined ? op.ELEV_FT : null,
@@ -4456,37 +4476,148 @@
             return OBJ_PT;
         }
 
+        //cancel modal
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+
+        //fix default radios and lat/long
+        var formatDefaults = function (theOP) {
+            //$scope.OP.FTorMETER needs to be 'ft'. if 'meter' ==convert value to ft 
+            if (theOP.FTorMETER == "meter") {
+                $scope.OP.FTorMETER = 'ft';
+                $scope.OP.ELEV_FT = $scope.OP.ELEV_FT * 3.2808;
+            }
+            //$scope.OP.FTorCM needs to be 'ft'. if 'cm' ==convert value to ft 
+            if (theOP.FTorCM == "cm") {
+                $scope.OP.FTorCM = 'ft'
+                $scope.OP.UNCERTAINTY = $scope.OP.UNCERTAINTY / 30.48;
+            }
+            //$scope.OP.decDegORdms needs to be 'dd'. if 'dms' ==convert $scope.DMS values to dd
+            if (theOP.decDegORdms == "dms") {
+                $scope.OP.decDegORdms = 'dd';
+                $scope.OP.LATITUDE_DD = azimuth($scope.DMS.LADeg, $scope.DMS.LAMin, $scope.DMS.LASec);
+                $scope.OP.LONGITUDE_DD = azimuth($scope.DMS.LODeg, $scope.DMS.LOMin, $scope.DMS.LOSec);
+                $scope.DMS = {};
+                $scope.OP.SITE_ID = $scope.thisOPsite.SITE_ID;
+            }
+        }
+
+        //Create this OP
         $scope.create = function () {
             if (this.OPForm.$valid) {
-                //post the stuff
-                //$scope.OP.FTorMETER needs to be 'ft'. if 'meter' ==convert value to ft 
-                if ($scope.OP.FTorMETER == "meter") {
-                    $scope.OP.FTorMETER = 'ft';
-                    $scope.OP.ELEV_FT = $scope.OP.ELEV_FT * 3.2808;
-                }
-                //$scope.OP.FTorCM needs to be 'ft'. if 'cm' ==convert value to ft 
-                if ($scope.OP.FTorCM == "cm") {
-                    $scope.OP.FTorCM = 'ft'
-                    $scope.OP.UNCERTAINTY = $scope.OP.UNCERTAINTY / 30.48;
-                }
-                //$scope.OP.decDegORdms needs to be 'dd'. if 'dms' ==convert $scope.DMS values to dd
-                if ($scope.OP.decDegORdms == "dms") {
-                    $scope.OP.decDegORdms = 'dd';
-                    $scope.OP.LATITUDE_DD = azimuth($scope.DMS.LADeg, $scope.DMS.LAMin, $scope.DMS.LASec);
-                    $scope.OP.LONGITUDE_DD = azimuth($scope.DMS.LODeg, $scope.DMS.LOMin, $scope.DMS.LOSec);
-                    $scope.DMS = {};
-                }
-                //add $scope.thisOPsite.SITE_ID to the OP before POST
-                $scope.OP.SITE_ID = $scope.thisOPsite.SITE_ID;
-                var OPtoPOST = trimOP($scope.OP);
-                var test;
-                //post $scope.addedIdentifiers
-         
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Accept'] = 'application/json';
+                var createdOP = {};
+                //post
+                formatDefaults($scope.OP); //$scope.OP.FTorMETER, FTorCM, decDegORdms                               
+                var OPtoPOST = trimOP($scope.OP); //make it an OBJECTIVE_POINT for saving
+
+                OBJECTIVE_POINT.save(OPtoPOST, function success(response) {
+                    toastr.success("Objective Point created");
+                    createdOP = response;
+                    if ($scope.addedIdentifiers.length > 0) {
+                        //post each one
+                        for (var opc = 0; opc < $scope.addedIdentifiers.length; opc++)
+                            OBJECTIVE_POINT.createOPControlID({ id: response.OBJECTIVE_POINT_ID }, $scope.addedIdentifiers[opc]).$promise;
+                    }
+                }).$promise.then(function () {
+                    var sendBack = [createdOP, 'created'];
+                    $modalInstance.close(sendBack);
+                });         
             } else {
                 alert("Please populate all required fields");
             }
+        } //end Create
+
+        //X was clicked next to existing Control Identifier to have it removed, store in remove array for Save()
+        $scope.RemoveID = function (opControl) {
+            //only add to remove list if it's an existing one to DELETE
+            var i = $scope.addedIdentifiers.indexOf(opControl);
+            if (opControl.OP_CONTROL_IDENTIFIER_ID != undefined) {                
+                $scope.removeOPCarray.push(opControl);
+                $scope.addedIdentifiers.splice(i, 1);
+            } else {
+                $scope.addedIdentifiers.splice(i, 1);
+            }
         }
-    }
+
+        //Save this OP
+        $scope.save = function () {
+            if ($scope.OPForm.$valid) {
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Accept'] = 'application/json';
+                
+                var updatedOP = {};
+                //if there's an OP_CONTROL_IDENTIFIER_ID, PUT .. else POST
+                if ($scope.addedIdentifiers.length > 0) {
+                    for (var i = 0; i < $scope.addedIdentifiers.length; i++) {
+                        if ($scope.addedIdentifiers[i].OP_CONTROL_IDENTIFIER_ID != undefined) {
+                            //existing: PUT
+                            OP_CONTROL_IDENTIFIER.update({ id: $scope.addedIdentifiers[i].OP_CONTROL_IDENTIFIER_ID }, $scope.addedIdentifiers[i]).$promise;
+                        } else {
+                            //post each one
+                            OBJECTIVE_POINT.createOPControlID({ id: $scope.OP.OBJECTIVE_POINT_ID }, $scope.addedIdentifiers[i]).$promise;
+                        }
+                    }//end foreach addedIdentifier
+                }//end if there's addedidentifiers
+
+                //if there's any in removeOPCarray, DELETE those
+                if ($scope.removeOPCarray.length > 0) {
+                    for (var r = 0; r < $scope.removeOPCarray.length; r++) {
+                        OP_CONTROL_IDENTIFIER.delete({ id: $scope.removeOPCarray[r].OP_CONTROL_IDENTIFIER_ID }).$promise;
+                    }//end foreach removeOPCarray
+                }//end if there's removeOPCs
+
+                //look at OP.FTorMETER ("ft"), OP.FTorCM ("ft"), and OP.decDegORdms ("dd"), make sure site_ID is on there and send it to trim before PUT
+                formatDefaults($scope.OP); //$scope.OP.FTorMETER, FTorCM, decDegORdms
+                var OPtoPOST = trimOP($scope.OP);
+                //$http.defaults.headers.common['X-HTTP-Method-Override'] = 'PUT';
+                OBJECTIVE_POINT.update({ id: OPtoPOST.OBJECTIVE_POINT_ID }, OPtoPOST, function success(response) {
+                    toastr.success("Objective Point updated");
+                    updatedOP = response;
+                //    delete $http.defaults.headers.common['X-HTTP-Method-Override'];
+                }).$promise.then(function () {
+                    var sendBack = [updatedOP, 'updated'];
+                    $modalInstance.close(sendBack);
+                });
+            } else {
+                alert("Please populated all required fields");
+            }
+        } //end Save
+
+        //delete this OP from the SITE
+        $scope.deleteOP = function () {
+            var DeleteModalInstance = $modal.open({
+                templateUrl: 'removemodal.html',
+                controller: 'ConfirmModalCtrl',
+                size: 'sm',
+                resolve: {
+                    nameToRemove: function () {
+                        return $scope.OP;
+                    },
+                    what: function () {
+                        return "Objective Point";
+                    }
+                }
+            });
+                      
+            DeleteModalInstance.result.then(function (opToRemove) {
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                OBJECTIVE_POINT.delete({ id: opToRemove.OBJECTIVE_POINT_ID }, opToRemove).$promise.then(function () {
+                    toastr.success("Objective Point Removed");
+                    var sendBack = ["de", 'deleted'];
+                    $modalInstance.close(sendBack);
+                    }, function error(errorResponse) {
+                        toastr.error("Error: " + errorResponse.statusText);
+                    });
+                }, function () {
+                    //logic for cancel
+            });//end modal
+        }
+        
+
+    }//end OPmodalCtrl
 
     STNControllers.controller('SITEmodalCtrl', ['$scope', '$location', '$state', '$http', '$timeout', '$modalInstance', '$filter', 'checkCreds', 'getCreds', 'getUserID', 'allDropDownParts', 'thisSiteStuff', 'SITE', 'SITE_HOUSING', 'MEMBER', 'INSTRUMENT', 'INSTRUMENT_STATUS', 'LANDOWNER_CONTACT', SITEmodalCtrl]);
     function SITEmodalCtrl($scope, $location, $state, $http, $timeout, $modalInstance, $filter, checkCreds, getCreds, getUserID, allDropDownParts, thisSiteStuff, SITE, SITE_HOUSING, MEMBER, INSTRUMENT, INSTRUMENT_STATUS, LANDOWNER_CONTACT) {

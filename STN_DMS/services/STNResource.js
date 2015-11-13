@@ -375,6 +375,35 @@
     }]);
     //#endregion of NETWORK_TYPE
     
+    //#region OBJECTIVE_POINT
+    STNResource.factory('OBJECTIVE_POINT', ['$resource', function ($resource) {
+        return $resource(rootURL + '/ObjectivePoints/:id.json',
+            {}, {
+                query: {},
+                getAll: { method: 'GET', isArray: true },
+                update: { method: 'PUT', cache: false, isArray: false },
+                createOPControlID: { method: 'POST', cache: false, isArray: false, url: rootURL + "/ObjectivePoints/:id/AddOPControls" },
+                getOPControls: {method: 'GET', cache: false, isArray: true, url: rootURL + "/ObjectivePoints/:id/OPControls" },
+                save: { method: 'POST', cache: false, isArray: false },
+                delete: { method: 'DELETE', cache: false, isArray: false }
+            });
+    }]);
+    //#endregion of OBJECTIVE_POINT
+
+    //#region OP_CONTROL_IDENTIFIER
+    STNResource.factory('OP_CONTROL_IDENTIFIER', ['$resource', function ($resource) {
+        return $resource(rootURL + '/OPControlIdentifiers/:id.json',
+            {}, {
+                query: {},
+                getAll: { method: 'GET', isArray: true },
+                update: { method: 'PUT', cache: false, isArray: false },
+                save: { method: 'POST', cache: false, isArray: false },
+                delete: { method: 'DELETE', cache: false, isArray: false }
+            });
+    }]);
+    //#endregion of OP_CONTROL_IDENTIFIER
+
+
     //#region OP_QUALITY
     STNResource.factory('OP_QUALITY', ['$resource', function ($resource) {
         return $resource(rootURL + '/ObjectivePointQualities/:id.json',
