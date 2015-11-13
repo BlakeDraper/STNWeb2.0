@@ -754,8 +754,11 @@
                     url: "/SiteDashboard",
                     views: {
                         'siteNo': {
-                            controller: 'SiteCtrl',
-                            template: '<div><h2 style="margin-top:0">Site {{aSite.SITE_NO}}</h2></div><hr />' 
+                            controller: function ($scope, thisSite) {
+                                if (thisSite != undefined)
+                                    $scope.SiteNo = thisSite.SITE_NO;
+                            },
+                            template: '<div><h2 style="margin-top:0">Site {{SiteNo}}</h2></div><hr />' 
                         },
                         'aSite': {
                             controller: 'SiteCtrl',
