@@ -84,6 +84,7 @@
     <Content Include="js\vendor\checklist-model.js" />
     <Content Include="js\vendor\errors.json" />
     <Content Include="js\vendor\angular-simple-logger.js" />
+    <Content Include="js\vendor\jquery.inputmask.bundle.js" />
     <Content Include="js\vendor\ng-tags-input.min.js" />
     <Content Include="js\vendor\version.json" />
   </ItemGroup>

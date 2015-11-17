@@ -2,14 +2,14 @@
     "use strict"; 
     var app = angular.module('app',
         ['ngResource', 'ui.router', 'ngCookies', 'ui.mask', 'ui.bootstrap', 'isteven-multi-select',
-            'STNResource', 'STNControllers', 'STNBusinessServices']);
-    
-    app.run(function ($rootScope) {        
+            'STNResource', 'STNControllers']);
+    //, 'STNBusinessServices'
+    app.run(function ($rootScope) {
         $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
             $("#ui-view").html("");
             $(".page-loading").removeClass("hidden");
             //check to see if they are going to project info
-            
+
             if (toState.url == "/") {
                 //make username focus
                 $("#userNameFocus").focus();
@@ -19,11 +19,11 @@
         $rootScope.$on('$stateChangeSuccess', function () {
             $(".page-loading").addClass("hidden");
         });
+        
     });
-
-    //app.config(function that defines the config code. 'ui.select', 'ngSanitize',
-    app.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
-        function ($stateProvider, $urlRouterProvider, $locationProvider){
+    //app.config(function that defines the config code. 'ui.select', 'ngSanitize','$locationProvider', $locationProvider
+    app.config(['$stateProvider', '$urlRouterProvider', 
+        function ($stateProvider, $urlRouterProvider ){
             //if no active state, display state associated with this fragment identifier
             $urlRouterProvider.otherwise("/");
 
@@ -170,8 +170,8 @@
                         allAgencies: function (ag) {
                             return ag.getAll().$promise;
                         },
-                        incompleteReports: function (r, getUserID) {
-                            var mID = getUserID();
+                        incompleteReports: function (r, $cookies) {
+                            var mID = $cookies.get('mID');
                             return r.getMemberReports({ memberId: mID }).$promise;
                         }
                     }
@@ -247,10 +247,10 @@
                     controller: "memberInfoCtrl",
                     resolve: {
                         m: 'MEMBER',
-                        thisMember: function (m, $stateParams, $http, getCreds) {
+                        thisMember: function (m, $stateParams, $http, $cookies) {
                             var memberId = $stateParams.id;
                             if (memberId > 0) {
-                                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                                 $http.defaults.headers.common['Accept'] = 'application/json';
                                 return m.query(
                                     { id: memberId }).$promise;
@@ -843,9 +843,12 @@
                 //#endregion site.HWM
 
                 
-            $locationProvider.html5Mode(false).hashPrefix('!');
+           // $locationProvider.html5Mode(false).hashPrefix('!');
             //$locationProvider.html5Mode({ enabled: true, requireBase: false });
         }
     ]);
+
+    
+
 
 }());

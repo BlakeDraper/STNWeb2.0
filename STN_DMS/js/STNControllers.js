@@ -1,12 +1,15 @@
 ﻿(function () {
-    /* controllers.js*/
+    /* controllers.js, 'leaflet-directive''ui.unique','ngTagsInput',*/
     'use strict';
 
     var STNControllers = angular.module('STNControllers',
-        ['ngInputModified', 'ui.unique', 'ui.validate', 'angular.filter', 'xeditable', 'checklist-model', 'ngTagsInput', 'ngFileUpload', 'leaflet-directive']);
+        ['ngInputModified',  'ui.validate', 'angular.filter', 'xeditable', 'checklist-model', 'ngFileUpload']);
 
-    //#region FILTERS
-    //#endregion FILTERS
+    //#region cookies
+        /*
+        * STNCreds, STNUsername, usersName, mID, usersRole, SessionEventID, SessionEventName, SessionTeaID, SessionTeamName
+        */
+    //#endregion cookies
 
     //#region CONSTANTS
     //regular expression for a password requirement of at least 8 characters long and at least 3 of 4 character categories used (upper, lower, digit, special
@@ -122,12 +125,6 @@
             link: function (scope, elm, attrs, ctrl) {
                 elm.unbind('keydown').unbind('change');
                 elm.bind('blur', function (viewValue) {
-                    //ctrl.$validators.passwordValidate = function (modelView, viewValue) {
-                    //    if ((regex.PASSWORD).test(viewValue)) {
-                    //        return true;
-                    //    }
-                    //    return false;
-                    //};
                     scope.$apply(function () {
                         if ((regex.PASSWORD).test(viewValue.target.value)) {
                             //it is valid
@@ -250,20 +247,20 @@
     //});
     //#endregion DIRECTIVES
 
-    //#region MAIN Controller
-    STNControllers.controller('mainCtrl', ['$scope', '$rootScope', '$location', '$state', 'checkCreds', 'getUsersNAME', 'getUserID', mainCtrl]);
-    function mainCtrl($scope, $rootScope, $location, $state, checkCreds, getUsersNAME, getUserID) {
+    //#region MAIN Controller 
+    STNControllers.controller('mainCtrl', ['$scope', '$rootScope', '$cookies', '$location', '$state',  mainCtrl]);
+    function mainCtrl($scope, $rootScope, $cookies, $location, $state) {
         //$scope.logo = 'images/usgsLogo.png';
         $rootScope.isAuth = {};
         $rootScope.activeMenu = 'home'; //scope var for setting active class
        // $scope.activeMenu = 'home'; //scope var for setting active class
-        if (!checkCreds()) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $rootScope.isAuth.val = false;
             $location.path('/login');
         } else {
             $rootScope.isAuth.val = true;
-            $rootScope.usersName = getUsersNAME();
-            $rootScope.userID = getUserID();
+            $rootScope.usersName = $cookies.get('usersName');
+            $rootScope.userID = $cookies.get('mID');
             $rootScope.sessionEvent = "";
             $rootScope.sessionTeam = "";
             $state.go('home');
@@ -280,20 +277,23 @@
     //#endregion HELP Controller
 
     //#region NAV Controller
-    STNControllers.controller('navCtrl', ['$scope', '$location', '$rootScope', 'deleteCreds', navCtrl]);
-    function navCtrl($scope, $location, $rootScope, deleteCreds) {
+    STNControllers.controller('navCtrl', ['$scope', '$cookies', '$location', '$rootScope', navCtrl]);
+    function navCtrl($scope, $cookies, $location, $rootScope) {
         $scope.logout = function () {
-            deleteCreds();
+            $cookies.remove('STNCreds');
+            $cookies.remove('STNUsername');
+            $cookies.remove('usersName');
+            $cookies.remove('usersRole');
             $rootScope.isAuth.val = false;
             $location.path('/login');
         };
     }
     //#endregion NAV Controller
 
-    //#region Home Controller
-    STNControllers.controller('HomeCtrl', ['$scope', '$rootScope', '$location', '$http', '$modal', 'eventList', 'agencyList', 'roleList', 'INSTRUMENT', 'HWM', 'MEMBER', 'COLLECT_TEAM', 'checkCreds', 'getCreds', 'getUserID', 'setSessionEvent', 'setSessionTeam', HomeCtrl]);
-    function HomeCtrl($scope, $rootScope, $location, $http, $modal, eventList, agencyList, roleList, INSTRUMENT, HWM, MEMBER, COLLECT_TEAM, checkCreds, getCreds, getUserID, setSessionEvent, setSessionTeam) {
-        if (!checkCreds()) {
+    //#region Home Controller 
+    STNControllers.controller('HomeCtrl', ['$scope', '$rootScope', '$location', '$cookies', '$http', '$modal', 'eventList', 'agencyList', 'roleList', 'INSTRUMENT', 'HWM', 'MEMBER', 'COLLECT_TEAM', HomeCtrl]);
+    function HomeCtrl($scope, $rootScope, $location, $cookies, $http, $modal, eventList, agencyList, roleList, INSTRUMENT, HWM, MEMBER, COLLECT_TEAM) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
@@ -352,7 +352,9 @@
                 //set event to session cookie
                 $scope.evID = this.ChooseEvent.id;
                 var eventName = $scope.allEvents.filter(function (x) { return x.EVENT_ID == $scope.evID; })[0];
-                setSessionEvent($scope.evID, eventName.EVENT_NAME);
+                $cookies.put('SessionEventID', $scope.evID);
+                $cookies.put('SessionEventName', eventName.EVENT_NAME);
+                
                 $rootScope.sessionEvent = "For Event: " + eventName.EVENT_NAME + ".";
 
                 //get all the instrument stat counts
@@ -391,8 +393,10 @@
                     alert("Error: " + errorResponse.statusText);
                 }).$promise;
 
-                //get people count
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                //get people count 
+                var creds = $cookies.get('STNCreds');
+                //   $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.STNCreds;
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + creds;
                 MEMBER.getEventPeople({ Eventid: $scope.evID }, function success(data) {
                     var p = data;
                     $scope.peopleBack = true;
@@ -412,8 +416,9 @@
                         $scope.CollectTeams[x].selected = false;
                     }
                 }
-                setSessionTeam(this.t.COLLECT_TEAM_ID, this.t.DESCRIPTION);
-
+                $cookies.put('SessionTeaID', this.t.COLLECT_TEAM_ID);
+                $cookies.put('SessionTeamName', this.t.DESCRIPTION);
+               
                 $rootScope.sessionTeam = "You are on Team: " + this.t.DESCRIPTION + ".";
             };
 
@@ -457,7 +462,8 @@
             };//end showTeamMembers click
 
             $scope.AddNewTeam = function () {
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 MEMBER.getAll().$promise.then(function (response) {
                     for (var x = 0; x < response.length; x++) {
@@ -495,15 +501,14 @@
                         var createdNewTeam = {};
                         collectTeamToPost.DESCRIPTION = newCreateTeam.TEAM_NAME;
                         //post this collection team
-                        $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                        $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                         $http.defaults.headers.common['Accept'] = 'application/json';
                         COLLECT_TEAM.save(collectTeamToPost).$promise.then(function (newTeam) {
                             toastr.success("Team Created");
                             $scope.CollectTeams.push(newTeam);
                             $scope.teamsBack = true;
-                            //createdNewTeam = newTeam;
-                            //add the logged in member to list of team members
-                            var loggedInMember = $scope.memberList.filter(function (m) { return m.MEMBER_ID == getUserID(); })[0];
+                            //add the logged in member to list of team members  
+                            var loggedInMember = $scope.memberList.filter(function (m) { return m.MEMBER_ID == $cookies.get('mID') })[0];
                             newCreateTeam.MEMBER_WITH.push(loggedInMember);
 
                             for (var m = 0; m < newCreateTeam.MEMBER_WITH.length; m++) {
@@ -531,9 +536,10 @@
     //#endregion Home Controller
 
     //#region Map Controller
-    STNControllers.controller('MapCtrl', ['$scope', '$rootScope', '$location', 'checkCreds', MapCtrl]);
-    function MapCtrl($scope, $rootScope, $location, checkCreds) {
-        if (!checkCreds()) {
+    STNControllers.controller('MapCtrl', ['$scope', '$rootScope', '$cookies', '$location', MapCtrl]);
+    function MapCtrl($scope, $rootScope, $cookies, $location) {
+        var cred = $cookies.get('STNCreds');
+        if (cred == undefined || cred == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
@@ -545,15 +551,15 @@
     //#endregion Map Controller
 
     //#region File Controller
-    STNControllers.controller('FileCtrl', ['$scope', '$location', 'Upload', 'multipartForm', 'checkCreds', 'getUserID', 'getUsersNAME', 'fileTypeList', 'agencyList', FileCtrl]);
-    function FileCtrl($scope, $location, Upload, multipartForm, checkCreds, getUserID, getUsersNAME, fileTypeList, agencyList) {
-        if (!checkCreds()) {
+    STNControllers.controller('FileCtrl', ['$scope', '$location', '$cookies', 'Upload', 'multipartForm', 'fileTypeList', 'agencyList', FileCtrl]);
+    function FileCtrl($scope, $location, $cookies, Upload, multipartForm, fileTypeList, agencyList) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
             $scope.loggedInMember = {};
-            $scope.loggedInMember.fullName = getUsersNAME();
-            $scope.loggedInMember.ID = getUserID();
+            $scope.loggedInMember.fullName = $cookies.get('usersName');
+            $scope.loggedInMember.ID = $cookies.get('mID');
             $scope.map = "Welcome to the new STN File upload Page!!";
             $scope.allFileTypes = fileTypeList;
             $scope.allAgencies = agencyList;
@@ -621,23 +627,19 @@
                         File: $scope.aFile.File
                     };
 
-                    //getCreds() before post https://www.youtube.com/watch?v=vLHgpOG1cW4
+                    //$cookies.STNCreds before post https://www.youtube.com/watch?v=vLHgpOG1cW4
                     multipartForm.post(fileParts);
 
                 }
             };
-
-
         }
     }
     //#endregion File Controller
 
     //#region Approval Controller
-    STNControllers.controller('ApprovalCtrl', ['$scope', '$rootScope', '$location', '$http', 'eventList', 'stateList', 'instrumentList', 'MEMBER', 'allSensorTypes',
-        'HWM', 'DATA_FILE', 'INSTRUMENT', 'SITE', 'checkCreds', 'getCreds', ApprovalCtrl]);
-    function ApprovalCtrl($scope, $rootScope, $location, $http, eventList, stateList, instrumentList, MEMBER, allSensorTypes,
-        HWM, DATA_FILE, INSTRUMENT, SITE, checkCreds, getCreds) {
-        if (!checkCreds()) {
+    STNControllers.controller('ApprovalCtrl', ['$scope', '$cookies', '$rootScope', '$location', '$http', 'eventList', 'stateList', 'instrumentList',  'allSensorTypes', 'HWM', 'DATA_FILE', 'INSTRUMENT', 'MEMBER', 'SITE', ApprovalCtrl]);
+    function ApprovalCtrl($scope, $cookies, $rootScope, $location, $http, eventList, stateList, instrumentList, allSensorTypes, HWM, DATA_FILE, INSTRUMENT, MEMBER, SITE) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
@@ -645,7 +647,7 @@
             $rootScope.thisPage = "Approval";
             $rootScope.activeMenu = "approval"; 
             $scope.allEvents = eventList;
-            $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+            $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
             $http.defaults.headers.common['Accept'] = 'application/json';
             MEMBER.getAll(function success(response) {
                 $scope.allMembers = response;
@@ -670,7 +672,7 @@
                 var mID = this.ChosenMember.id != undefined ? this.ChosenMember.id : 0;
 
                 //go get the HWMs and DataFiles that need to be approved
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 HWM.getUnapprovedHWMs({ IsApproved: 'false', Event: evID, TeamMember: mID, State: sID }, function success(response) {
                     $scope.unApprovedHWMs = response.HWMs;
@@ -703,9 +705,9 @@
     //#endregion Approval Controller
 
     //#region Site Search Controller
-    STNControllers.controller('SiteSearchCtrl', ['$scope', '$rootScope', '$location', 'eventList', 'stateList', 'sensorTypes', 'networkNames', 'SITE', 'checkCreds', SiteSearchCtrl]);
-    function SiteSearchCtrl($scope, $rootScope, $location, eventList, stateList, sensorTypes, networkNames, SITE, checkCreds) {
-        if (!checkCreds()) {
+    STNControllers.controller('SiteSearchCtrl', ['$scope', '$cookies', '$rootScope', '$location', 'eventList', 'stateList', 'sensorTypes', 'networkNames', 'SITE', SiteSearchCtrl]);
+    function SiteSearchCtrl($scope, $cookies, $rootScope, $location, eventList, stateList, sensorTypes, networkNames, SITE) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
@@ -802,9 +804,9 @@
     //#endregion Site Search Controller
 
     //#region Reporting Controller
-    STNControllers.controller('ReportingCtrl', ['$scope', '$rootScope', '$location', '$http', '$modal', 'incompleteReports', 'allEvents', 'allStates', 'allReports', 'allEventTypes', 'allEventStatus', 'allAgencies', 'REPORT', 'MEMBER', 'checkCreds', 'getCreds', 'getUserID', ReportingCtrl]);
-    function ReportingCtrl($scope, $rootScope, $location, $http, $modal, incompleteReports, allEvents, allStates, allReports, allEventTypes, allEventStatus, allAgencies, REPORT, MEMBER, checkCreds, getCreds, getUserID) {
-        if (!checkCreds()) {
+    STNControllers.controller('ReportingCtrl', ['$scope', '$rootScope', '$cookies', '$location', '$http', '$modal', 'incompleteReports', 'allEvents', 'allStates', 'allReports', 'allEventTypes', 'allEventStatus', 'allAgencies', 'REPORT', 'MEMBER', ReportingCtrl]);
+    function ReportingCtrl($scope, $rootScope, $cookies, $location, $http, $modal, incompleteReports, allEvents, allStates, allReports, allEventTypes, allEventStatus, allAgencies, REPORT, MEMBER) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
@@ -871,10 +873,10 @@
             $scope.events = allEvents;
             $scope.states = allStates;
             $scope.reports = allReports;
-            var mID = getUserID();
-            $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+            
+            $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
             $http.defaults.headers.common['Accept'] = 'application/json';
-            MEMBER.query({ id: mID }, function success(response) {
+            MEMBER.query({ id: $cookies.get('mID') }, function success(response) {
                 $scope.MemberLoggedIn = response;
                 var memberAgency = allAgencies.filter(function (a) { return a.AGENCY_ID == $scope.MemberLoggedIn.AGENCY_ID; })[0];
                 $scope.MemberLoggedIn.AGENCY_NAME = memberAgency.AGENCY_NAME;
@@ -1053,7 +1055,7 @@
                     var thisDate = $scope.formatDate($scope.genSummary.SUM_DATE);
                     $scope.reportModel = [];
                     //all filtered reports 
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     REPORT.getReportwithContacts({
                         Event: $scope.EventName.EVENT_ID, States: abbrevString, Date: thisDate
@@ -1101,7 +1103,7 @@
                                         return $scope.GenRepEventModel;
                                     }
                                 },
-                                controller: function ($scope, $http, $modalInstance, theseReports, thisEvent, getCreds) {
+                                controller: function ($scope, $http, $modalInstance, theseReports, thisEvent) {
                                     $scope.Reports = theseReports;
                                     $scope.Event = thisEvent;
                                     $scope.ok = function () {
@@ -1134,9 +1136,8 @@
         }
     }
 
-    STNControllers.controller('ReportingDashCtrl', ['$scope', '$filter', '$modal', '$state', '$http', 'CONTACT', 'MEMBER', 'getCreds', 'allReportsAgain', ReportingDashCtrl]);
-    function ReportingDashCtrl($scope, $filter, $modal, $state, $http, CONTACT, MEMBER, getCreds, allReportsAgain) {
-        
+    STNControllers.controller('ReportingDashCtrl', ['$scope', '$cookies', '$filter', '$modal', '$state', '$http', 'CONTACT', 'MEMBER', 'allReportsAgain', ReportingDashCtrl]);
+    function ReportingDashCtrl($scope, $cookies, $filter, $modal, $state, $http, CONTACT, MEMBER, allReportsAgain) {        
         $scope.reportsToDate = allReportsAgain;
         $scope.todayRpts = []; $scope.yesterdayRpts = []; $scope.pickDateRpts = []; $scope.pickAdateReports = false;
         $scope.today = new Date();
@@ -1157,7 +1158,7 @@
                         return r;
                     },
                     submitPerson: function () {
-                        $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                        $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                         $http.defaults.headers.common['Accept'] = 'application/json';
                         var member = {};
                         MEMBER.query({ id: r.MEMBER_ID }, function success(response) {
@@ -1169,7 +1170,7 @@
                         return member;
                     },
                     contacts: function () {
-                        $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                        $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                         $http.defaults.headers.common['Accept'] = 'application/json';
                         return CONTACT.getContactModel({ ContactModelByReport: r.REPORTING_METRICS_ID }).$promise;
                     }
@@ -1226,7 +1227,7 @@
             $scope.$parent.newReport = rep;
             $scope.$parent.disabled = false;
             $scope.$parent.needToComplete = true;
-            $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+            $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
             $http.defaults.headers.common['Accept'] = 'application/json';
             CONTACT.getContactModel({ ContactModelByReport: rep.REPORTING_METRICS_ID }, function success(response) {
                 $scope.$parent.DeployStaff = response.filter(function (d) { return d.TYPE == "Deployed Staff"; })[0];
@@ -1282,8 +1283,8 @@
 
     }
 
-    STNControllers.controller('SubmitReportCtrl', ['$scope', '$http', '$modal', '$state', 'getCreds', 'CONTACT', 'REPORT', SubmitReportCtrl]);
-    function SubmitReportCtrl($scope, $http, $modal, $state, getCreds, CONTACT, REPORT) {
+    STNControllers.controller('SubmitReportCtrl', ['$scope', '$http', '$modal', '$state', 'CONTACT', 'REPORT', SubmitReportCtrl]);
+    function SubmitReportCtrl($scope, $http, $modal, $state, CONTACT, REPORT) {
         //#make sure this clears except for if they care needing to complete a report
         if ($scope.$parent.needToComplete != true) {
             $scope.$parent.newReport = {};
@@ -1305,7 +1306,7 @@
 
         //#region GET Report Contacts
         var getReportContacts = function (reportID) {
-            $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+            $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
             $http.defaults.headers.common['Accept'] = 'application/json';
             CONTACT.getContactModel({ ContactModelByReport: reportID }, function success(response) {
                 $scope.DeployStaff = response.filter(function (d) { return d.TYPE == "Deployed Staff"; })[0];
@@ -1371,7 +1372,7 @@
         //Post/Put the Report and Report Contacts. Called twice (from within Modal (incomplete) and outside (complete))
         var PostPutReportAndReportContacts = function () {
             //POST or PUT
-            $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+            $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
             $http.defaults.headers.common['Accept'] = 'application/json';
             if ($scope.newReport.REPORTING_METRICS_ID != undefined) {
                 //PUT
@@ -1432,7 +1433,7 @@
                     return (r.EVENT_ID == $scope.newReport.EVENT_ID && r.STATE == $scope.newReport.STATE) &&
                         (new Date(repDate).getTime()) == (previousDay.getTime());
                 })[0];
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 if (yesterdayRpt != undefined && yesterdayRpt.length > 0) {
                     // PERSONNEL populating
@@ -1520,9 +1521,9 @@
     //#endregion Reporting Controller
 
     //#region Settings Controller
-    STNControllers.controller('SettingsCtrl', ['$scope', '$rootScope', '$location', '$state', 'checkCreds', SettingsCtrl]);
-    function SettingsCtrl($scope, $rootScope, $location, $state, checkCreds) {
-        if (!checkCreds()) {
+    STNControllers.controller('SettingsCtrl', ['$scope', '$rootScope', '$cookies', '$location', '$state', SettingsCtrl]);
+    function SettingsCtrl($scope, $rootScope, $cookies, $location, $state) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
@@ -1537,9 +1538,9 @@
     //#endregion Settings Controller
 
     //#region member Controller (abstract)
-    STNControllers.controller('memberCtrl', ['$scope', '$rootScope', '$location', '$http', '$filter', 'MEMBER', 'allRoles', 'allAgencies', 'checkCreds', 'getCreds', 'getUserRole', 'getUsersNAME', 'getUserID', memberCtrl]);
-    function memberCtrl($scope, $rootScope, $location, $http, $filter, MEMBER, allRoles, allAgencies, checkCreds, getCreds, getUserRole, getUsersNAME, getUserID) {
-        if (!checkCreds()) {
+    STNControllers.controller('memberCtrl', ['$scope', '$rootScope', '$cookies', '$location', '$http', '$filter', 'MEMBER', 'allRoles', 'allAgencies',  memberCtrl]);
+    function memberCtrl($scope, $rootScope, $cookies, $location, $http, $filter, MEMBER, allRoles, allAgencies) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
@@ -1564,13 +1565,13 @@
             };
 
             $scope.loggedInUser = {};
-            $scope.loggedInUser.Name = getUsersNAME(); //User's NAME
-            $scope.loggedInUser.ID = getUserID();
-            $scope.loggedInUser.Role = getUserRole();
+            $scope.loggedInUser.Name = $cookies.get('usersName'); //User's NAME
+            $scope.loggedInUser.ID = $cookies.get('mID');
+            $scope.loggedInUser.Role = $cookies.get('usersRole');
 
             $scope.roleList = allRoles;
             $scope.agencyList = allAgencies;
-            $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+            $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
             $http.defaults.headers.common['Accept'] = 'application/json';
             MEMBER.getAll().$promise.then(function (response) {
                 $scope.memberList = [];
@@ -1591,9 +1592,9 @@
     //#endregion  member Controller (abstract)
 
     //#region memberInfo Controller
-    STNControllers.controller('memberInfoCtrl', ['$scope', '$location', '$http', '$modal', '$stateParams', '$filter', 'MEMBER', 'thisMember', 'checkCreds', 'setCreds', 'getCreds', 'getUserRole', memberInfoCtrl]);
-    function memberInfoCtrl($scope, $location, $http, $modal, $stateParams, $filter, MEMBER, thisMember, checkCreds, setCreds, getCreds, getUserRole) {
-        if (!checkCreds()) {
+    STNControllers.controller('memberInfoCtrl', ['$scope', '$cookies', '$location', '$http', '$modal', '$stateParams', '$filter', 'MEMBER', 'thisMember', memberInfoCtrl]);
+    function memberInfoCtrl($scope, $cookies, $location, $http, $modal, $stateParams, $filter, MEMBER, thisMember) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
@@ -1622,7 +1623,7 @@
                     //yes, remove this keyword
                     var test;
                     //DELETE it
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
 
                     MEMBER.deleteMember({ id: nameToRemove.MEMBER_ID }, function success(response) {
                         var delMem = {};
@@ -1665,7 +1666,7 @@
                     if ($scope.aMember) {
                         //ensure they don't delete required field values
                         if ($scope.aMember.FNAME != null) {
-                            $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                            $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                             $http.defaults.headers.common['Accept'] = 'application/json';
                             MEMBER.update({ id: $scope.aMember.MEMBER_ID }, $scope.aMember, function success(response) {
                                 toastr.success("Member Updated");
@@ -1691,7 +1692,30 @@
                                 toastr.success("Password Updated");
                                 //update creds ONLY IF user logged in is == this updating member
                                 if ($scope.aMember.MEMBER_ID == $scope.loggedInUser.MEMBER_ID) {
-                                    setCreds($scope.aMember.USERNAME, $scope.pass.newP, $scope.loggedInUser.Name, $scope.aMember.ROLE_ID, $scope.aMember.MEMBER_ID);
+                                    var enc = btoa($scope.aMember.USERNAME.concat(":", $scope.pass.newP));
+                                    $cookies.put('STNCreds', enc);
+                                    $cookies.put('STNUsername', $scope.aMember.USERNAME);
+                                    $cookies.put('usersName', $scope.loggedInUser.Name);
+                                    $cookies.put('mID', $scope.aMember.MEMBER_ID);
+                                    var roleName;
+                                    switch ($scope.aMember.ROLE_ID) {
+                                        case 1:
+                                            roleName = "Admin";
+                                            break;
+                                        case 2:
+                                            roleName = "Manager";
+                                            break;
+                                        case 3:
+                                            roleName = "Field";
+                                            break;
+                                        case 4:
+                                            roleName = "Public";
+                                            break;
+                                        default:
+                                            roleName = "CitizenManager";
+                                            break;
+                                    }
+                                    $cookies.put('usersRole', roleName);
                                 }
                                 $scope.changePass = false;
                                 $scope.pass.newP = '';
@@ -1713,7 +1737,7 @@
                 //this is a new member being created
                 $scope.save = function (valid) {
                     if (valid) {
-                        $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                        $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                         $http.defaults.headers.common['Accept'] = 'application/json';
 
                         MEMBER.addMember({ pass: $scope.pass.confirmP }, $scope.aMember, function success(response) {
@@ -1739,14 +1763,14 @@
     //#endregion memberInfo Controller
 
     //#region event Controller (abstract)
-    STNControllers.controller('eventCtrl', ['$scope', '$rootScope', '$location', '$http', '$filter', 'MEMBER', 'allEvents', 'allEventTypes', 'allEventStats', 'checkCreds', 'getCreds', 'getUserRole', eventCtrl]);
-    function eventCtrl($scope, $rootScope, $location, $http, $filter, MEMBER, allEvents, allEventTypes, allEventStats, checkCreds, getCreds, getUserRole) {
-        if (!checkCreds()) {
+    STNControllers.controller('eventCtrl', ['$scope', '$rootScope', '$cookies', '$location', '$http', '$filter', 'MEMBER', 'allEvents', 'allEventTypes', 'allEventStats', eventCtrl]);
+    function eventCtrl($scope, $rootScope, $cookies, $location, $http, $filter, MEMBER, allEvents, allEventTypes, allEventStats) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
             $rootScope.thisPage = "Settings/Events";
-            $scope.loggedInRole = getUserRole();
+            $scope.loggedInRole = $cookies.get('usersRole');
             $scope.isAdmin = $scope.loggedInRole == "Admin" ? true : false;
 
             // change sorting order
@@ -1769,7 +1793,7 @@
 
             $scope.eventTypeList = allEventTypes;
             $scope.eventStatList = allEventStats;
-            $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+            $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
             $http.defaults.headers.common['Accept'] = 'application/json';
             MEMBER.getRoleMembers({ roleId: 1 }).$promise.then(function (response) {
                 $scope.eventCoordList = response;
@@ -1793,9 +1817,9 @@
     //#endregion  event Controller (abstract)
 
     //#region eventInfo Controller
-    STNControllers.controller('eventInfoCtrl', ['$scope', '$location', '$http', '$modal', '$filter', 'EVENT', 'thisEvent', 'checkCreds', 'getCreds', 'getUserID', eventInfoCtrl]);
-    function eventInfoCtrl($scope, $location, $http, $modal, $filter, EVENT, thisEvent, checkCreds, getCreds, getUserRole) {
-        if (!checkCreds()) {
+    STNControllers.controller('eventInfoCtrl', ['$scope', '$cookies', '$location', '$http', '$modal', '$filter', 'EVENT', 'thisEvent', eventInfoCtrl]);
+    function eventInfoCtrl($scope, $cookies, $location, $http, $modal, $filter, EVENT, thisEvent) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
@@ -1837,7 +1861,7 @@
                     //yes, remove this keyword
                     var test;
                     //DELETE it
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
 
                     EVENT.delete({ id: nameToRemove.EVENT_ID }, function success(response) {
                         var delEv = {};
@@ -1880,7 +1904,7 @@
                     if ($scope.anEvent) {
                         //ensure they don't delete required field values
                         if ($scope.anEvent.EVENT_NAME != null) {
-                            $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                            $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                             $http.defaults.headers.common['Accept'] = 'application/json';
                             EVENT.update({ id: $scope.anEvent.EVENT_ID }, $scope.anEvent, function success(response) {
                                 toastr.success("Event Updated");
@@ -1921,15 +1945,15 @@
     //#endregion eventInfo Controller
 
     //#region SITE
-    STNControllers.controller('SiteCtrl', ['$scope', '$rootScope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'getCreds', 'getUserID',
+    STNControllers.controller('SiteCtrl', ['$scope', '$rootScope', '$cookies', '$location', '$state', '$http', '$modal', '$filter', '$timeout',
         'thisSite', 'thisSiteNetworkNames', 'thisSiteNetworkTypes', 'thisSiteHousings', 'thisSiteOPs', 'thisSiteSensors', 'thisSiteHWMs', 'thisSiteFiles', 'thisSitePeaks',
         'SITE', 'LANDOWNER_CONTACT', 'MEMBER', 'DEPLOYMENT_TYPE', 'INSTRUMENT', 'INSTRUMENT_STATUS', 'SITE_HOUSING', 'NETWORK_NAME',
         'allHorDatums', 'allHorCollMethods', 'allStates', 'allCounties', 'allDeployPriorities', 'allHousingTypes', 'allNetworkNames', 'allNetworkTypes', 'allDeployTypes', 'allSensDeps', SiteCtrl]);
-    function SiteCtrl($scope, $rootScope, $location, $state, $http, $modal, $filter, $timeout, checkCreds, getCreds, getUserID,
+    function SiteCtrl($scope, $rootScope, $cookies, $location, $state, $http, $modal, $filter, $timeout,
         thisSite, thisSiteNetworkNames, thisSiteNetworkTypes, thisSiteHousings, thisSiteOPs, thisSiteSensors, thisSiteHWMs, thisSiteFiles, thisSitePeaks,
         SITE, LANDOWNER_CONTACT, MEMBER, DEPLOYMENT_TYPE, INSTRUMENT, INSTRUMENT_STATUS, SITE_HOUSING, NETWORK_NAME,
         allHorDatums, allHorCollMethods, allStates, allCounties, allDeployPriorities, allHousingTypes, allNetworkNames, allNetworkTypes, allDeployTypes, allSensDeps) {
-        if (!checkCreds()) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
@@ -2049,7 +2073,7 @@
 
                     //get member name for display
                     if ($scope.aSite.MEMBER_ID != null) {
-                        $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                        $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                         $http.defaults.headers.common['Accept'] = 'application/json';
                         MEMBER.query({ id: $scope.aSite.MEMBER_ID }).$promise.then(function (response) {
                             $scope.aSite.Creator = response.FNAME + " " + response.LNAME;
@@ -2060,7 +2084,7 @@
 
                     //get the landownerCOntact with getCreds
                     if ($scope.aSite.LANDOWNERCONTACT_ID != null) {
-                        $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                        $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                         $http.defaults.headers.common['Accept'] = 'application/json';
                         SITE.getSiteLandOwner({ id: $scope.aSite.SITE_ID }, function success(response) {
                             $scope.landowner = response;
@@ -2088,9 +2112,9 @@
     //#endregion SITE
 
     //#region OBJECTIVE_POINT allVertDatums, allVertColMethods, allOPQualities
-    STNControllers.controller('ObjectivePointCtrl', ['$scope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'OBJECTIVE_POINT', 'thisSite', 'thisSiteOPs', 'allOPTypes', 'allHorDatums', 'allHorCollMethods', 'allVertDatums', 'allVertColMethods', 'allOPQualities', ObjectivePointCtrl]);
-    function ObjectivePointCtrl($scope, $location, $state, $http, $modal, $filter, $timeout, checkCreds, OBJECTIVE_POINT, thisSite, thisSiteOPs, allOPTypes, allHorDatums, allHorCollMethods, allVertDatums, allVertColMethods, allOPQualities) {
-        if (!checkCreds()) {
+    STNControllers.controller('ObjectivePointCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'OBJECTIVE_POINT', 'thisSite', 'thisSiteOPs', 'allOPTypes', 'allHorDatums', 'allHorCollMethods', 'allVertDatums', 'allVertColMethods', 'allOPQualities', ObjectivePointCtrl]);
+    function ObjectivePointCtrl($scope, $cookies, $location, $state, $http, $modal, $filter, $timeout, OBJECTIVE_POINT, thisSite, thisSiteOPs, allOPTypes, allHorDatums, allHorCollMethods, allVertDatums, allVertColMethods, allOPQualities) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
@@ -2149,9 +2173,9 @@
     //#endregion OBJECTIVE_POINT
 
     //#region INSTRUMENT
-    STNControllers.controller('SensorCtrl', ['$scope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'thisSite', 'thisSiteSensors', 'allStatusTypes', 'allDeployTypes', 'allSensDeps', 'INSTRUMENT', SensorCtrl]);
-    function SensorCtrl($scope, $location, $state, $http, $modal, $filter, $timeout, checkCreds, thisSite, thisSiteSensors, allStatusTypes, allDeployTypes, allSensDeps, INSTRUMENT) {
-        if (!checkCreds()) {
+    STNControllers.controller('SensorCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'thisSite', 'thisSiteSensors', 'allStatusTypes', 'allDeployTypes', 'allSensDeps', 'INSTRUMENT', SensorCtrl]);
+    function SensorCtrl($scope, $cookies, $location, $state, $http, $modal, $filter, $timeout, thisSite, thisSiteSensors, allStatusTypes, allDeployTypes, allSensDeps, INSTRUMENT) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
@@ -2180,9 +2204,9 @@
     //#endregion INSTRUMENT
 
     //#region HWM
-    STNControllers.controller('HWMCtrl', ['$scope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'thisSite', 'thisSiteHWMs', HWMCtrl]);
-    function HWMCtrl($scope, $location, $state, $http, $modal, $filter, $timeout, checkCreds, thisSite, thisSiteHWMs) {
-        if (!checkCreds()) {
+    STNControllers.controller('HWMCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'thisSite', 'thisSiteHWMs', HWMCtrl]);
+    function HWMCtrl($scope, $cookies, $location, $state, $http, $modal, $filter, $timeout, thisSite, thisSiteHWMs) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
@@ -2193,9 +2217,9 @@
     //#endregion HWM
 
     //#region FILE
-    STNControllers.controller('FileCtrl', ['$scope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'thisSite', 'thisSiteFiles', FileCtrl]);
-    function FileCtrl($scope, $location, $state, $http, $modal, $filter, $timeout, checkCreds, thisSite, thisSiteFiles) {
-        if (!checkCreds()) {
+    STNControllers.controller('FileCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'thisSite', 'thisSiteFiles', FileCtrl]);
+    function FileCtrl($scope, $cookies, $location, $state, $http, $modal, $filter, $timeout, thisSite, thisSiteFiles) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
@@ -2206,9 +2230,9 @@
     //#endregion FILE
 
     //#region PEAK
-    STNControllers.controller('PeakCtrl', ['$scope', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'checkCreds', 'thisSite', 'thisSitePeaks', PeakCtrl]);
-    function PeakCtrl($scope, $location, $state, $http, $modal, $filter, $timeout, checkCreds, thisSite, thisSitePeaks) {
-        if (!checkCreds()) {
+    STNControllers.controller('PeakCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'thisSite', 'thisSitePeaks', PeakCtrl]);
+    function PeakCtrl($scope, $cookies, $location, $state, $http, $modal, $filter, $timeout, thisSite, thisSitePeaks) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
@@ -2219,24 +2243,22 @@
     //#endregion PEAK
 
     //#region resource Controller (abstract)
-    STNControllers.controller('resourcesCtrl', ['$scope', '$rootScope', '$location', '$state', '$http', '$filter', '$modal', 'AGENCY', 'CONTACT_TYPE', 'DEPLOYMENT_PRIORITY', 'EVENT_STATUS',
+    STNControllers.controller('resourcesCtrl', ['$scope', '$rootScope', '$cookies', '$location', '$state', '$http', '$filter', '$modal', 'AGENCY', 'CONTACT_TYPE', 'DEPLOYMENT_PRIORITY', 'EVENT_STATUS',
         'EVENT_TYPE', 'FILE_TYPE', 'HORIZONTAL_COLL_METHODS', 'HORIZONTAL_DATUM', 'HOUSING_TYPE', 'HWM_QUALITY', 'HWM_TYPE', 'INST_COLL_CONDITION', 'MARKER', 'NETWORK_NAME', 'OP_QUALITY',
         'OP_TYPE', 'SENSOR_BRAND', 'DEPLOYMENT_TYPE', 'SENSOR_TYPE', 'NETWORK_TYPE', 'STATUS_TYPE', 'VERTICAL_COLL_METHOD', 'VERTICAL_DATUM', 'allStates', 'allAgencies', 'allContactTypes', 'allDeployPriorities', 'allEventStats', 'allEventTypes',
         'allFileTypes', 'allHorCollMethods', 'allHorDatums', 'allHouseTypes', 'allHWMqualities', 'allHWMtypes', 'allInstCollectConditions', 'allMarkers', 'allNetworkNames', 'allObjPtQualities',
-        'allObjPtTypes', 'allSensorBrands', 'allDeploymentTypes', 'allStatusTypes', 'allSensorTypes', 'allNetworkTypes', 'allVerticalCollMethods', 'allVerticalDatums',
-        'checkCreds', 'getCreds', 'getUserRole', resourcesCtrl]);
-    function resourcesCtrl($scope, $rootScope, $location, $state, $http, $filter, $modal, AGENCY, CONTACT_TYPE, DEPLOYMENT_PRIORITY, EVENT_STATUS,
+        'allObjPtTypes', 'allSensorBrands', 'allDeploymentTypes', 'allStatusTypes', 'allSensorTypes', 'allNetworkTypes', 'allVerticalCollMethods', 'allVerticalDatums', resourcesCtrl]);
+    function resourcesCtrl($scope, $rootScope, $cookies, $location, $state, $http, $filter, $modal, AGENCY, CONTACT_TYPE, DEPLOYMENT_PRIORITY, EVENT_STATUS,
         EVENT_TYPE, FILE_TYPE, HORIZONTAL_COLL_METHODS, HORIZONTAL_DATUM, HOUSING_TYPE, HWM_QUALITY, HWM_TYPE, INST_COLL_CONDITION, MARKER, NETWORK_NAME, OP_QUALITY,
         OP_TYPE, SENSOR_BRAND, DEPLOYMENT_TYPE, SENSOR_TYPE,NETWORK_TYPE, STATUS_TYPE, VERTICAL_COLL_METHOD, VERTICAL_DATUM, allStates, allAgencies, allContactTypes, allDeployPriorities, allEventStats, allEventTypes, allFileTypes,
         allHorCollMethods, allHorDatums, allHouseTypes, allHWMqualities, allHWMtypes, allInstCollectConditions, allMarkers, allNetworkNames, allObjPtQualities, allObjPtTypes,
-        allSensorBrands, allDeploymentTypes, allStatusTypes, allSensorTypes, allNetworkTypes, allVerticalCollMethods, allVerticalDatums,
-        checkCreds, getCreds, getUserRole) {
-        if (!checkCreds()) {
+        allSensorBrands, allDeploymentTypes, allStatusTypes, allSensorTypes, allNetworkTypes, allVerticalCollMethods, allVerticalDatums) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
             $rootScope.thisPage = "Settings/Resources";
-            $scope.accountRole = getUserRole();
+            $scope.accountRole = $cookies.get('usersRole');
             // change sorting order
             $scope.sort_by = function (newSortingOrder) {
                 if ($scope.sortingOrder == newSortingOrder) {
@@ -2281,7 +2303,7 @@
 
             $scope.AddAgency = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     AGENCY.save($scope.newAg, function success(response) {
                         $scope.agencyList.push(response);
@@ -2296,7 +2318,7 @@
             };
             $scope.saveAgency = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';               
                 AGENCY.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -2326,7 +2348,7 @@
                     //yes, remove this keyword
                     var index = $scope.agencyList.indexOf(ag);
                     //DELETE it
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     AGENCY.delete({ id: ag.AGENCY_ID }, ag, function success(response) {
                         $scope.agencyList.splice(index, 1);
                         toastr.success("Agency Removed");
@@ -2367,7 +2389,7 @@
 
             $scope.AddContactType = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     CONTACT_TYPE.save($scope.newCT, function success(response) {
                         $scope.contactTypeList.push(response);
@@ -2383,7 +2405,7 @@
 
             $scope.saveContactType = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 CONTACT_TYPE.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -2414,7 +2436,7 @@
                     //yes, remove this keyword
                     var index = $scope.contactTypeList.indexOf(ct);
                     //DELETE it
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     CONTACT_TYPE.delete({ id: ct.CONTACT_TYPE_ID }, ct, function success(response) {
                         $scope.contactTypeList.splice(index, 1);
                         toastr.success("Contact Type Removed");
@@ -2446,7 +2468,7 @@
             };
             $scope.AddDepPriority = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     DEPLOYMENT_PRIORITY.save($scope.newDP, function success(response) {
                         $scope.deployPriorityList.push(response);
@@ -2461,7 +2483,7 @@
             };
             $scope.saveDepPriority = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 DEPLOYMENT_PRIORITY.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -2488,7 +2510,7 @@
                 });
                 modalInstance.result.then(function (keyToRemove) {
                     var index = $scope.deployPriorityList.indexOf(dp);
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     DEPLOYMENT_PRIORITY.delete({ id: dp.PRIORITY_ID }, dp, function success(response) {
                         $scope.deployPriorityList.splice(index, 1);
                         toastr.success("Deployment Priority Removed");
@@ -2520,7 +2542,7 @@
             };
             $scope.AddEventStat = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     EVENT_STATUS.save($scope.newES, function success(response) {
                         $scope.eventStatList.push(response);
@@ -2535,7 +2557,7 @@
             };
             $scope.saveEventStat = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 EVENT_STATUS.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -2562,7 +2584,7 @@
                 });
                 modalInstance.result.then(function (keyToRemove) {
                     var index = $scope.eventStatList.indexOf(es);
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     EVENT_STATUS.delete({ id: es.EVENT_STATUS_ID }, es, function success(response) {
                         $scope.eventStatList.splice(index, 1);
                         toastr.success("Event Status Removed");
@@ -2595,7 +2617,7 @@
 
             $scope.AddEventType = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     EVENT_TYPE.save($scope.newET, function success(response) {
                         $scope.eventTypeList.push(response);
@@ -2611,7 +2633,7 @@
 
             $scope.saveEventType = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 EVENT_TYPE.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -2642,7 +2664,7 @@
                     //yes, remove this keyword
                     var index = $scope.eventTypeList.indexOf(et);
                     //DELETE it
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     EVENT_TYPE.delete({ id: et.EVENT_TYPE_ID }, et, function success(response) {
                         $scope.eventTypeList.splice(index, 1);
                         toastr.success("Event Type Removed");
@@ -2674,7 +2696,7 @@
             };
             $scope.AddFileType = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     FILE_TYPE.save($scope.newFT, function success(response) {
                         $scope.fileTypeList.push(response);
@@ -2689,7 +2711,7 @@
             };
             $scope.saveFileType = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 FILE_TYPE.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -2716,7 +2738,7 @@
                 });
                 modalInstance.result.then(function (keyToRemove) {
                     var index = $scope.fileTypeList.indexOf(ft);
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     FILE_TYPE.delete({ id: ft.FILETYPE_ID }, ft, function success(response) {
                         $scope.fileTypeList.splice(index, 1);
                         toastr.success("File Type Removed");
@@ -2748,7 +2770,7 @@
             };
             $scope.AddHorCollMethod = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     HORIZONTAL_COLL_METHODS.save($scope.newHCM, function success(response) {
                         $scope.horColMethList.push(response);
@@ -2763,7 +2785,7 @@
             };
             $scope.saveHorCollMethod = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 HORIZONTAL_COLL_METHODS.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -2790,7 +2812,7 @@
                 });
                 modalInstance.result.then(function (keyToRemove) {
                     var index = $scope.horColMethList.indexOf(hcm);
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     HORIZONTAL_COLL_METHODS.delete({ id: hcm.HCOLLECT_METHOD_ID }, hcm, function success(response) {
                         $scope.horColMethList.splice(index, 1);
                         toastr.success("Horizontal Collection Method Removed");
@@ -2823,7 +2845,7 @@
 
             $scope.AddHorDatum = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     HORIZONTAL_DATUM.save($scope.newHD, function success(response) {
                         $scope.horDatList.push(response);
@@ -2839,7 +2861,7 @@
 
             $scope.saveHorDatum = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 HORIZONTAL_DATUM.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -2870,7 +2892,7 @@
                     //yes, remove this keyword
                     var index = $scope.horDatList.indexOf(hd);
                     //DELETE it
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     HORIZONTAL_DATUM.delete({ id: hd.DATUM_ID }, hd, function success(response) {
                         $scope.horDatList.splice(index, 1);
                         toastr.success("Horizontal Datum Removed");
@@ -2902,7 +2924,7 @@
             };
             $scope.AddHouseType = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     HOUSING_TYPE.save($scope.newHT, function success(response) {
                         $scope.houseTypeList.push(response);
@@ -2917,7 +2939,7 @@
             };
             $scope.saveHouseType = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 HOUSING_TYPE.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -2944,7 +2966,7 @@
                 });
                 modalInstance.result.then(function (keyToRemove) {
                     var index = $scope.houseTypeList.indexOf(ht);
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     HOUSING_TYPE.delete({ id: ht.HOUSING_TYPE_ID }, ht, function success(response) {
                         $scope.houseTypeList.splice(index, 1);
                         toastr.success("Housing Type Removed");
@@ -2976,7 +2998,7 @@
             };
             $scope.AddHwmQuality = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     HWM_QUALITY.save($scope.newHWMQ, function success(response) {
                         $scope.hwmQualList.push(response);
@@ -2991,7 +3013,7 @@
             };
             $scope.saveHwmQuality = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 HWM_QUALITY.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -3018,7 +3040,7 @@
                 });
                 modalInstance.result.then(function (keyToRemove) {
                     var index = $scope.hwmQualList.indexOf(hwmq);
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     HWM_QUALITY.delete({ id: hwmq.HWM_QUALITY_ID }, hwmq, function success(response) {
                         $scope.hwmQualList.splice(index, 1);
                         toastr.success("HWM Quality Removed");
@@ -3051,7 +3073,7 @@
 
             $scope.AddHwmType = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     HWM_TYPE.save($scope.newHWMT, function success(response) {
                         $scope.hwmTypeList.push(response);
@@ -3067,7 +3089,7 @@
 
             $scope.saveHwmType = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 HWM_TYPE.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -3098,7 +3120,7 @@
                     //yes, remove this keyword
                     var index = $scope.hwmTypeList.indexOf(hwmt);
                     //DELETE it
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     HWM_TYPE.delete({ id: hwmt.HWM_TYPE_ID }, hwmt, function success(response) {
                         $scope.hwmTypeList.splice(index, 1);
                         toastr.success("HWM Type Removed");
@@ -3130,7 +3152,7 @@
             };
             $scope.AddInstColCond = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     INST_COLL_CONDITION.save($scope.newICC, function success(response) {
                         $scope.instColCondList.push(response);
@@ -3145,7 +3167,7 @@
             };
             $scope.saveInstColCond = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 INST_COLL_CONDITION.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -3172,7 +3194,7 @@
                 });
                 modalInstance.result.then(function (keyToRemove) {
                     var index = $scope.instColCondList.indexOf(icc);
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     INST_COLL_CONDITION.delete({ id: icc.ID }, icc, function success(response) {
                         $scope.instColCondList.splice(index, 1);
                         toastr.success("Instrument Collection Condition Removed");
@@ -3204,7 +3226,7 @@
             };
             $scope.AddMarker = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     MARKER.save($scope.newM, function success(response) {
                         $scope.markList.push(response);
@@ -3219,7 +3241,7 @@
             };
             $scope.saveMarker = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 MARKER.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -3246,7 +3268,7 @@
                 });
                 modalInstance.result.then(function (keyToRemove) {
                     var index = $scope.markList.indexOf(m);
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     MARKER.delete({ id: m.MARKER_ID }, m, function success(response) {
                         $scope.markList.splice(index, 1);
                         toastr.success("Marker Removed");
@@ -3278,7 +3300,7 @@
             };
             $scope.AddNetworkName = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     NETWORK_NAME.save($scope.newNN, function success(response) {
                         $scope.netNameList.push(response);
@@ -3293,7 +3315,7 @@
             };
             $scope.saveNetworkName = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 NETWORK_NAME.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -3320,7 +3342,7 @@
                 });
                 modalInstance.result.then(function (keyToRemove) {
                     var index = $scope.netNameList.indexOf(nn);
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     NETWORK_NAME.delete({ id: nn.NETWORK_NAME_ID }, nn, function success(response) {
                         $scope.netNameList.splice(index, 1);
                         toastr.success("Network Name Removed");
@@ -3353,7 +3375,7 @@
 
             $scope.AddOPQuality = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     OP_QUALITY.save($scope.newOPQ, function success(response) {
                         $scope.opQualList.push(response);
@@ -3369,7 +3391,7 @@
 
             $scope.saveOPQuality = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 OP_QUALITY.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -3400,7 +3422,7 @@
                     //yes, remove this keyword
                     var index = $scope.opQualList.indexOf(opq);
                     //DELETE it
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     OP_QUALITY.delete({ id: opq.OP_QUALITY_ID }, opq, function success(response) {
                         $scope.opQualList.splice(index, 1);
                         toastr.success("Objective Point Quality Removed");
@@ -3432,7 +3454,7 @@
             };
             $scope.AddOPType = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     OP_TYPE.save($scope.newOPT, function success(response) {
                         $scope.opTypeList.push(response);
@@ -3447,7 +3469,7 @@
             };
             $scope.saveOPType = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 OP_TYPE.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -3474,7 +3496,7 @@
                 });
                 modalInstance.result.then(function (keyToRemove) {
                     var index = $scope.opTypeList.indexOf(opt);
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     OP_TYPE.delete({ id: opt.OBJECTIVE_POINT_TYPE_ID }, opt, function success(response) {
                         $scope.opTypeList.splice(index, 1);
                         toastr.success("Objective Point Type Removed");
@@ -3506,7 +3528,7 @@
             };
             $scope.AddSensorBrand = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     SENSOR_BRAND.save($scope.newSB, function success(response) {
                         $scope.sensBrandList.push(response);
@@ -3521,7 +3543,7 @@
             };
             $scope.saveSensorBrand = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 SENSOR_BRAND.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -3548,7 +3570,7 @@
                 });
                 modalInstance.result.then(function (keyToRemove) {
                     var index = $scope.sensBrandList.indexOf(sb);
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     SENSOR_BRAND.delete({ id: sb.SENSOR_BRAND_ID }, sb, function success(response) {
                         $scope.sensBrandList.splice(index, 1);
                         toastr.success("Sensor Brand Removed");
@@ -3581,7 +3603,7 @@
 
             $scope.AddDepType = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     DEPLOYMENT_TYPE.save($scope.newDT, function success(response) {
                         $scope.depTypeList.push(response);
@@ -3597,7 +3619,7 @@
 
             $scope.saveDepType = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 DEPLOYMENT_TYPE.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -3628,7 +3650,7 @@
                     //yes, remove this keyword
                     var index = $scope.depTypeList.indexOf(dt);
                     //DELETE it
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     DEPLOYMENT_TYPE.delete({ id: dt.DEPLOYMENT_TYPE_ID }, dt, function success(response) {
                         $scope.depTypeList.splice(index, 1);
                         toastr.success("Deployment Type Removed");
@@ -3660,7 +3682,7 @@
             };
             $scope.AddStatusType = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     STATUS_TYPE.save($scope.newStatT, function success(response) {
                         $scope.statTypeList.push(response);
@@ -3675,7 +3697,7 @@
             };
             $scope.saveStatusType = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 STATUS_TYPE.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -3702,7 +3724,7 @@
                 });
                 modalInstance.result.then(function (keyToRemove) {
                     var index = $scope.statTypeList.indexOf(statT);
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     STATUS_TYPE.delete({ id: statT.STATUS_TYPE_ID }, statT, function success(response) {
                         $scope.statTypeList.splice(index, 1);
                         toastr.success("Status Type Removed");
@@ -3817,7 +3839,7 @@
                 if (valid) {
                     var newSensor = {};
                     var relatedDeps = [];
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     SENSOR_TYPE.save($scope.newSenT, function success(response) {
                         newSensor = response;
@@ -3846,7 +3868,7 @@
             };
             $scope.saveSensorType = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 //pull out just the sensor and then the deployment type to post separately
                 var ST = {SENSOR_TYPE_ID: data.SENSOR_TYPE_ID, SENSOR: data.SENSOR};
@@ -3902,7 +3924,7 @@
                 modalInstance.result.then(function (keyToRemove) {
                     var index = $scope.formattedSensTypeList.indexOf(senT);
                     var ST = { SENSOR_TYPE_ID: senT.SENSOR_TYPE_ID, SENSOR: senT.SENSOR };
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
 
                     //need to delete the relationship before I can delete the sensor type                    
                     angular.forEach($scope.depTypeList, function (s) {
@@ -3949,7 +3971,7 @@
 
             $scope.AddNetType = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     NETWORK_TYPE.save($scope.newNT, function success(response) {
                         $scope.netTypeList.push(response);
@@ -3965,7 +3987,7 @@
 
             $scope.saveNetType = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 NETWORK_TYPE.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -3996,7 +4018,7 @@
                     //yes, remove this keyword
                     var index = $scope.netTypeList.indexOf(nt);
                     //DELETE it
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     NETWORK_TYPE.delete({ id: nt.NETWORK_TYPE_ID }, nt, function success(response) {
                         $scope.netTypeList.splice(index, 1);
                         toastr.success("Network Type Removed");
@@ -4028,7 +4050,7 @@
             };
             $scope.AddVertColMeth = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     VERTICAL_COLL_METHOD.save($scope.newVCM, function success(response) {
                         $scope.vertColMethList.push(response);
@@ -4043,7 +4065,7 @@
             };
             $scope.saveVertColMeth = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 VERTICAL_COLL_METHOD.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -4070,7 +4092,7 @@
                 });
                 modalInstance.result.then(function (keyToRemove) {
                     var index = $scope.vertColMethList.indexOf(vcm);
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     VERTICAL_COLL_METHOD.delete({ id: vcm.VCOLLECT_METHOD_ID }, vcm, function success(response) {
                         $scope.vertColMethList.splice(index, 1);
                         toastr.success("Vertical Collection Method Removed");
@@ -4102,7 +4124,7 @@
             };
             $scope.AddVertDatum = function (valid) {
                 if (valid) {
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     VERTICAL_DATUM.save($scope.newVD, function success(response) {
                         $scope.vertDatList.push(response);
@@ -4117,7 +4139,7 @@
             };
             $scope.saveVertDatum = function (data, id) {
                 var retur = false;
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 VERTICAL_DATUM.update({ id: id }, data, function success(response) {
                     retur = response;
@@ -4144,7 +4166,7 @@
                 });
                 modalInstance.result.then(function (keyToRemove) {
                     var index = $scope.vertDatList.indexOf(vd);
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     VERTICAL_DATUM.delete({ id: vd.DATUM_ID }, vd, function success(response) {
                         $scope.vertDatList.splice(index, 1);
                         toastr.success("Vertical Datum Removed");
@@ -4293,8 +4315,8 @@
         };
     }
     
-    STNControllers.controller('OPmodalCtrl', ['$scope', '$http', '$modalInstance', '$modal', 'allDropdowns', 'thisOP', 'thisOPControls', 'opSite', 'getCreds', 'OBJECTIVE_POINT', 'OP_CONTROL_IDENTIFIER', OPmodalCtrl]);
-    function OPmodalCtrl($scope, $http, $modalInstance, $modal, allDropdowns, thisOP, thisOPControls, opSite, getCreds, OBJECTIVE_POINT, OP_CONTROL_IDENTIFIER) {
+    STNControllers.controller('OPmodalCtrl', ['$scope', '$cookies', '$http', '$modalInstance', '$modal', 'allDropdowns', 'thisOP', 'thisOPControls', 'opSite', 'OBJECTIVE_POINT', 'OP_CONTROL_IDENTIFIER', OPmodalCtrl]);
+    function OPmodalCtrl($scope, $cookies, $http, $modalInstance, $modal, allDropdowns, thisOP, thisOPControls, opSite, OBJECTIVE_POINT, OP_CONTROL_IDENTIFIER) {
         //defaults for radio buttons
         //dropdowns
         $scope.OPTypeList = allDropdowns[0];
@@ -4531,7 +4553,7 @@
         //Create this OP
         $scope.create = function () {
             if (this.OPForm.$valid) {
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 var createdOP = {};
                 //post
@@ -4570,7 +4592,7 @@
         //Save this OP
         $scope.save = function () {
             if ($scope.OPForm.$valid) {
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 $http.defaults.headers.common['Accept'] = 'application/json';
                 
                 var updatedOP = {};
@@ -4629,7 +4651,7 @@
             });
                       
             DeleteModalInstance.result.then(function (opToRemove) {
-                $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                 OBJECTIVE_POINT.delete({ id: opToRemove.OBJECTIVE_POINT_ID }, opToRemove).$promise.then(function () {
                     toastr.success("Objective Point Removed");
                     var sendBack = ["de", 'deleted'];
@@ -4645,8 +4667,8 @@
 
     }//end OPmodalCtrl
 
-    STNControllers.controller('SITEmodalCtrl', ['$scope', '$location', '$state', '$http', '$timeout', '$modalInstance', '$filter', 'checkCreds', 'getCreds', 'getUserID', 'allDropDownParts', 'thisSiteStuff', 'SITE', 'SITE_HOUSING', 'MEMBER', 'INSTRUMENT', 'INSTRUMENT_STATUS', 'LANDOWNER_CONTACT', SITEmodalCtrl]);
-    function SITEmodalCtrl($scope, $location, $state, $http, $timeout, $modalInstance, $filter, checkCreds, getCreds, getUserID, allDropDownParts, thisSiteStuff, SITE, SITE_HOUSING, MEMBER, INSTRUMENT, INSTRUMENT_STATUS, LANDOWNER_CONTACT) {
+    STNControllers.controller('SITEmodalCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$timeout', '$modalInstance', '$filter', 'allDropDownParts', 'thisSiteStuff', 'SITE', 'SITE_HOUSING', 'MEMBER', 'INSTRUMENT', 'INSTRUMENT_STATUS', 'LANDOWNER_CONTACT', SITEmodalCtrl]);
+    function SITEmodalCtrl($scope, $cookies, $location, $state, $http, $timeout, $modalInstance, $filter, allDropDownParts, thisSiteStuff, SITE, SITE_HOUSING, MEMBER, INSTRUMENT, INSTRUMENT_STATUS, LANDOWNER_CONTACT) {
         //dropdowns
         $scope.HorizontalDatumList = allDropDownParts[0];
         $scope.HorCollMethodList = allDropDownParts[1];
@@ -4851,7 +4873,7 @@
                 if (valid == true) {
                     $(".page-loading").removeClass("hidden");
                     //update the site
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     //did they add or edit the landowner
                     if ($scope.addLandowner == true) {
@@ -4949,9 +4971,9 @@
         else {
             //#region this is a NEW SITE CREATE (site == undefined)
             //get logged in member to make them creator
-            $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+            $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
             $http.defaults.headers.common['Accept'] = 'application/json';
-            MEMBER.query({ id: getUserID() }, function success(response) {
+            MEMBER.query({ id: $cookies.get('mID') }, function success(response) {
                 $scope.aSite.Creator = response.FNAME + " " + response.LNAME;
                 $scope.aSite.MEMBER_ID = response.MEMBER_ID;
                 $scope.aSite.IS_PERMANENT_HOUSING_INSTALLED = "No";
@@ -4966,7 +4988,7 @@
                 if (valid == true) {
                     $(".page-loading").removeClass("hidden");
                     //POST landowner, if they added one
-                    $http.defaults.headers.common['Authorization'] = 'Basic ' + getCreds();
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     delete $scope.aSite.Creator;
                     if ($scope.addLandowner == true) {
@@ -5171,9 +5193,9 @@
     //#endregion MODALS
 
     //#region LOGIN/OUT
-    //login 'setLoggedIn',
-    STNControllers.controller('LoginCtrl', ['$scope', '$state', '$http', '$rootScope', 'Login', 'setCreds', LoginCtrl]);
-    function LoginCtrl($scope, $state, $http, $rootScope, Login, setCreds) {
+    //login 
+    STNControllers.controller('LoginCtrl', ['$scope', '$state', '$http', '$cookies', '$rootScope', 'Login', LoginCtrl]);
+    function LoginCtrl($scope, $state, $http, $cookies, $rootScope, Login) {
 
         //#region CAP lock Check
         $('[type=password]').keypress(function (e) {
@@ -5211,7 +5233,32 @@
                     if (user != undefined) {
                         //set user cookies (cred, username, name, role
                         var usersNAME = user.FNAME + " " + user.LNAME;
-                        setCreds($scope.username, $scope.password, usersNAME, user.ROLE_ID, user.MEMBER_ID);
+                        var enc = btoa($scope.username.concat(":", $scope.password));
+                        $cookies.put('STNCreds', enc);
+//                        $cookies.STNCreds = btoa($scope.username.concat(":", $scope.password));
+                        $cookies.put('STNUsername', $scope.username);
+                        $cookies.put('usersName', usersNAME);
+                        $cookies.put('mID', user.MEMBER_ID);
+                        var roleName;
+                        switch (user.ROLE_ID) {
+                            case 1:
+                                roleName = "Admin";
+                                break;
+                            case 2:
+                                roleName = "Manager";
+                                break;
+                            case 3:
+                                roleName = "Field";
+                                break;
+                            case 4:
+                                roleName = "Public";
+                                break;
+                            default:
+                                roleName = "CitizenManager";
+                                break;
+                        }
+                        $cookies.put('usersRole', roleName);
+
                         //setLoggedIn.changeLoggedIn(true);
                         $rootScope.isAuth.val = true;
                         $rootScope.usersName = usersNAME;
@@ -5230,10 +5277,13 @@
     }
 
     //logOut
-    STNControllers.controller('LogoutCtrl', ['$scope', '$location', 'deleteCreds', LogoutCtrl]);
-    function LogoutCtrl($scope, $location, deleteCreds) {
+    STNControllers.controller('LogoutCtrl', ['$scope', '$cookies', '$location', LogoutCtrl]);
+    function LogoutCtrl($scope, $cookies, $location) {
         $scope.logout = function () {
-            deleteCreds();
+            $cookies.remove('STNCreds');
+            $cookies.remove('STNUsername');
+            $cookies.remove('usersName');
+            $cookies.remove('usersRole');
             $location.path('/login');
         };
     }
