@@ -1,4 +1,4 @@
-﻿<h3>Pending Approval</h3>
+﻿<h3>Pending Approval - For {{sessionEvent}}</h3>
 
 <hr />
 
@@ -6,12 +6,12 @@
 <br />
 <form name="approvalForm">
     <div class="row">
-        <label class="col-md-1 control-label" for="inputEVENT">Events:</label>
-        <div class="col-md-3">
-            <select class="form-control" id="inputEVENT_ID" name="EVENT_ID" ng-model="ChosenEvent.id" ng-change="changedEvent(ChosenEvent.id)"
+        <label class="col-md-1 control-label" for="inputEVENT">Event:</label>
+        <div class="col-md-3">{{sessionEvent}}
+            <!--<select class="form-control" id="inputEVENT_ID" name="EVENT_ID" ng-model="ChosenEvent.id" ng-change="changedEvent(ChosenEvent.id)"
                     ng-options="e.EVENT_ID as (e.EVENT_NAME + ' --- ' + (e.EVENT_START_DATE | date: 'MM/dd/yyyy') + ' to ' + ((e.EVENT_END_DATE || '-Not Set-') | date: 'MM/dd/yyyy'))  for e in allEvents | orderBy: '-EVENT_START_DATE'">
                 <option value=""></option>
-            </select>
+            </select>-->
         </div>
 
         <label class="col-md-1 control-label" for="inputSTATE">States:</label>

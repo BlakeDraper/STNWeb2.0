@@ -69,6 +69,9 @@
     <Content Include="images\Events1.png" />
     <Content Include="images\Members1.png" />
     <Content Include="images\Tables1.png" />
+    <Content Include="js\LogInOutCtrl.js" />
+    <Content Include="js\ModalsCtrl.js" />
+    <Content Include="js\SettingsCtrl.js" />
     <Content Include="js\vendor\angular-animate.min.js.map" />
     <Content Include="js\vendor\angular-aria.min.js.map" />
     <Content Include="js\vendor\angular-cookies.min.js.map" />
@@ -148,6 +151,7 @@
     <Content Include="js\vendor\ui-utils.js" />
     <Content Include="js\vendor\xeditable.js" />
     <Content Include="js\vendor\xeditable.min.js" />
+    <Content Include="partials\Components\LatLong.html" />
     <Content Include="partials\file.html" />
     <Content Include="partials\Reporting\completedReportView.html" />
     <Content Include="partials\Reporting\generateReport.html" />

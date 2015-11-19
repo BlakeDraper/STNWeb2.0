@@ -1,4 +1,4 @@
-﻿<h3>Site Search</h3>
+﻿<h3>Site Search - For {{sessionEvent}}</h3>
 
 <hr />
 
@@ -7,11 +7,11 @@
 <form name="siteSearchForm">
     <div class="form-group col-md-6">
         <label class="col-md-4 control-label" for="inputEVENT_ID">Events:</label>
-        <div class="col-md-6">
-            <select class="form-control" id="inputEVENT_ID" name="EVENT_ID" ng-model="Chosen.event"
+        <div class="col-md-6">{{sessionEvent}}
+            <!--<select class="form-control" id="inputEVENT_ID" name="EVENT_ID" ng-model="Chosen.event"
                     ng-options="e.EVENT_ID as (e.EVENT_NAME + ' --- ' + (e.EVENT_START_DATE | date: 'MM/dd/yyyy') + ' to ' + ((e.EVENT_END_DATE || '-Not Set-') | date: 'MM/dd/yyyy'))  for e in events | orderBy: '-EVENT_START_DATE'">
                 <option value=""></option>
-            </select>
+            </select>-->
         </div>
     </div>
 
