@@ -1,8 +1,9 @@
 ﻿(function () {
     "use strict"; 
     var app = angular.module('app',
-        ['ngResource', 'ui.router', 'ngCookies', 'ui.mask', 'ui.bootstrap', 'isteven-multi-select',
-            'STNResource', 'STNControllers']);
+        ['ngResource', 'ui.router', 'ngCookies', 'ui.mask', 'ui.bootstrap', 'isteven-multi-select', 'ngInputModified', 'ui.validate',
+            'angular.filter', 'xeditable', 'checklist-model', 'ngFileUpload',
+            'STNResource', 'STNControllers', 'LogInOutController', 'ModalControllers', 'SettingsControllers']);
     //, 'STNBusinessServices'
     app.run(function ($rootScope) {
         $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
@@ -42,21 +43,27 @@
                 .state("home", {
                     url: "/Home",
                     templateUrl: "partials/homeBase.html",
-                    controller: "HomeCtrl",
-                    resolve: {
-                        e: 'EVENT',
-                        eventList: function (e) {
-                            return e.getAll().$promise;
-                        },
-                        a: 'AGENCY',
-                        agencyList: function (a) {
-                            return a.getAll().$promise;
-                        },
-                        r: 'ROLE',
-                        roleList: function (r) {
-                            return r.getAll().$promise;
-                        }
-                    }
+                    controller: "HomeCtrl"//,
+                    //resolve: {
+                    //    e: 'EVENT',
+                    //    eventList: function (e) {
+                    //        return e.getAll().$promise;
+                    //    },
+                    //    a: 'AGENCY',
+                    //    agencyList: function (a) {
+                    //        return a.getAll().$promise;
+                    //    },
+                    //    r: 'ROLE',
+                    //    roleList: function (r) {
+                    //        return r.getAll().$promise;
+                    //    },
+                    //    allEventTypes: function (et) {
+                    //        return et.getAll().$promise;
+                    //    }, st: 'STATE',
+                    //    allStates: function (st) {
+                    //        return st.getAll().$promise;
+                    //    }
+                    //}
                 })
                 //#endregion entry point once logged in
 
@@ -72,7 +79,7 @@
                 .state("fileUpload", {
                     url: "/File",
                     templateUrl: "partials/file.html",
-                    controller: "FileCtrl",
+                    controller: "FileUploadCtrl",
                     resolve: {
                         ft: 'FILE_TYPE',
                         fileTypeList: function (ft) {
@@ -92,10 +99,10 @@
                     templateUrl: "partials/Approval.html",
                     controller: "ApprovalCtrl",
                     resolve: {
-                        e: 'EVENT',
-                        eventList: function (e) {
-                            return e.getAll().$promise;
-                        },
+                        //e: 'EVENT',
+                        //eventList: function (e) {
+                        //    return e.getAll().$promise;
+                        //},
                         s: 'STATE',
                         stateList: function (s) {
                             return s.getAll().$promise;
@@ -118,10 +125,10 @@
                     templateUrl: "partials/SiteSearch.html",
                     controller: "SiteSearchCtrl",
                     resolve: {
-                        e: 'EVENT',
-                        eventList: function (e) {
-                            return e.getAll().$promise;
-                        },
+                        //e: 'EVENT',
+                        //eventList: function (e) {
+                        //    return e.getAll().$promise;
+                        //},
                         s: 'STATE',
                         stateList: function (s) {
                             return s.getAll().$promise;
@@ -704,36 +711,36 @@
                         },
                         //#endregion op stuff
                         //#region sensor stuff
-                        /*e: 'EVENT',
+                        e: 'EVENT',
                         allEvents: function (e) {
                             return e.getAll().$promise;
                         },
                         sent: 'SENSOR_TYPE',
                         allSensorTypes: function (sent) {
                             return sent.getAll().$promise;
-                        },*/
+                        },
                         statT: 'STATUS_TYPE',
                         allStatusTypes: function (statT) {
                             return statT.getAll().$promise;
-                        }//,
-                        //sb: 'SENSOR_BRAND',
-                        //allSensorBrands: function (sb){
-                        //    return sb.getAll().$promise;
-                        //}//,                       
+                        },
+                        sb: 'SENSOR_BRAND',
+                        allSensorBrands: function (sb){
+                            return sb.getAll().$promise;
+                        },                       
                         //#endregion sensor stuff
                         //#region hwm stuff
-                        //hwmt: 'HWM_TYPE',
-                        //allHWMTypes: function (hwmt) {
-                        //    return hwmt.getAll().$promise;
-                        //},
-                        //hq: 'HWM_QUALITY',
-                        //allHWMQualities: function (hq){
-                        //    return hq.getAll().$promise;
-                        //},
-                        //m: 'MARKER',
-                        //allMarkers: function (m){
-                        //    return m.getAll().$promise;
-                        //}, 
+                        hwmt: 'HWM_TYPE',
+                        allHWMTypes: function (hwmt) {
+                            return hwmt.getAll().$promise;
+                        },
+                        hq: 'HWM_QUALITY',
+                        allHWMQualities: function (hq){
+                            return hq.getAll().$promise;
+                        },
+                        m: 'MARKER',
+                        allMarkers: function (m){
+                            return m.getAll().$promise;
+                        }//, 
                         //#endregion hwm stuff
                         //#region file
                         /*   ft: 'FILE_TYPE',
@@ -754,11 +761,15 @@
                     url: "/SiteDashboard",
                     views: {
                         'siteNo': {
-                            controller: function ($scope, thisSite) {
+                            controller: function ($scope, $cookies, thisSite) {
                                 if (thisSite != undefined)
                                     $scope.SiteNo = thisSite.SITE_NO;
+                                // watch for the session event to change and update
+                                $scope.$watch(function () { return $cookies.get('SessionEventName'); }, function (newValue) {
+                                    $scope.sessionEvent = $cookies.get('SessionEventName') != null ? $cookies.get('SessionEventName') : "All Events";
+                                });
                             },
-                            template: '<div><h2 style="margin-top:0">Site {{SiteNo}}</h2></div><hr />' 
+                            template: '<div><h2 style="margin-top:0">Site {{SiteNo}} - For {{sessionEvent}}</h2></div><hr />' 
                         },
                         'aSite': {
                             controller: 'SiteCtrl',
@@ -847,8 +858,4 @@
             //$locationProvider.html5Mode({ enabled: true, requireBase: false });
         }
     ]);
-
-    
-
-
 }());

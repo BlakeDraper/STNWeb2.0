@@ -18,14 +18,14 @@
 
     <!--NEW library scripts -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
-    <script src="bower_components/angular/angular.min.js"></script>-->
+    <!--<script src="bower_components/angular/angular.min.js"></script>-->
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-route/angular-route.min.js"></script> <!-- (this uses 1.4.7 ... vendor has 1.3.15)-->
     <script src="bower_components/angular-resource/angular-resource.min.js"></script>
     <script src="bower_components/angular-cookies/angular-cookies.min.js"></script>
     <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script> <!--includes templates--> 
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script> <!--includes templates-->
     <script src="bower_components/angular-ui-mask/dist/mask.min.js"></script> <!--for data masking ui-mask="(999)-****", unique, validate I think-->
     <script src="bower_components/isteven-angular-multiselect/isteven-multi-select.js"></script>
     <script src="bower_components/toastr/toastr.js"></script>
@@ -40,8 +40,8 @@
     <script src="bower_components/angular-simple-logger/dist/angular-simple-logger.min.js"></script>
     <script src="bower_components/angular-leaflet-directive/dist/angular-leaflet-directive.min.js"></script>
     <script src="bower_components/leaflet/dist/leaflet.js"></script>-->
-    -->
     
+
     <script src="js/vendor/jquery.inputmask.bundle.js"></script>
     <!--<script src="js/vendor/ng-tags-input.min.js"></script>
     <script src="//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script> <!-- used for the address find on site create page              <!--    added -->
@@ -49,22 +49,23 @@
     <script src="js/vendor/ng-file-upload-all.min.js"></script> <!-- upload files to s3 -->
     <script src="js/vendor/ng-file-upload.min.js"></script>
     <script src="js/vendor/checklist-model.js"></script><!--used as multiselect checkboxes on sensorType page                <!--  added -->
-    
     <!--application scripts -->
     <script src="js/app.js"></script>
 
     <!--Services-->
     <script src="services/STNResource.js"></script>
-    <!--<script src="services/businessServices.js"></script>-->
 
     <!-- Controllers -->
     <script src="js/STNControllers.js"></script>
     <script src="js/datePickrCtrl.js"></script>
+    <script src="js/LogInOutCtrl.js"></script>
+    <script src="js/ModalsCtrl.js"></script>
+    <script src="js/SettingsCtrl.js"></script>
 </head>
 
 <body ng-app="app">
     <!--<div ng-include src="'partials/header.html'"></div>-->
-    <!--HEADER START-->
+    <!--HEADER START navCtrl-->
     <div ng-controller="mainCtrl" class="navbar navbar-default">
         <div class="container-fluid" style="background-color:gray;">
             <div class="navbar-header">
@@ -78,10 +79,15 @@
                 </div>
                 <div class="pull-right" style="margin-top:10px" ng-show="isAuth.val">
                     <div><span>Welcome, <a ui-sref="members.MemberInfo({id: userID})">{{usersName}}</a></span></div>
-                    <div><button ng-controller="navCtrl" ng-click="logout()">LOG OFF</button></div>
+                    <div><button ng-controller="LogoutCtrl" ng-click="logout()">LOG OFF</button></div>
                 </div>
                 <br clear="all" />
-                <div class="pull-right">{{sessionTeam}} {{sessionEvent}}</div>
+
+                <div class="pull-right" ng-show="isAuth.val">{{sessionTeam}} {{sessionEvent}}</div>
+                <br clear="all" />
+                <div class="pull-right" ng-show="isAuth.val">
+                    <button ng-controller="EventSessionCtrl" class="btn btn-primary" ng-click="openEventModal()">Choose Session Event</button>
+                </div>
             </div>
             <br clear="all" />
             <div ng-show="isAuth.val" class="container">
@@ -96,15 +102,30 @@
                         <li ng-class="{active: activeMenu == 'settings'}"><a style="color:#000" ui-sref="settings" ng-click="activeMenu = 'settings'">Settings</a></li>
                     </ul>
 
-                    <div class="span6" style="text-align:center">
+                    <!--<div class="span6" style="text-align:center">
                         <a ui-sref="site.dashboard({id: 0})">
                             <button class="btn btn-primary large">
                                 Site Create
                             </button>
                         </a>
-                    </div>
-                </div>
+                    </div>-->
 
+                    <!-- Single button -->
+                    <div class="span6" style="text-align:center">
+                        <div class="btn-group" dropdown is-open="status.isopen">
+                            <button id="single-button" type="button" class="btn btn-primary" dropdown-toggle ng-disabled="disabled">
+                                Create <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="single-button">
+                                <li role="menuitem"><a ui-sref="site.dashboard({id: 0})">Site</a></li>
+                                <li role="menuitem"><a href="#">Quick HWM</a></li>
+                                <li role="menuitem"><a href="#">Quick Sensor</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+
+                    </div>
             </div>
         </div>
     </div>
@@ -131,6 +152,70 @@
         <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
     </div>
 </script>
+
+<!-- MODAL for Choose Event for this session -->
+<script type="text/ng-template" id="ChooseEvent.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Choose Event for this Session</h3>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal" name="eventForm" novalidate>
+            <fieldset>
+                <div>Filter Events by any of the following or just choose an event below:</div>
+                <div class="form-group">
+                    <label class="col-md-5 control-label">Events created on or after:</label>
+                    <div class="col-md-6 input-group" style="padding-right:14px;padding-left:14px">
+                        <input class="form-control" name="ed" type="text" datepicker-popup="MMM dd, yyyy" is-open="datepickrs.ed" ng-model="event.DATE" placeholder="No filter" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" ng-click="open($event, 'ed')">
+                                <i class="glyphicon glyphicon-calendar" />
+                            </button>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-5 control-label">Event Type:</label>
+                    <div class="col-md-6">
+                        <select class="form-control" name="" ng-model="event.TYPE" ng-options="et.EVENT_TYPE_ID as et.TYPE for et in EventTypeList">
+                            <option value="">No filter</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-5 control-label">Event State:</label>
+                    <div class="col-md-6">
+                        <select class="form-control" name="" ng-model="event.STATE" ng-options="s.STATE_ABBREV as s.STATE_NAME for s in StateList">
+                            <option value="">No filter</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <button class="btn btn-primary center-block" type="button" ng-click="filterEvents()">Filter Events</button>
+                    </div>
+                </div>
+
+                    <div class="form-group">
+                        <label class="col-md-5 control-label">Events:</label>
+                        <div class="col-md-6">
+                            <select class="form-control" name="" ng-model="event.EventChosen" ng-options="e.EVENT_ID as e.EVENT_NAME for e in EventList">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                    </div>
+</fieldset>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="setEvent()">Set event</button>
+        <button class="btn btn-warning" ng-click="clearEvent()">Clear event</button>
+        <button class="btn btn-warning" ng-click="close()">Cancel</button>
+    </div>
+
+</script>
+
 
 <script type="text/ng-template" id="saveReportModal.html">
     <div class="modal-header">
