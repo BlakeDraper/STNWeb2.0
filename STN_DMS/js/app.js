@@ -799,60 +799,8 @@
                     }
                 });//#endregion site.info
 
-                //#region site.OP
-                //.state("site.OP", {
-                //    url: "/ObjectivePoint/:id",
-                //    templateUrl: "partials/Sites/siteOPView.html",
-                //    controller: "ObjectivePointCtrl",
-                //    resolve: {
-                //        op: 'OBJECTIVE_POINT',
-                //        thisOP: function (op, $stateParams){
-                //            if ($stateParams.id > 0) {
-                //                return op.query({id: $stateParams.id}).$promise;
-                //            }
-                //        }
-                //    }
-                //})
-                //#endregion site.OP
-        
-                //#region site.Sensor
-                //.state("site.Sensor", {
-                //    url: "/Sensor/:id",
-                //    templateUrl: "partials/Sites/siteSensorView.html",
-                //    controller: "SensorCtrl",
-                //    resolve: {
-                //        ins: 'INSTRUMENT',
-                //        thisInstrument: function (inst, $stateParams){
-                //            if ($stateParams.id > 0) {
-                //                return inst.query({id: $stateParams.id}).$promise;
-                //            }
-                //        },
-                //        instStat: 'INSTRUMENT_STATUS',
-                //        theseInstruStats: function (instStat, $stateParams) {
-                //            if ($stateParams.id > 0) {
-                //                instStat.getInstrumentStatusLog({id: $stateParams.id}).$promise;
-                //            }
-                //        }
-                //    }
-                //})
-                //#endregion site.Sensor
-
-                //#region site.HWM
-                //.state("site.HWM", {
-                //    url: "/HWM/:id",
-                //    templateUrl: "partials/Sites/siteHWMView.html",
-                //    controller: "HWMCtrl",
-                //    resolve: {
-                //        hwm: 'HWM',
-                //        thisHWM: function (hwm, $stateParams){
-                //            if ($stateParams.id > 0) {
-                //                return hwm.query({id: $stateParams.id}).$promise;
-                //            }
-                //        }
-                //    }
-                //})
-                //#endregion site.HWM
-
+            
+               
                 
            // $locationProvider.html5Mode(false).hashPrefix('!');
             //$locationProvider.html5Mode({ enabled: true, requireBase: false });

@@ -82,6 +82,16 @@
             case "Objective Point":
                 $scope.nameToRmv = nameToRemove.NAME;
                 break;
+            case "HWM":
+                var aDate = new Date(nameToRemove.FLAG_DATE);
+                var year = aDate.getFullYear();
+                var month = aDate.getMonth();
+                var day = ('0' + aDate.getDate()).slice(-2);
+                var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                var dateWOtime = monthNames[month] + " " + day + ", " + year;
+                
+                $scope.nameToRmv = "Flagged on: " + dateWOtime;
+                break;
         }
         //#endregion
 
@@ -763,11 +773,6 @@
             $scope.datepickrs[which] = true;
         };
 
-        //cancel
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-
         //lat/long =is number
         $scope.isNum = function (evt) {
             var theEvent = evt || window.event;
@@ -1006,8 +1011,8 @@
         }
     }//end OPmodalCtrl
 
-    ModalControllers.controller('HWMmodalCtrl', ['$scope', '$cookies', '$http', '$modalInstance', '$modal', 'allDropdowns', 'thisHWM', 'hwmSite', 'HWM', HWMmodalCtrl]);
-    function HWMmodalCtrl($scope, $cookies, $http, $modalInstance, $modal, allDropdowns, thisHWM, hwmSite, HWM) {
+    ModalControllers.controller('HWMmodalCtrl', ['$scope', '$cookies', '$http', '$modalInstance', '$modal', 'allDropdowns', 'thisHWM', 'hwmSite', 'allMembers', 'HWM', HWMmodalCtrl]);
+    function HWMmodalCtrl($scope, $cookies, $http, $modalInstance, $modal, allDropdowns, thisHWM, hwmSite, allMembers, HWM) {
         //TODO:: check to see if they chose an event.. if not, they need to before creating a hwm
         //dropdowns
         $scope.hwmTypeList = allDropdowns[0];
@@ -1017,9 +1022,26 @@
         $scope.VDatumsList = allDropdowns[4];
         $scope.vCollMList = allDropdowns[5];
         $scope.markerList = allDropdowns[6];
-        $scope.sessionEvent = $cookies.get('SessionEventName');
+        $scope.eventList = allDropdowns[7];
+        $scope.userRole = $cookies.get('usersRole');
+        $scope.FlagMember = ""; //just for show on page
+        $scope.SurveyMember = ""; //just for show on page
+        $scope.showEventDD = false; //toggle to show/hide event dd (admin only)
+
+        //button click to show event dropdown to change it on existing hwm (admin only)
+        $scope.showChangeEventDD = function () {
+            $scope.showEventDD = !$scope.showEventDD;
+        }
+
+        //change event = apply it to the $scope.EventName
+        $scope.ChangeEvent = function () {
+            $scope.EventName = $scope.eventList.filter(function (el) { return el.EVENT_ID == $scope.aHWM.EVENT_ID; })[0].EVENT_NAME;
+        }
+        // $scope.sessionEvent = $cookies.get('SessionEventName');
+        $scope.LoggedInMember = allMembers.filter(function (m) { return m.MEMBER_ID == $cookies.get('mID'); })[0];
 
         $scope.aHWM = {};
+        $scope.DMS = {};
         $scope.thisHWMsite = hwmSite;
 
         //Datepicker
@@ -1122,16 +1144,77 @@
         if (thisHWM != "empty") {
             //#region existing HWM
             $scope.aHWM = thisHWM;
+            //get this hwm's event name
+            $scope.EventName = $scope.eventList.filter(function (e) { return e.EVENT_ID == $scope.aHWM.EVENT_ID; })[0].EVENT_NAME;
+            //date formatting
             $scope.aHWM.FLAGGED_DATE = makeAdate($scope.aHWM.FLAGGED_DATE);
-            if ($scope.aHWM.SURVEY_DATE != null)
-                $scope.aHWM.SURVEY_DATE = makeAdate($scope.aHWM.SURVEY_DATE);
 
-            $scope.save = function () {
-                //save stuff
+            //if this is surveyed, date format and get survey member's name
+            if ($scope.aHWM.SURVEY_DATE != null) {
+                $scope.aHWM.SURVEY_DATE = makeAdate($scope.aHWM.SURVEY_DATE);
+                $scope.SurveyMember = allMembers.filter(function (m) { return m.MEMBER_ID == $scope.aHWM.SURVEY_TEAM_ID; })[0];
             }
 
+            //get flagging member's name
+            $scope.FlagMember = allMembers.filter(function (m) { return m.MEMBER_ID == $scope.aHWM.FLAG_TEAM_ID; })[0];
+
+            //save aHWM
+            $scope.save = function () {                
+                if ($scope.HWMForm.$valid) {
+                    var updatedHWM = {};
+                    if ($scope.aHWM.SURVEY_DATE != undefined)
+                        $scope.aHWM.SURVEY_TEAM_ID = $cookies.get('mID');
+
+                    if ($scope.aHWM.ELEV_FT != undefined) {
+                        //make sure they added the survey date if they added an elevation
+                        if ($scope.aHWM.SURVEY_DATE == undefined)
+                            $scope.aHWM.SURVEY_DATE = makeAdate("");
+
+                        $scope.aHWM.SURVEY_TEAM_ID = $cookies.get('mID');
+                    }
+                
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
+                    $http.defaults.headers.common['Accept'] = 'application/json';
+                    HWM.update({ id: $scope.aHWM.HWM_ID }, $scope.aHWM).$promise.then(function (response) {
+                        toastr.success("HWM updated");
+                        updatedHWM = response;
+                        var sendBack = [updatedHWM, 'updated'];
+                        $modalInstance.close(sendBack);
+                    });                
+                } else {
+                    alert("Please populate all required fields.");
+                }
+            }//end save()
+
+            //delete aHWM
             $scope.deleteHWM = function () {
-                //delete it
+                //TODO:: Delete the files for this OP too or reassign to the Site?? Services or client handling?
+                var DeleteModalInstance = $modal.open({
+                    templateUrl: 'removemodal.html',
+                    controller: 'ConfirmModalCtrl',
+                    size: 'sm',
+                    resolve: {
+                        nameToRemove: function () {
+                            return $scope.aHWM
+                        },
+                        what: function () {
+                            return "HWM";
+                        }
+                    }
+                });
+
+                DeleteModalInstance.result.then(function (hwmToRemove) {
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
+                    HWM.delete({ id: hwmToRemove.HWM_ID }, hwmToRemove).$promise.then(function () {
+                        toastr.success("HWM Removed");
+                        var sendBack = ["de", 'deleted'];
+                        $modalInstance.close(sendBack);
+                    }, function error(errorResponse) {
+                        toastr.error("Error: " + errorResponse.statusText);
+                    });
+                }, function () {
+                    //logic for cancel
+                });//end modal
             }
 
             //#endregion existing HWM
@@ -1139,6 +1222,8 @@
             //#region new HWM
             //use site's LAT, LONG, WATERBODY, HDATUM, HCOLLECTMETHOD, set FLAGDATE with today
             $scope.aHWM = {
+                SITE_ID: $scope.thisHWMsite.SITE_ID,
+                EVENT_ID: $cookies.get('SessionEventID'),
                 HWM_ENVIRONMENT: 'Riverine',
                 BANK: 'N/A',
                 STILLWATER: 0,
@@ -1148,12 +1233,38 @@
                 HDATUM_ID: hwmSite.HDATUM_ID,
                 HCOLLECT_METHOD_ID: hwmSite.HCOLLECT_METHOD_ID,
                 FLAG_DATE: makeAdate(""),
-                FLAG_TEAM_ID: $cookies.get('mID') //need to make this FLAG_MEMBER_ID ... and at SiteCtrl level get all members and pass to these modals to filter for member info to show
+                FLAG_TEAM_ID: $scope.LoggedInMember.MEMBER_ID //need to make this FLAG_MEMBER_ID ... and at SiteCtrl level get all members and pass to these modals to filter for member info to show
             };
+            $scope.EventName = $cookies.get('SessionEventName');
+            $scope.FlagMember = $scope.LoggedInMember;
 
             $scope.create = function () {
-                //create stuff
-            }
+                if (this.HWMForm.$valid) {
+                    var createdHWM = {};
+                    //if they entered a survey date or elevation, then set survey member as the flag member (flagging and surveying at same time
+                    if ($scope.aHWM.SURVEY_DATE != undefined) 
+                        $scope.aHWM.SURVEY_TEAM_ID = $scope.FLAG_TEAM_ID;
+
+                    if ($scope.aHWM.ELEV_FT != undefined) {
+                        //make sure they added the survey date if they added an elevation
+                        if ($scope.aHWM.SURVEY_DATE == undefined)
+                            $scope.aHWM.SURVEY_DATE = makeAdate("");
+
+                        $scope.aHWM.SURVEY_TEAM_ID = $scope.FLAG_TEAM_ID;
+                    }
+
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
+                    $http.defaults.headers.common['Accept'] = 'application/json';
+                    HWM.save($scope.aHWM).$promise.then(function (response) {
+                        createdHWM = response;
+                        toastr.success("HWM created");
+                        var sendBack = [createdHWM, 'created'];
+                        $modalInstance.close(sendBack);
+                    });
+                } else {
+                    alert("Please populate all required fields");
+                }
+            }//end create()
             //#endregion new HWM
         }
         //radio button defaults

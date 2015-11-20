@@ -834,11 +834,24 @@
                 <!-- Event: -->
                 <div class="form-group" ng-class="{'has-error':HWMForm.EVENT_ID.$invalid && HWMForm.EVENT_ID.$dirty}">
                     <label class="col-md-3 control-label" for="EVENT_ID">Event:</label>
-                    <div class="col-md-6">{{sessionEvent}}
-                        <!--<select class="form-control" id="EVENT_ID" name="EVENT_ID" ng-model="aHWM.EVENT_ID"
-                                ng-options="e.EVENT_ID as e.EVENT_NAME for e in eventList">
-                            <option value=""></option>
-                        </select>-->
+                    <div class="col-md-6">
+                        <div class="col-md-8">{{EventName}}</div>
+                        <div class="col-md-3" ng-show="userRole == 'Admin' && aHWM.HWM_ID != undefined">
+                            <button type="button" ng-click="showChangeEventDD()" class="btn btn-primary">Change Event</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!--Event dropdown for admin -->
+                <div ng-show="showEventDD">
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">Events:</label>
+                        <div class="col-md-6">
+                            <select class="form-control" id="EVENT_ID" name="EVENT_ID" ng-model="aHWM.EVENT_ID" ng-change="ChangeEvent()"
+                                    ng-options="e.EVENT_ID as (e.EVENT_NAME + ' --- ' + (e.EVENT_START_DATE | date: 'MM/dd/yyyy') + ' to ' + ((e.EVENT_END_DATE || '-Not Set-') | date: 'MM/dd/yyyy'))  for e in eventList | orderBy: '-EVENT_START_DATE'"
+                                <option value=""></option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -865,7 +878,7 @@
                         </label>
                     </div>
                 </div>
-                
+
                 <!-- Breakdown of categories -->
                 <div class="form-group">
                     <label class="col-md-3"></label>
@@ -915,7 +928,7 @@
                         <textarea class="form-control" id="HWM_LOCATIONDESCRIPTION" name="HWM_LOCATIONDESCRIPTION" type=" text" rows="3" ng-model="aHWM.HWM_LOCATIONDESCRIPTION" />
                     </div>
                 </div>
-                
+
                 <!-- dec deg or dms: -->
                 <div class="form-group">
                     <label class="col-md-3 control-label"></label>
@@ -974,7 +987,7 @@
                     <label class="col-md-3 control-label req">Horizontal Datum:</label>
                     <div class="col-md-6">
                         <select class="form-control" id="HDATUM_ID" name="HDATUM_ID" ng-model="aHWM.HDATUM_ID"
-                                ng-options="hd.HDATUM_ID as hd.DATUM_NAME for hd in HDatumsList" required>
+                                ng-options="hd.DATUM_ID as hd.DATUM_NAME for hd in HDatumsList" required>
                             <option value=""></option>
                         </select>
                     </div>
@@ -1004,7 +1017,7 @@
                     <label class="col-md-3 control-label">Vertical Datum:</label>
                     <div class="col-md-6">
                         <select class="form-control" id="VDATUM_ID" name="VDATUM_ID" ng-model="aHWM.VDATUM_ID"
-                                ng-options="vd.VDATUM_ID as vd.DATUM_NAME for vd in VDatumsList">
+                                ng-options="vd.DATUM_ID as vd.DATUM_NAME for vd in VDatumsList">
                             <option value=""></option>
                         </select>
                     </div>
@@ -1093,7 +1106,15 @@
                 <div class="form-group">
                     <label class="col-md-3 control-label" for="FLAG_TEAM_ID">Flagging Member:</label>
                     <div class="col-md-6">
-                        <textarea class="form-control" id="FLAG_TEAM_ID" name="FLAG_TEAM_ID" type=" text" rows="3" ng-model="aHWM.FLAG_TEAM_ID" />
+                        <span>{{FlagMember.FNAME}} {{FlagMember.LNAME}}</span>                        
+                    </div>
+                </div>
+
+                <!-- Survey Member: -->
+                <div class="form-group" ng-show="aHWM.SURVEY_TEAM_ID">
+                    <label class="col-md-3 control-label" for="SURVEY_TEAM_ID">Survey Member:</label>
+                    <div class="col-md-6">
+                        <span>{{SurveyMember.FNAME}} {{SurveyMember.LNAME}}</span>                        
                     </div>
                 </div>
 
