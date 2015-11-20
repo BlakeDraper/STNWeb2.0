@@ -1602,8 +1602,8 @@
     //#endregion INSTRUMENT
 
     //#region HWM
-    STNControllers.controller('HWMCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'thisSite', 'thisSiteHWMs', 'allHWMTypes', 'allHWMQualities', 'allHorDatums', 'allMarkers', 'allHorCollMethods', 'allVertDatums', 'allVertColMethods', HWMCtrl]);
-    function HWMCtrl($scope, $cookies, $location, $state, $http, $modal, $filter, $timeout, thisSite, thisSiteHWMs, allHWMTypes, allHWMQualities, allHorDatums, allMarkers, allHorCollMethods, allVertDatums, allVertColMethods) {
+    STNControllers.controller('HWMCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'thisSite', 'thisSiteHWMs', 'allHWMTypes', 'allHWMQualities', 'allHorDatums', 'allMarkers', 'allHorCollMethods', 'allVertDatums', 'allVertColMethods', 'allEvents', 'MEMBER', HWMCtrl]);
+    function HWMCtrl($scope, $cookies, $location, $state, $http, $modal, $filter, $timeout, thisSite, thisSiteHWMs, allHWMTypes, allHWMQualities, allHorDatums, allMarkers, allHorCollMethods, allVertDatums, allVertColMethods, allEvents, MEMBER) {
         if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
@@ -1625,7 +1625,7 @@
             });
 
             $scope.showHWMModal = function (HWMclicked) {
-                var passAllLists = [allHWMTypes, allHWMQualities, allHorDatums, allHorCollMethods, allVertDatums, allVertColMethods, allMarkers];
+                var passAllLists = [allHWMTypes, allHWMQualities, allHorDatums, allHorCollMethods, allVertDatums, allVertColMethods, allMarkers, allEvents];
                 var indexClicked = $scope.SiteHWMs.indexOf(HWMclicked);
 
                 //modal
@@ -1644,6 +1644,11 @@
                             },
                             hwmSite: function () {
                                 return thisSite;
+                            },
+                            allMembers: function () {
+                                $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
+                                $http.defaults.headers.common['Accept'] = 'application/json';
+                                return MEMBER.getAll().$promise;
                             }
                        }
                 });
