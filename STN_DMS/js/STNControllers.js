@@ -248,10 +248,8 @@
 
     //#region MAIN Controller 
     STNControllers.controller('mainCtrl', ['$scope', '$rootScope', '$cookies', '$modal', '$location', '$state', mainCtrl]);
-    function mainCtrl($scope, $rootScope, $cookies, $modal, $location, $state) {
-        //$scope.logo = 'images/usgsLogo.png';
-        $rootScope.isAuth = {};
-        
+    function mainCtrl($scope, $rootScope, $cookies, $modal, $location, $state) {        
+        $rootScope.isAuth = {};        
         $rootScope.activeMenu = 'home'; //scope var for setting active class
         if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $rootScope.isAuth.val = false;
@@ -282,6 +280,7 @@
     STNControllers.controller('EventSessionCtrl', ['$scope', '$rootScope', '$cookies', '$modal', '$location', '$state', 'EVENT', 'EVENT_TYPE', 'STATE', EventSessionCtrl]);
     function EventSessionCtrl($scope, $rootScope, $cookies,  $modal, $location, $state, EVENT, EVENT_TYPE, STATE) {
         $scope.openEventModal = function () {
+            $(".page-loading").removeClass("hidden");
             //modal
             var modalInstance = $modal.open({
                 templateUrl: 'ChooseEvent.html',
@@ -1673,6 +1672,239 @@
             }; //end showHWMModal function
         } //end stncreds good
     } //#endregion HWM
+
+    //#region QuickHWM
+    STNControllers.controller('QuickHWMCtrl', ['$scope', '$rootScope', '$cookies', '$location', '$state', '$http', '$modal', '$filter',
+        'allHorDatums', 'allHorCollMethods', 'allStates', 'allCounties', 'allOPTypes', 'allVertDatums', 'allVertColMethods', 
+        'allOPQualities', 'allHWMTypes', 'allHWMQualities', 'allMarkers', QuickHWMCtrl]);
+    function QuickHWMCtrl($scope, $rootScope, $cookies, $location, $state, $http, $modal, $filter, allHorDatums, allHorCollMethods, allStates, 
+        allCounties, allOPTypes, allVertDatums, allVertColMethods, allOPQualities, allHWMTypes, allHWMQualities, allMarkers) {
+        if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
+            $scope.auth = false;
+            $location.path('/login');
+        } else {
+            //global vars
+            $rootScope.thisPage = "Quick HWM";
+
+            //called a few times to format just the date (no time)
+            var makeAdate = function (d) {
+                var aDate = new Date();
+                if (d != "") {
+                    //provided date
+                    aDate = new Date(d);
+                }
+
+                var year = aDate.getFullYear();
+                var month = aDate.getMonth();
+                var day = ('0' + aDate.getDate()).slice(-2);
+                var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                var dateWOtime = new Date(monthNames[month] + " " + day + ", " + year);
+                return dateWOtime;
+            }//end makeAdate()
+            $scope.decDegORdms = {};
+            $scope.aSite = { MEMBER_ID: $cookies.get('mID') };
+            $scope.aOP = {DATE_ESTABLISHED: makeAdate("")};
+            $scope.aHWM = { HWM_ENVIRONMENT: 'Riverine', BANK: 'N/A', FLAG_DATE: makeAdate(""), STILLWATER:0 };
+            $scope.status = { siteOpen: true, opOpen: false, hwmOpen: false }; //accordion for parts
+            $scope.removeOPCarray = []; //holder if they remove any OP controls
+            $scope.addedIdentifiers = []; //holder for added Identifiers
+            $scope.showControlIDinput = false; //initially hide the area containing added control Identifiers
+            //dropdowns
+            $scope.horDatumList = allHorDatums; $scope.horCollMethodList = allHorCollMethods;
+            $scope.stateList = allStates; $scope.allCountyList = allCounties; $scope.stateCountyList = [];
+            $scope.opTypeList = allOPTypes; $scope.vertDatumList = allVertDatums;
+            $scope.vertCollMethodList = allVertColMethods; $scope.opQualList = allOPQualities;
+            $scope.hwmTypeList = allHWMTypes; $scope.hwmQualList = allHWMQualities; $scope.markerList = allMarkers;
+            //default radios
+            $scope.FTorMETER = 'ft';
+            $scope.FTorCM = 'ft';
+
+            //want to add identifier
+            $scope.addNewIdentifier = function () {
+                $scope.addedIdentifiers.push({ OBJECTIVE_POINT_ID: $scope.aOP.OBJECTIVE_POINT_ID, IDENTIFIER: "", IDENTIFIER_TYPE: "" });
+                $scope.showControlIDinput = true;
+            }//end addNewIdentifier for OP
+
+            //#region Datepicker
+            $scope.datepickrs = {};
+            $scope.open = function ($event, which) {
+                $event.preventDefault();
+                $event.stopPropagation();
+
+                $scope.datepickrs[which] = true;
+            };
+            //#endregion
+
+            //#region lat/long stuff
+            
+            $scope.decDegORdms.val = 'dd';
+            $scope.DMS = {}; //holder of deg min sec values
+
+            //convert deg min sec to dec degrees
+            var azimuth = function (deg, min, sec) {
+                var azi = 0;
+                if (deg < 0) {
+                    azi = -1.0 * deg + 1.0 * min / 60.0 + 1.0 * sec / 3600.0;
+                    return (-1.0 * azi).toFixed(5);
+                }
+                else {
+                    azi = 1.0 * deg + 1.0 * min / 60.0 + 1.0 * sec / 3600.0;
+                    return (azi).toFixed(5);
+                }
+            }
+
+            //convert dec degrees to dms
+            var deg_to_dms = function (deg) {
+                if (deg < 0) {
+                    deg = deg.toString();
+
+                    //longitude, remove the - sign
+                    deg = deg.substring(1);
+                }
+                var d = Math.floor(deg);
+                var minfloat = (deg - d) * 60;
+                var m = Math.floor(minfloat);
+                var s = ((minfloat - m) * 60).toFixed(3);
+
+                return ("" + d + ":" + m + ":" + s);
+            }
+
+            //they changed radio button for dms dec deg
+            $scope.latLongChange = function () {
+                if ($scope.decDegORdms.val == "dd") {
+                    //they clicked Dec Deg..
+                    if ($scope.DMS.LADeg != undefined) {
+                        //convert what's here for each lat and long
+                        $scope.aSite.LATITUDE_DD = azimuth($scope.DMS.LADeg, $scope.DMS.LAMin, $scope.DMS.LASec);
+                        $scope.aSite.LONGITUDE_DD = azimuth($scope.DMS.LODeg, $scope.DMS.LOMin, $scope.DMS.LOSec);
+                        var test;
+                    }
+                } else {
+                    //they clicked dms (convert lat/long to dms)
+                    if ($scope.aSite.LATITUDE_DD != undefined) {
+                        var latDMS = (deg_to_dms($scope.aSite.LATITUDE_DD)).toString();
+                        var ladDMSarray = latDMS.split(':');
+                        $scope.DMS.LADeg = ladDMSarray[0];
+                        $scope.DMS.LAMin = ladDMSarray[1];
+                        $scope.DMS.LASec = ladDMSarray[2];
+
+                        var longDMS = deg_to_dms($scope.aSite.LONGITUDE_DD);
+                        var longDMSarray = longDMS.split(':');
+                        $scope.DMS.LODeg = longDMSarray[0] * -1;
+                        $scope.DMS.LOMin = longDMSarray[1];
+                        $scope.DMS.LOSec = longDMSarray[2];
+                    }
+                }
+            }
+
+            //  lat/long =is number
+            $scope.isNum = function (evt) {
+                var theEvent = evt || window.event;
+                var key = theEvent.keyCode || theEvent.which;
+                if (key != 46 && key != 45 && key > 31 && (key < 48 || key > 57)) {
+                    theEvent.returnValue = false;
+                    if (theEvent.preventDefault) theEvent.preventDefault();
+                }
+            };
+
+            //get address parts and existing sites 
+            $scope.getAddress = function () {
+                //clear them all first
+                delete $scope.aSite.ADDRESS; delete $scope.aSite.CITY; delete $scope.aSite.STATE;
+                $scope.stateCountyList = []; delete $scope.aSite.ZIP;
+
+                $(".page-loading").removeClass("hidden"); //loading...
+                var geocoder = new google.maps.Geocoder(); //reverse address lookup
+                var latlng = new google.maps.LatLng($scope.aSite.LATITUDE_DD, $scope.aSite.LONGITUDE_DD);
+                geocoder.geocode({ 'latLng': latlng }, function (results, status) {
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        //parse the results out into components ('street_number', 'route', 'locality', 'administrative_area_level_2', 'administrative_area_level_1', 'postal_code'
+                        var address_components = results[0].address_components;
+                        var components = {};
+                        $.each(address_components, function (k, v1) {
+                            $.each(v1.types, function (k2, v2) {
+                                components[v2] = v1.long_name;
+                            });
+                        });
+
+                        $scope.aSite.ADDRESS = components.street_number != undefined ? components.street_number + " " + components.route : components.route;
+                        $scope.aSite.CITY = components.locality;
+
+                        var thisState = $scope.stateList.filter(function (s) { return s.STATE_NAME == components.administrative_area_level_1; })[0];
+                        if (thisState != undefined) {
+                            $scope.aSite.STATE = thisState.STATE_ABBREV;
+                            $scope.stateCountyList = $scope.allCountyList.filter(function (c) { return c.STATE_ID == thisState.STATE_ID; });
+                            $scope.aSite.COUNTY = components.administrative_area_level_2;
+                            $scope.aSite.ZIP = components.postal_code;
+                            $scope.$apply();
+                            $(".page-loading").addClass("hidden");
+                        } else {
+                            $(".page-loading").addClass("hidden");
+                            toastr.error("The Latitude/Longitude did not return a location within the U.S.");
+                        }
+                    } else {
+                        $(".page-loading").addClass("hidden");
+                        toastr.error("There was an error getting address. Please try again.");
+                    }
+                });
+               // 
+            }//end getAddress()
+
+            //#endregion lat/long stuff
+
+            
+            // watch for the session event to change and update
+            $scope.$watch(function () { return $cookies.get('SessionEventName'); }, function (newValue) {
+                $scope.sessionEventName = newValue != undefined ? newValue : "All Events";
+                $scope.sessionEventExists = $scope.sessionEventName != "All Events" ? true : false;
+            });
+
+            //when SITE.state changes, update county list
+            $scope.updateCountyList = function (s) {
+                var thisState = $scope.stateList.filter(function (st) { return st.STATE_ABBREV == s; })[0];
+                $scope.stateCountyList = $scope.allCountyList.filter(function (c) { return c.STATE_ID == thisState.STATE_ID; });
+            }//end updateCountyList() for Site
+
+            //make uncertainty cleared and disabled when 'unquantified' is checked
+            $scope.UnquantChecked = function () {
+                if ($scope.aOP.UNQUANTIFIED == 1)
+                    $scope.aOP.UNCERTAINTY = "";
+            }//end unquantChecked() for op
+
+            //fix default radios and lat/long
+            var formatDefaults = function (theOP) {
+                //$scope.OP.FTorMETER needs to be 'ft'. if 'meter' ==convert value to ft 
+                if (theOP.FTorMETER == "meter") {
+                    $scope.aOP.FTorMETER = 'ft';
+                    $scope.aOP.ELEV_FT = $scope.aOP.ELEV_FT * 3.2808;
+                }
+                //$scope.OP.FTorCM needs to be 'ft'. if 'cm' ==convert value to ft 
+                if (theOP.FTorCM == "cm") {
+                    $scope.aOP.FTorCM = 'ft'
+                    $scope.aOP.UNCERTAINTY = $scope.aOP.UNCERTAINTY / 30.48;
+                }
+            }//end formatDefaults() for op radios
+
+            $scope.create = function () {
+                if (this.qhwmForm.$valid) {
+                    var test;
+                    //#region site stuff POST
+
+                    //#endregion
+                    //#region OP stuff POST
+
+                    //#endregion
+                    //#region HWM stuff POST
+
+                    //#endregion
+                    //finally take them to site dashboard of this site..
+                }
+            }
+
+
+        }//end else (logged in)
+    }
+    //#endregion QuickHWM
 
     //#region FILE
     STNControllers.controller('FileCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'thisSite', 'thisSiteFiles', FileCtrl]);

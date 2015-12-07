@@ -2,9 +2,8 @@
     "use strict"; 
     var app = angular.module('app',
         ['ngResource', 'ui.router', 'ngCookies', 'ui.mask', 'ui.bootstrap', 'isteven-multi-select', 'ngInputModified', 'ui.validate',
-            'angular.filter', 'xeditable', 'checklist-model', 'ngFileUpload',
-            'STNResource', 'STNControllers', 'LogInOutController', 'ModalControllers', 'SettingsControllers']);
-    //, 'STNBusinessServices'
+            'angular.filter', 'xeditable', 'checklist-model', 'ngFileUpload', 'STNResource', 'STNControllers', 'LogInOutController', 'ModalControllers', 'SettingsControllers']);
+    
     app.run(function ($rootScope) {
         $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
             $("#ui-view").html("");
@@ -34,7 +33,7 @@
                 //#region entryPoint
                 .state("entry", {
                     url: "/",
-                    templateUrl: "partials/entryView.html",
+                    templateUrl: "partials/TopLevel/entryView.html",
                     controller: "mainCtrl"
                 })
                 //#endregion entryPoint
@@ -42,7 +41,7 @@
                 //#region entry point once logged in
                 .state("home", {
                     url: "/Home",
-                    templateUrl: "partials/homeBase.html",
+                    templateUrl: "partials/TopLevel/homeBase.html",
                     controller: "HomeCtrl"//,
                     //resolve: {
                     //    e: 'EVENT',
@@ -70,7 +69,7 @@
                 //#region map page
                 .state("map", {
                     url: "/Map",
-                    templateUrl: "partials/Map.html",
+                    templateUrl: "partials/TopLevel/Map.html",
                     controller: "MapCtrl"
                 })
                 //#endregion
@@ -96,7 +95,7 @@
                 //#region approval page
                 .state("approval", {
                     url: "/Approval",
-                    templateUrl: "partials/Approval.html",
+                    templateUrl: "partials/TopLevel/Approval.html",
                     controller: "ApprovalCtrl",
                     resolve: {
                         //e: 'EVENT',
@@ -122,7 +121,7 @@
                 //#region sitesSearch page
                 .state("siteSearch", {
                     url: "/SiteSearch",
-                    templateUrl: "partials/SiteSearch.html",
+                    templateUrl: "partials/TopLevel/SiteSearch.html",
                     controller: "SiteSearchCtrl",
                     resolve: {
                         //e: 'EVENT',
@@ -150,7 +149,7 @@
                 .state("reporting", {
                     url: "/Reporting",
                     abstract: true,
-                    templateUrl: "partials/Reporting/reporting.html",
+                    templateUrl: "partials/TopLevel/reporting.html",
                     controller: "ReportingCtrl",
                     resolve: {
                         e: 'EVENT',
@@ -216,7 +215,7 @@
                 //#region settings 
                 .state("settings", {
                     url: "/Settings",
-                    templateUrl: "partials/Settings.html",
+                    templateUrl: "partials/TopLevel/Settings.html",
                     controller: "SettingsCtrl"
                 })
                 //#endregion settings
@@ -751,7 +750,7 @@
                            allAgencies: function(a){
                                return a.getAll().$promise;
                            }*/
-                           //#endregion file
+                        //#endregion file
                     }
                 })
                 //#endregion site (abstract)
@@ -797,9 +796,67 @@
 
                         }
                     }
-                });//#endregion site.info
+                })//#endregion site.info
 
-            
+                //#region QuickHWM page
+                .state("quickHWM", {
+                    url: "/QuickHWM",
+                    templateUrl: "partials/Sites/QuickHWM.html",
+                    controller: "QuickHWMCtrl",
+                    resolve: {
+                        //#region site stuff                        
+                        hd: 'HORIZONTAL_DATUM',
+                        allHorDatums: function (hd) {
+                            return hd.getAll().$promise;
+                        },
+                        hcm: 'HORIZONTAL_COLL_METHODS',
+                        allHorCollMethods: function (hcm) {
+                            return hcm.getAll().$promise;
+                        },
+                        st: 'STATE',
+                        allStates: function (st) {
+                            return st.getAll().$promise;
+                        },
+                        c: 'COUNTIES',
+                        allCounties: function (c) {
+                            return c.getAll().$promise;
+                        },                        
+                        //#endregion site stuff
+                        //#region op stuff                        
+                        opt: 'OP_TYPE',
+                        allOPTypes: function (opt) {
+                            return opt.getAll().$promise;
+                        },
+                        vertDats: 'VERTICAL_DATUM',
+                        allVertDatums: function (vertDats) {
+                            return vertDats.getAll().$promise;
+                        },
+                        vertColMet: 'VERTICAL_COLL_METHOD',
+                        allVertColMethods: function (vertColMet) {
+                            return vertColMet.getAll().$promise;
+                        },
+                        opQual: 'OP_QUALITY',
+                        allOPQualities: function (opQual) {
+                            return opQual.getAll().$promise;
+                        },
+                        //#endregion op stuff                        
+                        //#region hwm stuff
+                        hwmt: 'HWM_TYPE',
+                        allHWMTypes: function (hwmt) {
+                            return hwmt.getAll().$promise;
+                        },
+                        hq: 'HWM_QUALITY',
+                        allHWMQualities: function (hq) {
+                            return hq.getAll().$promise;
+                        },
+                        m: 'MARKER',
+                        allMarkers: function (m) {
+                            return m.getAll().$promise;
+                        }
+                        //#endregion hwm stuff                        
+                    }
+                });
+                //#endregion QuickHWM page
                
                 
            // $locationProvider.html5Mode(false).hashPrefix('!');
