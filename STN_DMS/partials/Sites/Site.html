@@ -847,7 +847,7 @@
                     <div class="form-group">
                         <label class="col-md-3 control-label">Events:</label>
                         <div class="col-md-6">
-                            <select class="form-control" id="EVENT_ID" name="EVENT_ID" ng-model="aHWM.EVENT_ID" ng-change="ChangeEvent()"
+                            <select class="form-control" id="EVENT_ID" name="EVENT_ID" ng-model="adminChanged.EVENT_ID" ng-change="ChangeEvent()"
                                     ng-options="e.EVENT_ID as (e.EVENT_NAME + ' --- ' + (e.EVENT_START_DATE | date: 'MM/dd/yyyy') + ' to ' + ((e.EVENT_END_DATE || '-Not Set-') | date: 'MM/dd/yyyy'))  for e in eventList | orderBy: '-EVENT_START_DATE'"
                                 <option value=""></option>
                             </select>

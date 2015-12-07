@@ -44,7 +44,6 @@
                         var usersNAME = user.FNAME + " " + user.LNAME;
                         var enc = btoa($scope.username.concat(":", $scope.password));
                         $cookies.put('STNCreds', enc);
-                        //                        $cookies.STNCreds = btoa($scope.username.concat(":", $scope.password));
                         $cookies.put('STNUsername', $scope.username);
                         $cookies.put('usersName', usersNAME);
                         $cookies.put('mID', user.MEMBER_ID);
@@ -68,7 +67,6 @@
                         }
                         $cookies.put('usersRole', roleName);
 
-                        //setLoggedIn.changeLoggedIn(true);
                         $rootScope.isAuth.val = true;
                         $rootScope.usersName = usersNAME;
                         $rootScope.userID = user.MEMBER_ID;

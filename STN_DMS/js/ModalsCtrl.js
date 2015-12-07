@@ -1027,6 +1027,7 @@
         $scope.FlagMember = ""; //just for show on page
         $scope.SurveyMember = ""; //just for show on page
         $scope.showEventDD = false; //toggle to show/hide event dd (admin only)
+        $scope.adminChanged = {}; //will hold EVENT_ID if admin changes it. apply when PUTting
 
         //button click to show event dropdown to change it on existing hwm (admin only)
         $scope.showChangeEventDD = function () {
@@ -1035,7 +1036,7 @@
 
         //change event = apply it to the $scope.EventName
         $scope.ChangeEvent = function () {
-            $scope.EventName = $scope.eventList.filter(function (el) { return el.EVENT_ID == $scope.aHWM.EVENT_ID; })[0].EVENT_NAME;
+            $scope.EventName = $scope.eventList.filter(function (el) { return el.EVENT_ID == $scope.adminChanged.EVENT_ID; })[0].EVENT_NAME;
         }
         // $scope.sessionEvent = $cookies.get('SessionEventName');
         $scope.LoggedInMember = allMembers.filter(function (m) { return m.MEMBER_ID == $cookies.get('mID'); })[0];
@@ -1055,6 +1056,8 @@
 
         //cancel
         $scope.cancel = function () {
+            $scope.adminChanged = {};
+            $scope.EventName = $scope.eventList.filter(function (e) { return e.EVENT_ID == $scope.aHWM.EVENT_ID; })[0].EVENT_NAME;
             $modalInstance.dismiss('cancel');
         };
         //convert deg min sec to dec degrees
@@ -1162,6 +1165,11 @@
             $scope.save = function () {                
                 if ($scope.HWMForm.$valid) {
                     var updatedHWM = {};
+                    if ($scope.adminChanged.EVENT_ID != undefined) {
+                        //admin changed the event for this hwm..
+                        $scope.aHWM.EVENT_ID = $scope.adminChanged.EVENT_ID;
+                    }
+                    //if they added a survey date, apply survey member as logged in member
                     if ($scope.aHWM.SURVEY_DATE != undefined)
                         $scope.aHWM.SURVEY_TEAM_ID = $cookies.get('mID');
 
@@ -1282,6 +1290,7 @@
         var chosenEv = $cookies.get('SessionEventID'); //see if we need to select the session event
         $scope.event = { EventChosen: chosenEv != undefined ? Number(chosenEv) : "" };
 
+        $(".page-loading").addClass("hidden");
         //filters chosen, only show these events
         $scope.filterEvents = function () {
             //?Date: null, Type: 0, State: null
@@ -1292,7 +1301,10 @@
                 $scope.EventList = response;
             });
         }
-
+        //clear the filters
+        $scope.clearFilters = function () {
+            $scope.event = { EventChosen: chosenEv != undefined ? Number(chosenEv) : "" };
+        }
         //event has been chosen. Set it as session event
         $scope.setEvent = function () {
             $scope.evID = $scope.event.EventChosen;
@@ -1326,6 +1338,8 @@
         $scope.close = function () {
             $modalInstance.dismiss('cancel');
         };
+
+        $(".page-loading").addClass("hidden");
     };
 
 }());
