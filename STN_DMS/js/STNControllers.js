@@ -1676,16 +1676,16 @@
     //#region QuickHWM
     STNControllers.controller('QuickHWMCtrl', ['$scope', '$rootScope', '$cookies', '$location', '$state', '$http', '$modal', '$filter',
         'allHorDatums', 'allHorCollMethods', 'allStates', 'allCounties', 'allOPTypes', 'allVertDatums', 'allVertColMethods', 
-        'allOPQualities', 'allHWMTypes', 'allHWMQualities', 'allMarkers', QuickHWMCtrl]);
+        'allOPQualities', 'allHWMTypes', 'allHWMQualities', 'allMarkers', 'SITE', 'OBJECTIVE_POINT', 'HWM', QuickHWMCtrl]);
     function QuickHWMCtrl($scope, $rootScope, $cookies, $location, $state, $http, $modal, $filter, allHorDatums, allHorCollMethods, allStates, 
-        allCounties, allOPTypes, allVertDatums, allVertColMethods, allOPQualities, allHWMTypes, allHWMQualities, allMarkers) {
+        allCounties, allOPTypes, allVertDatums, allVertColMethods, allOPQualities, allHWMTypes, allHWMQualities, allMarkers, SITE, OBJECTIVE_POINT, HWM) {
         if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
             //global vars
             $rootScope.thisPage = "Quick HWM";
-
+            $scope.qhwmForm = {}; //forms within the accordion .Site, .OP, .HWM
             //called a few times to format just the date (no time)
             var makeAdate = function (d) {
                 var aDate = new Date();
@@ -1851,7 +1851,6 @@
             }//end getAddress()
 
             //#endregion lat/long stuff
-
             
             // watch for the session event to change and update
             $scope.$watch(function () { return $cookies.get('SessionEventName'); }, function (newValue) {
@@ -1871,6 +1870,32 @@
                     $scope.aOP.UNCERTAINTY = "";
             }//end unquantChecked() for op
 
+            //just need an OBJECTIVE_POINT object to post/put
+            var trimOP = function (op) {
+                var OBJ_PT = {
+                    OBJECTIVE_POINT_ID: op.OBJECTIVE_POINT_ID != undefined ? op.OBJECTIVE_POINT_ID : 0,
+                    NAME: op.NAME,
+                    DESCRIPTION: op.DESCRIPTION,
+                    ELEV_FT: op.ELEV_FT != undefined ? op.ELEV_FT : null,
+                    DATE_ESTABLISHED: op.DATE_ESTABLISHED,
+                    OP_IS_DESTROYED: op.OP_IS_DESTROYED != undefined ? op.OP_IS_DESTROYED : 0,
+                    OP_NOTES: op.OP_NOTES != undefined ? op.OP_NOTES : null,
+                    SITE_ID: op.SITE_ID,
+                    VDATUM_ID: op.VDATUM_ID != undefined ? op.VDATUM_ID : 0,
+                    LATITUDE_DD: op.LATITUDE_DD,
+                    LONGITUDE_DD: op.LONGITUDE_DD,
+                    HDATUM_ID: op.HDATUM_ID != undefined ? op.HDATUM_ID : 0,
+                    HCOLLECT_METHOD_ID: op.HCOLLECT_METHOD_ID != undefined ? op.HCOLLECT_METHOD_ID : 0,
+                    VCOLLECT_METHOD_ID: op.VCOLLECT_METHOD_ID != undefined ? op.VCOLLECT_METHOD_ID : 0,
+                    OP_TYPE_ID: op.OP_TYPE_ID,
+                    DATE_RECOVERED: op.DATE_RECOVERED != undefined ? op.DATE_RECOVERED : null,
+                    UNCERTAINTY: op.UNCERTAINTY != undefined ? op.UNCERTAINTY : null,
+                    UNQUANTIFIED: op.UNQUANTIFIED != undefined ? op.UNQUANTIFIED : null,
+                    OP_QUALITY_ID: op.OP_QUALITY_ID != undefined ? op.OP_QUALITY_ID : null,
+                }
+                return OBJ_PT;
+            }
+
             //fix default radios and lat/long
             var formatDefaults = function (theOP) {
                 //$scope.OP.FTorMETER needs to be 'ft'. if 'meter' ==convert value to ft 
@@ -1882,22 +1907,83 @@
                 if (theOP.FTorCM == "cm") {
                     $scope.aOP.FTorCM = 'ft'
                     $scope.aOP.UNCERTAINTY = $scope.aOP.UNCERTAINTY / 30.48;
-                }
-            }//end formatDefaults() for op radios
+                }                
+            }
 
+            $scope.siteErrors = false; $scope.opErrors = false; $scope.hwmErrors = false; 
             $scope.create = function () {
-                if (this.qhwmForm.$valid) {
-                    var test;
-                    //#region site stuff POST
+                $(".page-loading").removeClass("hidden");
+                 var theForm = $scope.qhwmForm.quickHWM; $scope.siteErrors = false; $scope.opErrors = false; $scope.hwmErrors = false;
+                 if (theForm.$valid) {                    
+                    //site POST
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
+                    $http.defaults.headers.common['Accept'] = 'application/json';
+                    
+                    var createdSiteID = 0;
+                    if ($scope.aSite.LONGITUDE_DD > 0)
+                        $scope.aSite.LONGITUDE_DD = $scope.aSite.LONGITUDE_DD * (-1);
+                    //POST site
+                    SITE.save($scope.aSite, function success(response) {
+                        createdSiteID = response.SITE_ID;
+                        $scope.aOP.SITE_ID = createdSiteID; $scope.aOP.LATITUDE_DD = response.LATITUDE_DD; $scope.aOP.LONGITUDE_DD = response.LONGITUDE_DD;
+                        $scope.aOP.HDATUM_ID = response.HDATUM_ID; $scope.aOP.HCOLLECT_METHOD_ID = response.HCOLLECT_METHOD_ID;
 
-                    //#endregion
-                    //#region OP stuff POST
+                        $scope.aHWM.SITE_ID = createdSiteID; $scope.aHWM.WATERBODY = response.WATERBODY; $scope.aHWM.LATITUDE_DD = response.LATITUDE_DD;
+                        $scope.aHWM.LONGITUDE_DD = response.LONGITUDE_DD; $scope.aHWM.HCOLLECT_METHOD_ID = response.HCOLLECT_METHOD_ID;
+                        $scope.aHWM.HDATUM_ID = response.HDATUM_ID; $scope.aHWM.FLAG_TEAM_ID = response.MEMBER_ID; $scope.aHWM.EVENT_ID = $cookies.get('SessionEventID');
 
-                    //#endregion
-                    //#region HWM stuff POST
+                        //OP stuff POST
+                        var createdOP = {};
+                        //post
+                        formatDefaults($scope.aOP); //$scope.OP.FTorMETER, FTorCM, decDegORdms                               
+                        var OPtoPOST = trimOP($scope.aOP); //make it an OBJECTIVE_POINT for saving
 
-                    //#endregion
-                    //finally take them to site dashboard of this site..
+                        OBJECTIVE_POINT.save(OPtoPOST, function success(response) {
+                            createdOP = response;
+                            if ($scope.addedIdentifiers.length > 0) {
+                                //post each one
+                                for (var opc = 0; opc < $scope.addedIdentifiers.length; opc++)
+                                    OBJECTIVE_POINT.createOPControlID({ id: response.OBJECTIVE_POINT_ID }, $scope.addedIdentifiers[opc]).$promise;
+                            }
+                            //HWM stuff POST
+                            var createdHWM = {};
+                            //if they entered a survey date or elevation, then set survey member as the flag member (flagging and surveying at same time
+                            if ($scope.aHWM.SURVEY_DATE != undefined)
+                                $scope.aHWM.SURVEY_TEAM_ID = $scope.aHWM.FLAG_TEAM_ID;
+
+                            if ($scope.aHWM.ELEV_FT != undefined) {
+                                //make sure they added the survey date if they added an elevation
+                                if ($scope.aHWM.SURVEY_DATE == undefined)
+                                    $scope.aHWM.SURVEY_DATE = makeAdate("");
+
+                                $scope.aHWM.SURVEY_TEAM_ID = $scope.aHWM.FLAG_TEAM_ID;
+                            }
+                            HWM.save($scope.aHWM).$promise.then(function (response) {
+                                toastr.success("Quick HWM created");
+                                $(".page-loading").addClass("hidden");
+                                $location.path('/Site/' + createdSiteID + '/SiteDashboard').replace();//.notify(false);
+                                $scope.apply;
+                            });//end HWM.save()
+                        });//end OP.save()
+                    });//end SITE.save()
+
+                } else {                   
+                    $scope.status.siteOpen = true;
+                    $scope.status.opOpen = true;
+                    $scope.status.hwmOpen = true;
+                    
+                    angular.element("[name='" + theForm.$name + "']").find('.ng-invalid:visible:first').focus();
+
+                    if (theForm.SITE_DESCRIPTION.$invalid || theForm.LATITUDE_DD.$invalid || theForm.LONGITUDE_DD.$invalid || theForm.HDATUM_ID.$invalid || theForm.HCOLLECT_METHOD_ID.$invalid || theForm.WATERBODY.$invalid || theForm.STATE.$invalidv || theForm.COUNTY.$invalid) {
+                        $scope.siteErrors = true;
+                    }
+                    if (theForm.OP_TYPE_ID.$invalid || theForm.NAME.$invalid || theForm.DESCRIPTION.$invalid || theForm.de.$invalid) {
+                        $scope.opErrors = true;
+                    }
+                    if (theForm.HWM_TYPE_ID.$invalid || theForm.HWM_ENVIRONMENT.$invalid || theForm.HWM_QUALITY_ID.$invalid || theForm.fd.$invalid) {
+                        $scope.hwmErrors = true; 
+                    }
+                    toastr.error("Quick HWM not created.")
                 }
             }
 

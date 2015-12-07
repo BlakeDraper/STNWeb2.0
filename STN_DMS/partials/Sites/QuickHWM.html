@@ -1,9 +1,9 @@
 ﻿<div ng-if="sessionEventExists">
-    <form class="form-horizontal" name="qhwmForm">
+    <form class="form-horizontal" name="qhwmForm.quickHWM">
         <fieldset>
-            <accordion>
+            <accordion close-others="false">
                 <!-- SITE part close-others="false"-->
-                <accordion-group is-open="status.siteOpen">
+                <accordion-group is-open="status.siteOpen" ng-class="{'panel-danger': siteErrors}">
                     <accordion-heading>
                         <i style="margin-right:10px" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.siteOpen, 'glyphicon-chevron-right': !status.siteOpen}"></i>
                         <span>Site</span>
@@ -11,10 +11,10 @@
 
                     <div class="col-md-6">
                         <!--Site Description*-->
-                        <div class="form-group required" ng-class="{'has-error':qhwmForm.SITE_DESCRIPTION.$invalid && qhwmForm.SITE_DESCRIPTION.$dirty}">
-                            <label class="col-md-4 control-label req" for="inputSITE_DESCRIPTION">Site Description:</label>
+                        <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.SITE_DESCRIPTION.$invalid && qhwmForm.quickHWM.SITE_DESCRIPTION.$dirty}">
+                            <label class="col-md-4 control-label req" for="SITE_DESCRIPTION">Site Description:</label>
                             <div class="col-md-8">
-                                <textarea class="form-control" id="inputSITE_DESCRIPTION" type="text" rows="3" placeholder="Site Description" ng-model="aSite.SITE_DESCRIPTION" required />
+                                <textarea class="form-control" id="SITE_DESCRIPTION" type="text" rows="3" name="SITE_DESCRIPTION" placeholder="Site Description" ng-model="aSite.SITE_DESCRIPTION" required />
                             </div>
                         </div>
 
@@ -33,10 +33,10 @@
                         </div>
 
                         <!--Latitude*-->
-                        <div class="form-group required" ng-class="{'has-error':qhwmForm.LATITUDE_DD.$invalid && qhwmForm.LATITUDE_DD.$dirty}">
-                            <label class="col-md-4 control-label req" for="inputLATITUDE_DD">Latitude:</label>
+                        <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.LATITUDE_DD.$invalid && qhwmForm.quickHWM.LATITUDE_DD.$dirty}">
+                            <label class="col-md-4 control-label req" for="SITE_LATITUDE_DD">Latitude:</label>
                             <div class="col-md-8" ng-if="decDegORdms.val == 'dd'">
-                                <input class="form-control" ng-keypress="isNum($event)" name="LATITUDE_DD" id="inputLATITUDE_DD" ng-model="aSite.LATITUDE_DD"
+                                <input class="form-control" ng-keypress="isNum($event)" name="LATITUDE_DD" id="SITE_LATITUDE_DD" ng-model="aSite.LATITUDE_DD"
                                        type="text" placeholder="Latitude" required />
                             </div>
                             <div class="col-md-8" ng-if="decDegORdms.val == 'dms'">
@@ -54,10 +54,10 @@
                         </div>
 
                         <!--Longitude*-->
-                        <div class="form-group required" ng-class="{'has-error':qhwmForm.LONGITUDE_DD.$invalid && qhwmForm.LONGITUDE_DD.$dirty}">
-                            <label class="col-md-4 control-label req" for="inputLONGITUDE_DD">Longitude:</label>
+                        <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.LONGITUDE_DD.$invalid && qhwmForm.quickHWM.LONGITUDE_DD.$dirty}">
+                            <label class="col-md-4 control-label req" for="SITE_LONGITUDE_DD">Longitude:</label>
                             <div class="col-md-8" ng-if="decDegORdms.val == 'dd'">
-                                <input class="form-control" ng-keypress="isNum($event)" ng-enter="getAddress()" id="inputlongitude_dd" name="LONGITUDE_DD" ng-model="aSite.LONGITUDE_DD"
+                                <input class="form-control" ng-keypress="isNum($event)" ng-enter="getAddress()" id="SITE_longitude_dd" name="LONGITUDE_DD" ng-model="aSite.LONGITUDE_DD"
                                        type="text" placeholder="Longitude" required />
                             </div>
                             <div class="col-md-8" ng-if="decDegORdms.val == 'dms'">
@@ -76,17 +76,17 @@
 
                         <!--populate button*-->
                         <div class="form-group required" ng-if="aSite.SITE_ID == undefined">
-                            <label class="col-md-4 control-label" for="inputPOPULATEBTN">Click here to populate address fields::</label>
+                            <label class="col-md-4 control-label" for="inputPOPULATEBTN">Click here to populate address fields:</label>
                             <div class="col-md-8">
                                 <button type="button" ng-click="getAddress()" class="btn btn-primary">Lookup Address</button>
                             </div>
                         </div>
 
                         <!--Horizontal Datum*-->
-                        <div class="form-group required" ng-class="{'has-error':qhwmForm.HDATUM_ID.$invalid && qhwmForm.HDATUM_ID.$dirty}">
-                            <label class="col-md-4 control-label req" for="inputHDATUM_ID">Horizontal Datum:</label>
+                        <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.HDATUM_ID.$invalid && qhwmForm.quickHWM.HDATUM_ID.$dirty}">
+                            <label class="col-md-4 control-label req" for="SITE_HDATUM_ID">Horizontal Datum:</label>
                             <div class="col-md-8">
-                                <select class="form-control" id="inputHDATUM_ID" name="HDATUM_ID" ng-model="aSite.HDATUM_ID"
+                                <select class="form-control" id="SITE_HDATUM_ID" name="HDATUM_ID" ng-model="aSite.HDATUM_ID"
                                         ng-options="hd.DATUM_ID as hd.DATUM_NAME for hd in horDatumList" required>
                                     <option value=""></option>
                                 </select>
@@ -94,10 +94,10 @@
                         </div>
 
                         <!--Horizontal Collection Method*-->
-                        <div class="form-group required" ng-class="{'has-error':qhwmForm.HCOLLECT_METHOD_ID.$invalid && qhwmForm.HCOLLECT_METHOD_ID.$dirty}">
-                            <label class="col-md-4 control-label req" for="inputHCOLLECT_METHOD_ID">Horizontal Collection Method:</label>
+                        <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.HCOLLECT_METHOD_ID.$invalid && qhwmForm.quickHWM.HCOLLECT_METHOD_ID.$dirty}">
+                            <label class="col-md-4 control-label req" for="SITE_HCOLLECT_METHOD_ID">Horizontal Collection Method:</label>
                             <div class="col-md-8">
-                                <select class="form-control" id="inputHCOLLECT_METHOD_ID" name="HCOLLECT_METHOD_ID" ng-model="aSite.HCOLLECT_METHOD_ID"
+                                <select class="form-control" id="SITE_HCOLLECT_METHOD_ID" name="HCOLLECT_METHOD_ID" ng-model="aSite.HCOLLECT_METHOD_ID"
                                         ng-options="hc.HCOLLECT_METHOD_ID as hc.HCOLLECT_METHOD for hc in horCollMethodList" required>
                                     <option value=""></option>
                                 </select>
@@ -105,10 +105,10 @@
                         </div>
 
                         <!--Waterbody*-->
-                        <div class="form-group required" ng-class="{'has-error':qhwmForm.WATERBODY.$invalid && qhwmForm.WATERBODY.$dirty}">
-                            <label class="col-md-4 control-label req" for="inputWATERBODY">Waterbody:</label>
+                        <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.WATERBODY.$invalid && qhwmForm.quickHWM.WATERBODY.$dirty}">
+                            <label class="col-md-4 control-label req" for="SITE_WATERBODY">Waterbody:</label>
                             <div class="col-md-8">
-                                <input class="form-control" id="inputWATERBODY" name="WATERBODY" ng-model="aSite.WATERBODY" type="text" required />
+                                <input class="form-control" id="SITE_WATERBODY" name="WATERBODY" ng-model="aSite.WATERBODY" type="text" required />
                             </div>
                         </div>
                     </div><!--end first column-->
@@ -131,10 +131,10 @@
                         </div>
 
                         <!--State*-->
-                        <div class="form-group required" ng-class="{'has-error':qhwmForm.STATE.$invalid && qhwmForm.STATE.$dirty}">
-                            <label class="col-md-4 control-label req" for="inputSTATE">State:</label>
+                        <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.STATE.$invalid && qhwmForm.quickHWM.STATE.$dirty}">
+                            <label class="col-md-4 control-label req" for="SITE_STATE">State:</label>
                             <div class="col-md-8">
-                                <select class="form-control" id="inputSTATE" name="STATE" ng-model="aSite.STATE" ng-change="updateCountyList(aSite.STATE)"
+                                <select class="form-control" id="SITE_STATE" name="STATE" ng-model="aSite.STATE" ng-change="updateCountyList(aSite.STATE)"
                                         ng-options="state.STATE_ABBREV as state.STATE_NAME for state in stateList" required>
                                     <option value=""></option>
                                 </select>
@@ -150,10 +150,10 @@
                         </div>
 
                         <!--County*-->
-                        <div class="form-group required" ng-class="{'has-error':qhwmForm.COUNTY.$invalid && qhwmForm.COUNTY.$dirty}">
-                            <label class="col-md-4 control-label req" for="inputCOUNTY">County:</label>
+                        <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.COUNTY.$invalid && qhwmForm.quickHWM.COUNTY.$dirty}">
+                            <label class="col-md-4 control-label req" for="SITE_COUNTY">County:</label>
                             <div class="col-md-8">
-                                <select class="form-control" id="inputCOUNTY" name="COUNTY" ng-model="aSite.COUNTY" ng-options="c.COUNTY_NAME as c.COUNTY_NAME for c in stateCountyList" required>
+                                <select class="form-control" id="SITE_COUNTY" name="COUNTY" ng-model="aSite.COUNTY" ng-options="c.COUNTY_NAME as c.COUNTY_NAME for c in stateCountyList" required>
                                     <option value=""></option>
                                 </select>
                             </div>
@@ -163,7 +163,7 @@
                         <div class="form-group">
                             <label class="col-md-4 control-label" for="inputDRAINAGE_AREA_SQMI">Drainage Area (sq mi):</label>
                             <div class="col-md-8">
-                                <input class="form-control" id="inputDRAINAGE_AREA_SQMI" name="DRAINAGE_AREA_SQMI" ng-model="aSite.DRAINAGE_AREA_SQMI" type="text" />
+                                <input class="form-control" id="inputDRAINAGE_AREA_SQMI" ng-keypress="isNum($event)" name="DRAINAGE_AREA_SQMI" ng-model="aSite.DRAINAGE_AREA_SQMI" type="text" />
                             </div>
                         </div>
 
@@ -194,14 +194,14 @@
 
                 </accordion-group>
 
-                <accordion-group is-open="status.opOpen">
+                <accordion-group is-open="status.opOpen" ng-class="{'panel-danger':opErrors}">
                     <accordion-heading>
                         <i style="margin-right:10px" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.opOpen, 'glyphicon-chevron-right': !status.opOpen}"></i>
                         <span>Objective Point</span>
                     </accordion-heading>
                     <div class="col-md-6">
                         <!-- Type: -->
-                        <div class="form-group required" ng-class="{'has-error':qhwmForm.OP_TYPE_ID.$invalid && qhwmForm.OP_TYPE_ID.$dirty}">
+                        <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.OP_TYPE_ID.$invalid && qhwmForm.quickHWM.OP_TYPE_ID.$dirty}">
                             <label class="col-md-4 control-label req" for="OP_TYPE_ID">Type:</label>
                             <div class="col-md-8">
                                 <select class="form-control" id="OP_TYPE_ID" name="OP_TYPE_ID" ng-model="aOP.OP_TYPE_ID"
@@ -212,18 +212,18 @@
                         </div>
 
                         <!-- Name: -->
-                        <div class="form-group required" ng-class="{'has-error':qhwmForm.NAME.$invalid && qhwmForm.NAME.$dirty}">
+                        <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.NAME.$invalid && qhwmForm.quickHWM.NAME.$dirty}">
                             <label class="col-md-4 control-label req" for="NAME">Name:</label>
                             <div class="col-md-8">
-                                <input class="form-control" id="NAME" name="NAME" ng-model="aOP.NAME" type="text" required />
+                                <input class="form-control" id="OP_NAME" name="NAME" ng-model="aOP.NAME" type="text" required />
                             </div>
                         </div>
 
                         <!-- Description: -->
-                        <div class="form-group required" ng-class="{'has-error':qhwmForm.DESCRIPTION.$invalid && qhwmForm.DESCRIPTION.$dirty}">
+                        <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.DESCRIPTION.$invalid && qhwmForm.quickHWM.DESCRIPTION.$dirty}">
                             <label class="col-md-4 control-label req" for="DESCRIPTION">Description:</label>
                             <div class="col-md-8">
-                                <textarea class="form-control" id="DESCRIPTION" name="DESCRIPTION" type=" text" rows="3" ng-model="aOP.DESCRIPTION" required />
+                                <textarea class="form-control" id="OP_DESCRIPTION" name="DESCRIPTION" type=" text" rows="3" ng-model="aOP.DESCRIPTION" required />
                             </div>
                         </div>
 
@@ -276,7 +276,7 @@
 
                         <!-- Elevation: -->
                         <div class="form-group">
-                            <label class="col-md-4 control-label" for="inputELEV_FT">Elevation:</label>
+                            <label class="col-md-4 control-label" for="ELEV_FT">Elevation:</label>
                             <div class="col-md-8">
                                 <input class="form-control" ng-keypress="isNum($event)" id="ELEV_FT" name="ELEV_FT" ng-model="aOP.ELEV_FT" type="text" />
                             </div>
@@ -286,9 +286,9 @@
                     <div class="col-md-6">
                         <!-- Vertical Datum: -->
                         <div class="form-group">
-                            <label class="col-md-4 control-label" for="inputVDATUM_ID">Vertical Datum:</label>
+                            <label class="col-md-4 control-label" for="VDATUM_ID">Vertical Datum:</label>
                             <div class="col-md-8">
-                                <select class="form-control" id="inputVDATUM_ID" name="VDATUM_ID" ng-model="aOP.VDATUM_ID"
+                                <select class="form-control" id="VDATUM_ID" name="VDATUM_ID" ng-model="aOP.VDATUM_ID"
                                         ng-options="vd.DATUM_ID as vd.DATUM_ABBREVIATION for vd in vertDatumList">
                                     <option value=""></option>
                                 </select>
@@ -297,9 +297,9 @@
 
                         <!-- Vertical Collection Method: -->
                         <div class="form-group">
-                            <label class="col-md-4 control-label" for="inputVCOLLECT_METHOD_ID">Vertical Collection Method:</label>
+                            <label class="col-md-4 control-label" for="VCOLLECT_METHOD_ID">Vertical Collection Method:</label>
                             <div class="col-md-8">
-                                <select class="form-control" id="inputVCOLLECT_METHOD_ID" name="VCOLLECT_METHOD_ID" ng-model="aOP.VCOLLECT_METHOD_ID"
+                                <select class="form-control" id="VCOLLECT_METHOD_ID" name="VCOLLECT_METHOD_ID" ng-model="aOP.VCOLLECT_METHOD_ID"
                                         ng-options="vcm.VCOLLECT_METHOD_ID as vcm.VCOLLECT_METHOD for vcm in vertCollMethodList">
                                     <option value=""></option>
                                 </select>
@@ -321,13 +321,13 @@
 
                         <!-- Uncertainty: -->
                         <div class="form-group">
-                            <label class="col-md-4 control-label" for="inputUNCERTAINTY">Uncertainty:</label>
+                            <label class="col-md-4 control-label" for="UNCERTAINTY">Uncertainty:</label>
                             <div class="col-md-8">
                                 <div class="col-md-12" style="margin-bottom:5px;padding-left:0">
                                     <div class="col-md-3" style="padding-left: 0;"><input class="form-control" ng-disabled="aOP.UNQUANTIFIED==1" ng-keypress="isNum($event)" ng-model="aOP.UNCERTAINTY" type="text" /></div>
                                     <div class="col-md-2" style="text-decoration:underline">OR</span></div>
                                     <div class="col-md-7">
-                                        <input type="checkbox" ng-model="aOP.UNQUANTIFIED" ng-checked="aOP.UNQUANTIFIED==1" ng-true-value="1" ng-false-value="0" ng-click="UnquantChecked()" />
+                                        <input type="checkbox" ng-model="aOP.UNQUANTIFIED" name="UNQUANTIFIED" ng-checked="aOP.UNQUANTIFIED==1" ng-true-value="1" ng-false-value="0" ng-click="UnquantChecked()" />
                                         <span style="margin-left:10px">Unquantified</span>
                                     </div>
                                     <br />
@@ -337,9 +337,9 @@
 
                         <!-- Quality: -->
                         <div class="form-group">
-                            <label class="col-md-4 control-label" for="inputOP_QUALITY_ID">Quality:</label>
+                            <label class="col-md-4 control-label" for="OP_QUALITY_ID">Quality:</label>
                             <div class="col-md-8">
-                                <select class="form-control" id="inputOP_QUALITY_ID" name="OP_QUALITY_ID" ng-model="aOP.OP_QUALITY_ID"
+                                <select class="form-control" id="OP_QUALITY_ID" name="OP_QUALITY_ID" ng-model="aOP.OP_QUALITY_ID"
                                         ng-options="opq.OP_QUALITY_ID as opq.QUALITY for opq in opQualList">
                                     <option value=""></option>
                                 </select>
@@ -348,17 +348,17 @@
 
                         <!-- Objective Point Notes: -->
                         <div class="form-group">
-                            <label class="col-md-4 control-label" for="inputOP_NOTES">Objective Point Notes:</label>
+                            <label class="col-md-4 control-label" for="OP_NOTES">Objective Point Notes:</label>
                             <div class="col-md-8">
-                                <textarea class="form-control" id="inputOP_NOTES" type="text" rows="3" ng-model="aOP.OP_NOTES" />
+                                <textarea class="form-control" id="OP_NOTES" type="text" name="OP_NOTES" rows="3" ng-model="aOP.OP_NOTES" />
                             </div>
                         </div>
 
                         <!-- Date Established: -->
-                        <div class="form-group required" ng-class="{'has-error':qhwmForm.DATE_ESTABLISHED.$invalid && qhwmForm.DATE_ESTABLISHED.$dirty}">
-                            <label class="col-md-4 control-label req" for="inputDATE_ESTABLISHED">Date Established:</label>
+                        <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.DATE_ESTABLISHED.$invalid && qhwmForm.quickHWM.DATE_ESTABLISHED.$dirty}">
+                            <label class="col-md-4 control-label req" for="DATE_ESTABLISHED">Date Established:</label>
                             <div class="col-md-8 input-group" style="padding-right:14px;padding-left:14px">
-                                <input class="form-control" id="inputDATE_ESTABLISHED" name="de" type="text" datepicker-popup="MMM dd, yyyy"
+                                <input class="form-control" id="OP_DATE_ESTABLISHED" name="de" type="text" datepicker-popup="MMM dd, yyyy"
                                        is-open="datepickrs.de" ng-model="aOP.DATE_ESTABLISHED" required />
                                 <span class="input-group-btn">
                                     <button class="btn btn-default" ng-click="open($event, 'de')">
@@ -370,7 +370,7 @@
                     </div>
                 </accordion-group>
 
-                <accordion-group is-open="status.hwmOpen">
+                <accordion-group is-open="status.hwmOpen" ng-class="{'panel-danger': hwmErrors}">
                     <accordion-heading>
                         <i style="margin-right:10px" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.hwmOpen, 'glyphicon-chevron-right': !status.hwmOpen}"></i>
                         <span>HWM</span>
@@ -378,7 +378,7 @@
 
                     <div class="col-md-6">
                         <!-- HWM Type:* -->
-                        <div class="form-group required" ng-class="{'has-error':qhwmForm.HWM_TYPE_ID.$invalid && qhwmForm.HWM_TYPE_ID.$dirty}">
+                        <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.HWM_TYPE_ID.$invalid && qhwmForm.quickHWM.HWM_TYPE_ID.$dirty}">
                             <label class="col-md-4 control-label req" for="HWM_TYPE_ID">HWM Type:</label>
                             <div class="col-md-8">
                                 <select class="form-control" id="HWM_TYPE_ID" name="HWM_TYPE_ID" ng-model="aHWM.HWM_TYPE_ID"
@@ -389,14 +389,14 @@
                         </div>
 
                         <!-- HWM Environment:* -->
-                        <div class="form-group required" ng-class="{'has-error':qhwmForm.HWM_ENVIRONMENT.$invalid && qhwmForm.HWM_ENVIRONMENT.$dirty}">
+                        <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.HWM_ENVIRONMENT.$invalid && qhwmForm.quickHWM.HWM_ENVIRONMENT.$dirty}">
                             <label class="col-md-4 control-label req">HWM Environment:</label>
                             <div class="col-md-8">
                                 <label class="radio-inline">
-                                    <input type="radio" name="HWM_ENVIRONMENT" ng-model="aHWM.HWM_ENVIRONMENT" value="Coastal" />Coastal
+                                    <input type="radio" id="HWM_ENVIRONMENT" name="HWM_ENVIRONMENT" ng-model="aHWM.HWM_ENVIRONMENT" value="Coastal" />Coastal
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="HWM_ENVIRONMENT" ng-model="aHWM.HWM_ENVIRONMENT" value="Riverine" />Riverine
+                                    <input type="radio" id="HWM_ENVIRONMENT" name="HWM_ENVIRONMENT" ng-model="aHWM.HWM_ENVIRONMENT" value="Riverine" />Riverine
                                 </label>
                             </div>
                         </div>
@@ -417,7 +417,7 @@
                         </div>
 
                         <!-- HWM Quality:* -->
-                        <div class="form-group required" ng-class="{'has-error':qhwmForm.HWM_QUALITY_ID.$invalid && qhwmForm.HWM_QUALITY_ID.$dirty}">
+                        <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.HWM_QUALITY_ID.$invalid && qhwmForm.quickHWM.HWM_QUALITY_ID.$dirty}">
                             <label class="col-md-4 control-label req">HWM Quality:</label>
                             <div class="col-md-8">
                                 <select class="form-control" id="HWM_QUALITY_ID" name="HWM_QUALITY_ID" ng-model="aHWM.HWM_QUALITY_ID"
@@ -481,10 +481,10 @@
                         </div>
 
                         <!-- Flagged Date: * -->
-                        <div class="form-group required" ng-class="{'has-error':qhwmForm.FLAG_DATE.$invalid && qhwmForm.FLAG_DATE.$dirty}">
+                        <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.FLAG_DATE.$invalid && qhwmForm.quickHWM.FLAG_DATE.$dirty}">
                             <label class="col-md-4 control-label req" for="inputFLAG_DATE">Flagged Date:</label>
                             <div class="col-md-8 input-group" style="padding-right:14px;padding-left:14px">
-                                <input class="form-control" id="inputFLAG_DATE" name="fd" type="text" datepicker-popup="MMM dd, yyyy"
+                                <input class="form-control" id="FLAG_DATE" name="fd" type="text" datepicker-popup="MMM dd, yyyy"
                                        is-open="datepickrs.fd" ng-model="aHWM.FLAG_DATE" required />
                                 <span class="input-group-btn">
                                     <button class="btn btn-default" ng-click="open($event, 'fd')">
@@ -495,10 +495,10 @@
                         </div>
 
                         <!-- Surveyed Date: -->
-                        <div class="form-group" ng-class="{'has-error':qhwmForm.SURVEY_DATE.$invalid && qhwmForm.SURVEY_DATE.$dirty}">
+                        <div class="form-group">
                             <label class="col-md-4 control-label" for="inputSURVEY_DATE">Surveyed Date:</label>
                             <div class="col-md-8 input-group" style="padding-right:14px;padding-left:14px">
-                                <input class="form-control" id="inputSURVEY_DATE" name="sd" type="text" datepicker-popup="MMM dd, yyyy"
+                                <input class="form-control" id="SURVEY_DATE" name="sd" type="text" datepicker-popup="MMM dd, yyyy"
                                        is-open="datepickrs.sd" ng-model="aHWM.SURVEY_DATE" />
                                 <span class="input-group-btn">
                                     <button class="btn btn-default" ng-click="open($event, 'sd')">
@@ -551,14 +551,16 @@
                             </div>
                         </div>
                     </div>
-            </accordion>
+
+</accordion>
+
             <br clear="all" />
 
             <!--submit and cancel buttons-->
             <div class="form-group">
                 <div class="col-md-4 col-md-offset-2">
                     <span>
-                        <button class="btn btn-primary" style="width:80px;margin-right:10px" ng-click="create(qhwmForm.$valid)">
+                        <button class="btn btn-primary" style="width:80px;margin-right:10px" ng-click="create(qhwmForm.quickHWM.$valid)">
                             <span>Create</span>
                         </button>
                     </span>
@@ -572,4 +574,4 @@
 
 </div>
 
-<div ng-if="!sessionEventExists">Please choose a Session Event above before creating a Quick HWM.</div>
+<div ng-if="!sessionEventExists">Please choose a Session Event in the upper right corner before creating a Quick HWM.</div>
