@@ -5,12 +5,66 @@
     var STNControllers = angular.module('STNControllers', []);
 
     //#region $ccokies variables
-        /*
-        * STNCreds, STNUsername, usersName, mID, usersRole, SessionEventID, SessionEventName, SessionTeaID, SessionTeamName
-        */
+    /*
+    * STNCreds, STNUsername, usersName, mID, usersRole, SessionEventID, SessionEventName, SessionTeaID, SessionTeamName
+    */
     //#endregion $ccokies variables
 
     //#region CONSTANTS
+    var utcDateTime = function () {
+        var getMonth = function (mo) {
+            switch (mo) {
+                case 'Jan':
+                    return '01';
+                    break;
+                case 'Feb':
+                    return '02';
+                    break;
+                case 'Mar':
+                    return '03';
+                    break;
+                case 'Apr':
+                    return '04';
+                    break;
+                case 'May':
+                    return '05';
+                    break;
+                case 'Jun':
+                    return '06';
+                    break;
+                case 'Jul':
+                    return '07';
+                    break;
+                case 'Aug':
+                    return '08';
+                    break;
+                case 'Sep':
+                    return '09';
+                    break;
+                case 'Oct':
+                    return '10';
+                    break;
+                case 'Nov':
+                    return '11';
+                    break;
+                case 'Dec':
+                    return '12';
+                    break;
+            }
+    }
+        var Time_Stamp = new Date().toUTCString();// "Wed, 09 Dec 2015 17:18:26 GMT" == change to standard time for storage
+        var mo = Time_Stamp.substr(8, 3);
+        var actualMo = getMonth(mo);
+        var day = Time_Stamp.substr(5, 2);
+        var year = Time_Stamp.substr(12, 4);
+        var hr = Time_Stamp.substr(17,2);
+        var standardHrs = hr > 12 ? '0'+(hr-12).toString() : hr.toString();
+        var min = Time_Stamp.substr(20, 2);
+        var sec = Time_Stamp.substr(23, 2);;
+        var amPm = hr > 12 ? 'PM' : 'AM';
+        var time_stampNEW = actualMo + '/' + day + '/' + year + ' ' + standardHrs + ':' + min + ':' + sec + ' ' + amPm; //12/09/2015 04:22:32PM
+        return time_stampNEW;
+    }
     //regular expression for a password requirement of at least 8 characters long and at least 3 of 4 character categories used (upper, lower, digit, special
     STNControllers.constant('RegExp', {
         PASSWORD: /^(((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]))|((?=.*[a-z])(?=.*[A-Z])(?=.*[!@@?#$%^&_:;-]))|((?=.*[a-z])(?=.*[0-9])(?=.*[!@@?#$%^&_:;-]))|((?=.*[A-Z])(?=.*[0-9])(?=.*[!@@?#$%^&_:;-]))).{8,}$/
@@ -183,20 +237,20 @@
         };
     });
 
-    STNControllers.directive('tooltip', function () {
-        return {
-            restrict: 'A',
-            link: function (scope, element, attrs) {
-                $(element).hover(function () {
-                    // on mouseenter
-                    $(element).tooltip('show');
-                }, function () {
-                    // on mouseleave
-                    $(element).tooltip('hide');
-                });
-            }
-        };
-    });
+    //STNControllers.directive('tooltip', function () {
+    //    return {
+    //        restrict: 'A',
+    //        link: function (scope, element, attrs) {
+    //            $(element).hover(function () {
+    //                // on mouseenter
+    //                $(element).tooltip('show');
+    //            }, function () {
+    //                // on mouseleave
+    //                $(element).tooltip('hide');
+    //            });
+    //        }
+    //    };
+    //});
 
     STNControllers.directive('myInputMask', function () {
         return {
@@ -247,8 +301,8 @@
     //#endregion DIRECTIVES
 
     //#region MAIN Controller 
-    STNControllers.controller('mainCtrl', ['$scope', '$rootScope', '$cookies', '$modal', '$location', '$state', mainCtrl]);
-    function mainCtrl($scope, $rootScope, $cookies, $modal, $location, $state) {        
+    STNControllers.controller('mainCtrl', ['$scope', '$rootScope', '$cookies', '$uibModal', '$location', '$state', mainCtrl]);
+    function mainCtrl($scope, $rootScope, $cookies, $uibModal, $location, $state) {
         $rootScope.isAuth = {};        
         $rootScope.activeMenu = 'home'; //scope var for setting active class
         if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
@@ -277,12 +331,12 @@
     //#endregion MAIN Controller
 
     //#region EventSession
-    STNControllers.controller('EventSessionCtrl', ['$scope', '$rootScope', '$cookies', '$modal', '$location', '$state', 'EVENT', 'EVENT_TYPE', 'STATE', EventSessionCtrl]);
-    function EventSessionCtrl($scope, $rootScope, $cookies,  $modal, $location, $state, EVENT, EVENT_TYPE, STATE) {
+    STNControllers.controller('EventSessionCtrl', ['$scope', '$rootScope', '$cookies', '$uibModal', '$location', '$state', 'EVENT', 'EVENT_TYPE', 'STATE', EventSessionCtrl]);
+    function EventSessionCtrl($scope, $rootScope, $cookies, $uibModal, $location, $state, EVENT, EVENT_TYPE, STATE) {
         $scope.openEventModal = function () {
             $(".page-loading").removeClass("hidden");
             //modal
-            var modalInstance = $modal.open({
+            var modalInstance = $uibModal.open({
                 templateUrl: 'ChooseEvent.html',
                 controller: 'SessionEventmodalCtrl',
                 size: 'md',
@@ -317,19 +371,19 @@
     //#endregion HELP Controller
 
     //#region NAV Controller
-    STNControllers.controller('navCtrl', ['$scope', '$cookies', '$location', '$rootScope', navCtrl]);
-    function navCtrl($scope, $cookies, $location, $rootScope) {
-        $scope.logout = function () {
-            $cookies.remove('STNCreds');
-            $cookies.remove('STNUsername');
-            $cookies.remove('usersName');
-            $cookies.remove('usersRole');
-            $rootScope.isAuth.val = false;
-            $location.path('/login');
+    //STNControllers.controller('navCtrl', ['$scope', '$cookies', '$location', '$rootScope', navCtrl]);
+    //function navCtrl($scope, $cookies, $location, $rootScope) {
+    //    //$scope.logout = function () {
+    //    //    $cookies.remove('STNCreds');
+    //    //    $cookies.remove('STNUsername');
+    //    //    $cookies.remove('usersName');
+    //    //    $cookies.remove('usersRole');            
+    //    //    $rootScope.isAuth.val = false;
+    //    //    $location.path('/login');
 
             
-        };
-    }
+    //    //};
+    //}
     //#endregion NAV Controller
 
     //#region Home Controller 
@@ -340,7 +394,9 @@
             $location.path('/login');
         } else {
             //good to go
-            $rootScope.thisPage = "Home";          
+            $rootScope.thisPage = "Home";
+           
+
         }//end good to go
     }
     //#endregion Home Controller
@@ -356,6 +412,7 @@
             $rootScope.thisPage = "Map";
             $rootScope.activeMenu = "map"; 
             $scope.map = "Welcome to the new STN Map Page!!";
+           
         }
     }
     //#endregion Map Controller
@@ -624,8 +681,8 @@
     //#endregion Site Search Controller
 
     //#region Reporting Controller
-    STNControllers.controller('ReportingCtrl', ['$scope', '$rootScope', '$cookies', '$location', '$http', '$modal', 'incompleteReports', 'allEvents', 'allStates', 'allReports', 'allEventTypes', 'allEventStatus', 'allAgencies', 'REPORT', 'MEMBER', ReportingCtrl]);
-    function ReportingCtrl($scope, $rootScope, $cookies, $location, $http, $modal, incompleteReports, allEvents, allStates, allReports, allEventTypes, allEventStatus, allAgencies, REPORT, MEMBER) {
+    STNControllers.controller('ReportingCtrl', ['$scope', '$rootScope', '$cookies', '$location', '$http', '$uibModal', 'incompleteReports', 'allEvents', 'allStates', 'allReports', 'allEventTypes', 'allEventStatus', 'allAgencies', 'REPORT', 'MEMBER', ReportingCtrl]);
+    function ReportingCtrl($scope, $rootScope, $cookies, $location, $http, $uibModal, incompleteReports, allEvents, allStates, allReports, allEventTypes, allEventStatus, allAgencies, REPORT, MEMBER) {
         if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
@@ -830,7 +887,7 @@
                         $scope.GenRepEventModel.CoordAgency = $scope.agencies.filter(function (a) { return a.AGENCY_ID == $scope.GenRepEventModel.Coordinator.AGENCY_ID; })[0];
 
                         //modal
-                        var modalInstance = $modal.open({
+                        var modalInstance = $uibModal.open({
                             templateUrl: 'MetricsSummary.html',
                             size: 'lg',
                             windowClass: 'rep-dialog',
@@ -845,12 +902,12 @@
                                     return $scope.totalRow;
                                 }
                             },
-                            controller: function ($scope, $modalInstance, thisReport, thisEvent, theTotalRow) {
+                                controller: function ($scope, $uibModalInstance, thisReport, thisEvent, theTotalRow) {
                                 $scope.Report = thisReport;
                                 $scope.Event = thisEvent;
                                 $scope.totals = theTotalRow;
                                 $scope.ok = function () {
-                                    $modalInstance.dismiss('cancel');
+                                    $uibModalInstance.dismiss('cancel');
                                 };
                             }
                         });
@@ -904,7 +961,7 @@
 
                         //now send it all to the modal
                         var showModal = function () {
-                            var modalInstance = $modal.open({
+                            var modalInstance = $uibModal.open({
                                 templateUrl: 'ContactMetricsSummary.html',
                                 size: 'lg',
                                 windowClass: 'rep-dialog',
@@ -923,11 +980,11 @@
                                         return $scope.GenRepEventModel;
                                     }
                                 },
-                                controller: function ($scope, $http, $modalInstance, theseReports, thisEvent) {
+                                    controller: function ($scope, $http, $uibModalInstance, theseReports, thisEvent) {
                                     $scope.Reports = theseReports;
                                     $scope.Event = thisEvent;
                                     $scope.ok = function () {
-                                        $modalInstance.dismiss('cancel');
+                                        $uibModalInstance.dismiss('cancel');
                                     };
                                 }
                             });
@@ -943,11 +1000,18 @@
             $scope.getCSVfile = function (valid) {
                 if (valid == true) {
                     //get reports and give a csv file back
-                    $http.defaults.headers.common['Accept'] = 'text/csv';
-                    $http.defaults.headers.common['content-type'] = 'text/csv';
+                    $http.defaults.headers.common.Accept = 'text/csv';
+                  
                     REPORT.getReportsCSV({ Event: $scope.genSummary.EVENT_ID, States: $scope.StateAbbrevs, Date: $scope.genSummary.SUM_DATE }).$promise.then(function (result) {
-                        var blob = new Blob([result.data], { type: "text/plain;charset=utf-8" });
-                        saveAs(blob, "report.csv");
+                        var anchor = angular.element('<a/>');
+                        var joinedResponse = result.join("");
+                        var file = new Blob([joinedResponse], { type: 'application/csv' });
+                        var fileURL = URL.createObjectURL(file);
+                        anchor.href = fileURL;
+                        anchor.download = 'report.csv';
+                        anchor.click();
+                        var test;
+                        //File.saveAs(blob, "report.csv");
                     }), function () {
                         console.log('error');
                     };
@@ -956,8 +1020,8 @@
         }
     }
 
-    STNControllers.controller('ReportingDashCtrl', ['$scope', '$cookies', '$filter', '$modal', '$state', '$http', 'CONTACT', 'MEMBER', 'allReportsAgain', ReportingDashCtrl]);
-    function ReportingDashCtrl($scope, $cookies, $filter, $modal, $state, $http, CONTACT, MEMBER, allReportsAgain) {        
+    STNControllers.controller('ReportingDashCtrl', ['$scope', '$cookies', '$filter', '$uibModal', '$state', '$http', 'CONTACT', 'MEMBER', 'allReportsAgain', ReportingDashCtrl]);
+    function ReportingDashCtrl($scope, $cookies, $filter, $uibModal, $state, $http, CONTACT, MEMBER, allReportsAgain) {
         $scope.reportsToDate = allReportsAgain;
         $scope.todayRpts = []; $scope.yesterdayRpts = []; $scope.pickDateRpts = []; $scope.pickAdateReports = false;
         $scope.today = new Date();
@@ -968,7 +1032,7 @@
         //View Report button clicked, get stuff and make a pdf 
         $scope.ViewReport = function (r) {
             //modal
-            var modalInstance = $modal.open({
+            var modalInstance = $uibModal.open({
                 templateUrl: 'ViewReport.html',
                 controller: 'ReportModalCtrl',
                 size: 'lg',
@@ -1084,7 +1148,7 @@
             $scope.ProjectAlertParts.Event = $scope.events.filter(function (e) { return e.EVENT_ID == rep.EVENT_ID; })[0];
 
             //modal
-            var modalInstance = $modal.open({
+            var modalInstance = $uibModal.open({
                 templateUrl: $scope.ProjectAlertParts.Event.EVENT_TYPE_ID == 1 ? 'FloodPA.html' : 'HurricanePA.html',
                 controller: 'ProjAlertModalCtrl',
                 size: 'md',
@@ -1103,8 +1167,8 @@
 
     }
 
-    STNControllers.controller('SubmitReportCtrl', ['$scope', '$http', '$cookies', '$modal', '$state', 'CONTACT', 'REPORT', SubmitReportCtrl]);
-    function SubmitReportCtrl($scope, $http, $cookies, $modal, $state, CONTACT, REPORT) {
+    STNControllers.controller('SubmitReportCtrl', ['$scope', '$http', '$cookies', '$uibModal', '$state', 'CONTACT', 'REPORT', SubmitReportCtrl]);
+    function SubmitReportCtrl($scope, $http, $cookies, $uibModal, $state, CONTACT, REPORT) {
         //#make sure this clears except for if they care needing to complete a report
         if ($scope.$parent.needToComplete != true) {
             $scope.$parent.newReport = {};
@@ -1308,7 +1372,7 @@
                 //see if they checked the box to complete
                 if ($scope.newReport.COMPLETE == undefined || $scope.newReport.COMPLETE == 0) {
                     //modal confirming they want to save this without marking it complete
-                    var modalInstance = $modal.open({
+                    var modalInstance = $uibModal.open({
                         templateUrl: 'saveReportModal.html',
                         controller: 'ConfirmReportModalCtrl',
                         size: 'sm'
@@ -1341,11 +1405,11 @@
     //#endregion Reporting Controller
 
     //#region SITE
-    STNControllers.controller('SiteCtrl', ['$scope', '$rootScope', '$cookies', '$location', '$state', '$http', '$modal', '$filter', '$timeout',
+    STNControllers.controller('SiteCtrl', ['$scope', '$rootScope', '$cookies', '$location', '$state', '$http', '$uibModal', '$filter', '$timeout',
         'thisSite', 'thisSiteNetworkNames', 'thisSiteNetworkTypes', 'thisSiteHousings', 'thisSiteOPs', 'thisSiteSensors', 'thisSiteHWMs', 'thisSiteFiles', 'thisSitePeaks',
         'SITE', 'LANDOWNER_CONTACT', 'MEMBER', 'DEPLOYMENT_TYPE', 'INSTRUMENT', 'INSTRUMENT_STATUS', 'SITE_HOUSING', 'NETWORK_NAME',
         'allHorDatums', 'allHorCollMethods', 'allStates', 'allCounties', 'allDeployPriorities', 'allHousingTypes', 'allNetworkNames', 'allNetworkTypes', 'allDeployTypes', 'allSensDeps', SiteCtrl]);
-    function SiteCtrl($scope, $rootScope, $cookies, $location, $state, $http, $modal, $filter, $timeout,
+        function SiteCtrl($scope, $rootScope, $cookies, $location, $state, $http, $uibModal, $filter, $timeout,
         thisSite, thisSiteNetworkNames, thisSiteNetworkTypes, thisSiteHousings, thisSiteOPs, thisSiteSensors, thisSiteHWMs, thisSiteFiles, thisSitePeaks,
         SITE, LANDOWNER_CONTACT, MEMBER, DEPLOYMENT_TYPE, INSTRUMENT, INSTRUMENT_STATUS, SITE_HOUSING, NETWORK_NAME,
         allHorDatums, allHorCollMethods, allStates, allCounties, allDeployPriorities, allHousingTypes, allNetworkNames, allNetworkTypes, allDeployTypes, allSensDeps) {
@@ -1365,7 +1429,7 @@
                 var dropdownParts =[allHorDatums, allHorCollMethods, allStates, allCounties, allHousingTypes, allDeployPriorities,
                     allNetworkNames, allNetworkTypes, allDeployTypes, allSensDeps];
                 //modal
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                         templateUrl: 'SITEmodal.html',
                         controller: 'SITEmodalCtrl',
                         size: 'lg',
@@ -1509,8 +1573,8 @@
     //#endregion SITE
 
     //#region OBJECTIVE_POINT
-    STNControllers.controller('ObjectivePointCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'OBJECTIVE_POINT', 'thisSite', 'thisSiteOPs', 'allOPTypes', 'allHorDatums', 'allHorCollMethods', 'allVertDatums', 'allVertColMethods', 'allOPQualities', ObjectivePointCtrl]);
-    function ObjectivePointCtrl($scope, $cookies, $location, $state, $http, $modal, $filter, $timeout, OBJECTIVE_POINT, thisSite, thisSiteOPs, allOPTypes, allHorDatums, allHorCollMethods, allVertDatums, allVertColMethods, allOPQualities) {
+    STNControllers.controller('ObjectivePointCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$uibModal', '$filter', '$timeout', 'OBJECTIVE_POINT', 'thisSite', 'thisSiteOPs', 'allOPTypes', 'allHorDatums', 'allHorCollMethods', 'allVertDatums', 'allVertColMethods', 'allOPQualities', ObjectivePointCtrl]);
+    function ObjectivePointCtrl($scope, $cookies, $location, $state, $http, $uibModal, $filter, $timeout, OBJECTIVE_POINT, thisSite, thisSiteOPs, allOPTypes, allHorDatums, allHorCollMethods, allVertDatums, allVertColMethods, allOPQualities) {
         if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
@@ -1524,7 +1588,7 @@
                 var indexClicked = $scope.SiteObjectivePoints.indexOf(OPclicked);
 
                 //modal
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl : 'OPmodal.html',
                     controller: 'OPmodalCtrl',
                     size: 'lg',
@@ -1570,39 +1634,167 @@
     //#endregion OBJECTIVE_POINT
 
     //#region INSTRUMENT
-    STNControllers.controller('SensorCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'thisSite', 'thisSiteSensors', 'allStatusTypes', 'allDeployTypes', 'allSensDeps', 'INSTRUMENT', SensorCtrl]);
-    function SensorCtrl($scope, $cookies, $location, $state, $http, $modal, $filter, $timeout, thisSite, thisSiteSensors, allStatusTypes, allDeployTypes, allSensDeps, INSTRUMENT) {
+    STNControllers.controller('SensorCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$uibModal', '$filter', '$timeout', 'thisSite', 'thisSiteSensors', 'allSensorBrands', 'allStatusTypes', 'allDeployTypes', 'allSensorTypes', 'allSensDeps', 'allHousingTypes', 'allEvents', 'INSTRUMENT', 'INSTRUMENT_STATUS', 'SITE', 'MEMBER', 'DEPLOYMENT_TYPE', SensorCtrl]);
+    function SensorCtrl($scope, $cookies, $location, $state, $http, $uibModal, $filter, $timeout, thisSite, thisSiteSensors, allSensorBrands, allStatusTypes, allDeployTypes, allSensorTypes, allSensDeps, allHousingTypes, allEvents, INSTRUMENT, INSTRUMENT_STATUS, SITE, MEMBER, DEPLOYMENT_TYPE) {
         if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
         } else {
             //global vars
-            $scope.sensorCount = { total: thisSiteSensors.length };
-
+            $scope.sensorCount = { total: thisSiteSensors.length };           
             $scope.statusTypeList = allStatusTypes;
             $scope.deployTypeList = allDeployTypes;
+            var tempDepTypeID = 0;
+            //fix deployment types so that "Temperature" becomes 2 : Temperature (Met sensor)-SensorType:2 and Temperature (pressure transducer)-SensorType:1
+            for (var d = 0; d < $scope.deployTypeList.length; d++) {
+                if ($scope.deployTypeList[d].METHOD === "Temperature") {
+                    tempDepTypeID = $scope.deployTypeList[d].DEPLOYMENT_TYPE_ID;
+                    $scope.deployTypeList[d].METHOD = "Temperature (Met sensor)";
+                }
+            }
+            $scope.deployTypeList.push({DEPLOYMENT_TYPE_ID: tempDepTypeID, METHOD: "Temperature (Pressure Transducer)" });
+
             $scope.sensDepTypes = allSensDeps;
             $scope.showProposed = false; //they want to add a proposed sensor, open options
-
-            //for each sensor, need status and if proposed - need dep type
-            for (var x = 0; x < thisSiteSensors.length; x++) {
-                var ind = x;
-                INSTRUMENT.getInstrumentStatus({ id: thisSiteSensors[ind].INSTRUMENT_ID }, function success(response) {
-                    thisSiteSensors[ind].STATUS = allStatusTypes.filter(function (s) { return s.STATUS_TYPE_ID == response.STATUS_TYPE_ID; })[0].STATUS;
-                    //thisSiteSensors[ind].STATUS = response.STATUS_TYPE_ID;
-                }).$promise.then(function () {
-                    $scope.SiteSensors = thisSiteSensors;
-                });
+            $scope.SiteSensors = thisSiteSensors;
+            $scope.showHideProposed = function () {
+                $scope.showProposed = !$scope.showProposed;
             }
-            
+           
+            //add these checked Proposed sensors to this site
+            $scope.AddProposed = function () {
+                var proposedToAdd = {}; var propStatToAdd = {};
+                var Time_STAMP = utcDateTime();
+                for (var dt = 0; dt < $scope.deployTypeList.length; dt++) {
+                    if ($scope.deployTypeList[dt].selected == true) {
+                        if ($scope.deployTypeList[dt].METHOD.substring(0, 4) == "Temp") {
+                            proposedToAdd = {
+                                DEPLOYMENT_TYPE_ID: $scope.deployTypeList[dt].DEPLOYMENT_TYPE_ID,
+                                SITE_ID: thisSite.SITE_ID,
+                                SENSOR_TYPE_ID: $scope.deployTypeList[dt].METHOD == "Temperature (Pressure Transducer)" ? 1 : 2,
+                                EVENT_ID: $cookies.get('SessionEventID') != undefined ? $cookies.get('SessionEventID') : null,
+                                Deployment_Type: $scope.deployTypeList[dt].METHOD
+                            }
+                        } else {
+                            proposedToAdd = {
+                                DEPLOYMENT_TYPE_ID: $scope.deployTypeList[dt].DEPLOYMENT_TYPE_ID,
+                                SITE_ID: thisSite.SITE_ID,
+                                SENSOR_TYPE_ID: $scope.sensDepTypes.filter(function (sdt) { return sdt.DEPLOYMENT_TYPE_ID == $scope.deployTypeList[dt].DEPLOYMENT_TYPE_ID })[0].SENSOR_TYPE_ID,
+                                EVENT_ID: $cookies.get('SessionEventID') != undefined ? $cookies.get('SessionEventID') : null,
+                                Deployment_Type: $scope.deployTypeList[dt].METHOD
+                            }
+                        }
+                        //now post it
+                        $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
+                        $http.defaults.headers.common['Accept'] = 'application/json';
+                        INSTRUMENT.save(proposedToAdd).$promise.then(function (response) {
+                            proposedToAdd.INSTRUMENT_ID = response.INSTRUMENT_ID;
+                            var propStatToAdd = { INSTRUMENT_ID: response.INSTRUMENT_ID, STATUS_TYPE_ID: 4, COLLECTION_TEAM_ID: $cookies.get('mID'), TIME_STAMP: Time_STAMP, TIME_ZONE: 'UTC' };
+                            
+                            INSTRUMENT_STATUS.save(propStatToAdd).$promise.then(function (statResponse) {
+                                var instToPushToList = {
+                                    Instrument: proposedToAdd,
+                                    InstrumentStats: [statResponse]
+                                };
+                                //clean up ...all unchecked and then hide
+                                for (var dep = 0; dep < $scope.deployTypeList.length; dep++) {
+                                    $scope.deployTypeList[dep].selected = false;
+                                }
+                                
+
+                                $timeout(function () {
+                                    // anything you want can go here and will safely be run on the next digest.
+                                    $scope.showProposed = false;
+                                    $scope.SiteSensors.push(instToPushToList);
+                                    $scope.sensorCount = { total: $scope.SiteSensors.length };
+                                });
+
+                            });//end INSTRUMENT_STATUS.save
+                        }); //end INSTRUMENT.save
+                    }//end if selected == true
+                }//end foreach deployTypeList
+            }//end AddProposed()
+
+            //want to deploy/view a sensor, 
+            /*which modal? 
+             1: deploy proposed (sensor, 'depProp'), deploy new('0', 'deploy'), see deployed to view/edit(sensor, 'viewDep'). 
+             2: retrieve deployed(sensor, 'retrieve'). 
+             3: view/edit retrieved with deployed on top(sensor, 'viewRet')
+             */
+            $scope.showSensorModal = function (sensorClicked, modalNeeded) {
+                var passAllLists = [allSensorTypes, allSensorBrands, allHousingTypes, allSensDeps, allEvents];
+                var indexClicked = $scope.SiteSensors.indexOf(sensorClicked);
+                $(".page-loading").removeClass("hidden"); //loading...
+                //modal (dependent on 2nd param passed in here)
+                
+                var modalInstance = $uibModal.open({
+                    templateUrl: 'Sensormodal.html',
+                    controller: 'SensormodalCtrl',
+                    size: 'lg',
+                    backdrop: 'static',
+                    windowClass: 'rep-dialog',
+                    resolve: {
+                        allDropdowns: function () {
+                            return passAllLists;
+                        },
+                        allDepTypes: function () {
+                            return DEPLOYMENT_TYPE.getAll().$promise;
+                        },
+                        thisSensor: function () {
+                            return sensorClicked != 0 ? sensorClicked : "empty";
+                        },
+                        SensorSite: function () {
+                            return thisSite;
+                        },
+                        siteOPs: function () {
+                            return SITE.getSiteOPs({ id: thisSite.SITE_ID }).$promise;
+                        },
+                        allMembers: function () {
+                            $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
+                            $http.defaults.headers.common['Accept'] = 'application/json';
+                            return MEMBER.getAll().$promise;
+                        }
+                    }
+                });
+                modalInstance.result.then(function (createdSensor) {
+                    //is there a new op or just closed modal
+                    if (createdSensor[1] == 'created') {
+                        $scope.SiteSensors.push(createdSensor[0]); thisSiteSensors.push(createdSensor[0]);
+                        $scope.sensorCount.total = $scope.SiteSensors.length;
+                    }
+                    if (createdSensor[1] == 'updated') {
+                        //this is from edit -- refresh page?
+                        var indexClicked = $scope.SiteSensors.indexOf(sensorClicked);
+                        $scope.SiteSensors[indexClicked] = createdSensor[0];
+                    }
+                    if (createdSensor[1] == 'deleted') {
+                        var indexClicked1 = $scope.SiteSensors.indexOf(sensorClicked);
+                        $scope.SiteSensors.splice(indexClicked1, 1);
+                        $scope.sensorCount.total = $scope.SiteSensors.length;
+                    }
+                });
+            };
+
+            // watch for the session event to change and update
+            $scope.$watch(function () { return $cookies.get('SessionEventName'); }, function (newValue) {
+                $scope.sessionEventName = newValue != undefined ? newValue : "All Events";
+                $scope.sessionEventExists = $scope.sessionEventName != "All Events" ? true : false;
+                if (newValue != undefined) {
+                    $scope.SiteSensors = thisSiteSensors.filter(function (h) { return h.Instrument.EVENT_ID == $cookies.get('SessionEventID'); });
+                    $scope.sensorCount = { total: $scope.SiteSensors.length };
+                } else {
+                    $scope.SiteSensors = thisSiteSensors;
+                    $scope.sensorCount = { total: $scope.SiteSensors.length };
+                }
+            });
         } //end else not auth
     }
 
     //#endregion INSTRUMENT
 
     //#region HWM
-    STNControllers.controller('HWMCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'thisSite', 'thisSiteHWMs', 'allHWMTypes', 'allHWMQualities', 'allHorDatums', 'allMarkers', 'allHorCollMethods', 'allVertDatums', 'allVertColMethods', 'allEvents', 'MEMBER', HWMCtrl]);
-    function HWMCtrl($scope, $cookies, $location, $state, $http, $modal, $filter, $timeout, thisSite, thisSiteHWMs, allHWMTypes, allHWMQualities, allHorDatums, allMarkers, allHorCollMethods, allVertDatums, allVertColMethods, allEvents, MEMBER) {
+    STNControllers.controller('HWMCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$uibModal', '$filter', '$timeout', 'thisSite', 'thisSiteHWMs', 'allHWMTypes', 'allHWMQualities', 'allHorDatums', 'allMarkers', 'allHorCollMethods', 'allVertDatums', 'allVertColMethods', 'allEvents', 'MEMBER', HWMCtrl]);
+    function HWMCtrl($scope, $cookies, $location, $state, $http, $uibModal, $filter, $timeout, thisSite, thisSiteHWMs, allHWMTypes, allHWMQualities, allHorDatums, allMarkers, allHorCollMethods, allVertDatums, allVertColMethods, allEvents, MEMBER) {
         if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
@@ -1628,7 +1820,7 @@
                 var indexClicked = $scope.SiteHWMs.indexOf(HWMclicked);
 
                 //modal
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'HWMmodal.html',
                     controller: 'HWMmodalCtrl',
                         size: 'lg',
@@ -1674,10 +1866,10 @@
     } //#endregion HWM
 
     //#region QuickHWM
-    STNControllers.controller('QuickHWMCtrl', ['$scope', '$rootScope', '$cookies', '$location', '$state', '$http', '$modal', '$filter',
+    STNControllers.controller('QuickHWMCtrl', ['$scope', '$rootScope', '$cookies', '$location', '$state', '$http', '$uibModal', '$filter',
         'allHorDatums', 'allHorCollMethods', 'allStates', 'allCounties', 'allOPTypes', 'allVertDatums', 'allVertColMethods', 
         'allOPQualities', 'allHWMTypes', 'allHWMQualities', 'allMarkers', 'SITE', 'OBJECTIVE_POINT', 'HWM', QuickHWMCtrl]);
-    function QuickHWMCtrl($scope, $rootScope, $cookies, $location, $state, $http, $modal, $filter, allHorDatums, allHorCollMethods, allStates, 
+    function QuickHWMCtrl($scope, $rootScope, $cookies, $location, $state, $http, $uibModal, $filter, allHorDatums, allHorCollMethods, allStates,
         allCounties, allOPTypes, allVertDatums, allVertColMethods, allOPQualities, allHWMTypes, allHWMQualities, allMarkers, SITE, OBJECTIVE_POINT, HWM) {
         if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
@@ -1967,7 +2159,8 @@
                         });//end OP.save()
                     });//end SITE.save()
 
-                } else {                   
+                 } else {
+                     $(".page-loading").addClass("hidden");
                     $scope.status.siteOpen = true;
                     $scope.status.opOpen = true;
                     $scope.status.hwmOpen = true;
@@ -1993,8 +2186,8 @@
     //#endregion QuickHWM
 
     //#region FILE
-    STNControllers.controller('FileCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'thisSite', 'thisSiteFiles', FileCtrl]);
-    function FileCtrl($scope, $cookies, $location, $state, $http, $modal, $filter, $timeout, thisSite, thisSiteFiles) {
+    STNControllers.controller('FileCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$uibModal', '$filter', '$timeout', 'thisSite', 'thisSiteFiles', FileCtrl]);
+    function FileCtrl($scope, $cookies, $location, $state, $http, $uibModal, $filter, $timeout, thisSite, thisSiteFiles) {
         if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
@@ -2006,8 +2199,8 @@
     //#endregion FILE
 
     //#region PEAK
-    STNControllers.controller('PeakCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$modal', '$filter', '$timeout', 'thisSite', 'thisSitePeaks', PeakCtrl]);
-    function PeakCtrl($scope, $cookies, $location, $state, $http, $modal, $filter, $timeout, thisSite, thisSitePeaks) {
+    STNControllers.controller('PeakCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$uibModal', '$filter', '$timeout', 'thisSite', 'thisSitePeaks', PeakCtrl]);
+    function PeakCtrl($scope, $cookies, $location, $state, $http, $uibModal, $filter, $timeout, thisSite, thisSitePeaks) {
         if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');

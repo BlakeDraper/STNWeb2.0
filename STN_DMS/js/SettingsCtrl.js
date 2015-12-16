@@ -79,8 +79,8 @@
     //#endregion  member Controller (abstract)
 
     //#region memberInfo Controller
-    SettingsControllers.controller('memberInfoCtrl', ['$scope', '$cookies', '$location', '$http', '$modal', '$stateParams', '$filter', 'MEMBER', 'thisMember', memberInfoCtrl]);
-    function memberInfoCtrl($scope, $cookies, $location, $http, $modal, $stateParams, $filter, MEMBER, thisMember) {
+    SettingsControllers.controller('memberInfoCtrl', ['$scope', '$cookies', '$location', '$http', '$uibModal', '$stateParams', '$filter', 'MEMBER', 'thisMember', memberInfoCtrl]);
+    function memberInfoCtrl($scope, $cookies, $location, $http, $uibModal, $stateParams, $filter, MEMBER, thisMember) {
         if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
@@ -93,7 +93,7 @@
             //#region DELETE Member click
             $scope.DeleteMember = function (mem) {
                 //modal
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -306,8 +306,8 @@
     //#endregion  event Controller (abstract)
 
     //#region eventInfo Controller
-    SettingsControllers.controller('eventInfoCtrl', ['$scope', '$cookies', '$location', '$http', '$modal', '$filter', 'EVENT', 'thisEvent', eventInfoCtrl]);
-    function eventInfoCtrl($scope, $cookies, $location, $http, $modal, $filter, EVENT, thisEvent) {
+    SettingsControllers.controller('eventInfoCtrl', ['$scope', '$cookies', '$location', '$http', '$uibModal', '$filter', 'EVENT', 'thisEvent', eventInfoCtrl]);
+    function eventInfoCtrl($scope, $cookies, $location, $http, $uibModal, $filter, EVENT, thisEvent) {
         if ($cookies.get('STNCreds') == undefined || $cookies.get('STNCreds') == "") {
             $scope.auth = false;
             $location.path('/login');
@@ -333,7 +333,7 @@
             //#region DELETE Event click
             $scope.DeleteEvent = function (ev) {
                 //modal
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -435,12 +435,12 @@
     //#endregion events inside Settings Tab
 
     //#region resource Controller (abstract)
-    SettingsControllers.controller('resourcesCtrl', ['$scope', '$rootScope', '$cookies', '$location', '$state', '$http', '$filter', '$modal', 'AGENCY', 'CONTACT_TYPE', 'DEPLOYMENT_PRIORITY', 'EVENT_STATUS',
+    SettingsControllers.controller('resourcesCtrl', ['$scope', '$rootScope', '$cookies', '$location', '$state', '$http', '$filter', '$uibModal', 'AGENCY', 'CONTACT_TYPE', 'DEPLOYMENT_PRIORITY', 'EVENT_STATUS',
         'EVENT_TYPE', 'FILE_TYPE', 'HORIZONTAL_COLL_METHODS', 'HORIZONTAL_DATUM', 'HOUSING_TYPE', 'HWM_QUALITY', 'HWM_TYPE', 'INST_COLL_CONDITION', 'MARKER', 'NETWORK_NAME', 'OP_QUALITY',
         'OP_TYPE', 'SENSOR_BRAND', 'DEPLOYMENT_TYPE', 'SENSOR_TYPE', 'NETWORK_TYPE', 'STATUS_TYPE', 'VERTICAL_COLL_METHOD', 'VERTICAL_DATUM', 'allStates', 'allAgencies', 'allContactTypes', 'allDeployPriorities', 'allEventStats', 'allEventTypes',
         'allFileTypes', 'allHorCollMethods', 'allHorDatums', 'allHouseTypes', 'allHWMqualities', 'allHWMtypes', 'allInstCollectConditions', 'allMarkers', 'allNetworkNames', 'allObjPtQualities',
         'allObjPtTypes', 'allSensorBrands', 'allDeploymentTypes', 'allStatusTypes', 'allSensorTypes', 'allNetworkTypes', 'allVerticalCollMethods', 'allVerticalDatums', resourcesCtrl]);
-    function resourcesCtrl($scope, $rootScope, $cookies, $location, $state, $http, $filter, $modal, AGENCY, CONTACT_TYPE, DEPLOYMENT_PRIORITY, EVENT_STATUS,
+    function resourcesCtrl($scope, $rootScope, $cookies, $location, $state, $http, $filter, $uibModal, AGENCY, CONTACT_TYPE, DEPLOYMENT_PRIORITY, EVENT_STATUS,
         EVENT_TYPE, FILE_TYPE, HORIZONTAL_COLL_METHODS, HORIZONTAL_DATUM, HOUSING_TYPE, HWM_QUALITY, HWM_TYPE, INST_COLL_CONDITION, MARKER, NETWORK_NAME, OP_QUALITY,
         OP_TYPE, SENSOR_BRAND, DEPLOYMENT_TYPE, SENSOR_TYPE, NETWORK_TYPE, STATUS_TYPE, VERTICAL_COLL_METHOD, VERTICAL_DATUM, allStates, allAgencies, allContactTypes, allDeployPriorities, allEventStats, allEventTypes, allFileTypes,
         allHorCollMethods, allHorDatums, allHouseTypes, allHWMqualities, allHWMtypes, allInstCollectConditions, allMarkers, allNetworkNames, allObjPtQualities, allObjPtTypes,
@@ -523,7 +523,7 @@
             };
             $scope.deleteAgency = function (ag) {
                 //modal
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -611,7 +611,7 @@
 
             $scope.deleteContactType = function (ct) {
                 //modal
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -687,7 +687,7 @@
                 return retur;
             };
             $scope.deleteDepPriority = function (dp) {
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -761,7 +761,7 @@
                 return retur;
             };
             $scope.deleteEventStat = function (es) {
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -839,7 +839,7 @@
 
             $scope.deleteEventType = function (et) {
                 //modal
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -915,7 +915,7 @@
                 return retur;
             };
             $scope.deleteFileType = function (ft) {
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -989,7 +989,7 @@
                 return retur;
             };
             $scope.deleteHorCollMethod = function (hcm) {
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -1067,7 +1067,7 @@
 
             $scope.deleteHorDatum = function (hd) {
                 //modal
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -1143,7 +1143,7 @@
                 return retur;
             };
             $scope.deleteHouseType = function (ht) {
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -1217,7 +1217,7 @@
                 return retur;
             };
             $scope.deleteHwmQuality = function (hwmq) {
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -1295,7 +1295,7 @@
 
             $scope.deleteHwmType = function (hwmt) {
                 //modal
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -1371,7 +1371,7 @@
                 return retur;
             };
             $scope.deleteInstColCond = function (icc) {
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -1445,7 +1445,7 @@
                 return retur;
             };
             $scope.deleteMarker = function (m) {
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -1519,7 +1519,7 @@
                 return retur;
             };
             $scope.deleteNetworkName = function (nn) {
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -1597,7 +1597,7 @@
 
             $scope.deleteOPQuality = function (opq) {
                 //modal
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -1673,7 +1673,7 @@
                 return retur;
             };
             $scope.deleteOPType = function (opt) {
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -1747,7 +1747,7 @@
                 return retur;
             };
             $scope.deleteSensorBrand = function (sb) {
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -1825,7 +1825,7 @@
 
             $scope.deleteDepType = function (dt) {
                 //modal
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -1901,7 +1901,7 @@
                 return retur;
             };
             $scope.deleteStatusType = function (statT) {
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -2100,7 +2100,7 @@
                 return retur;
             };
             $scope.deleteSensorType = function (senT) {
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -2193,7 +2193,7 @@
 
             $scope.deleteNetType = function (nt) {
                 //modal
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -2269,7 +2269,7 @@
                 return retur;
             };
             $scope.deleteVertColMeth = function (vcm) {
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -2343,7 +2343,7 @@
                 return retur;
             };
             $scope.deleteVertDatum = function (vd) {
-                var modalInstance = $modal.open({
+                var modalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',

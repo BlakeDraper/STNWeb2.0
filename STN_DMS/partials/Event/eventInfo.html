@@ -34,9 +34,9 @@
             <div class="col-md-6">
                 <div class="input-group">
                     <input ng-show="loggedInRole == 'Admin'" class="form-control" id="inputEVENT_START_DATE" name="sd" ng-disabled="undetermined"
-                            type="text" datepicker-popup="MMMM dd, yyyy" is-open="datepickrs.sd"
-                            ng-model-options="{ updateOn: 'blur' }" ng-change="SaveOnBlur(0)"
-                            ng-model="anEvent.EVENT_START_DATE" />
+                           type="text" uib-datepicker-popup="MMMM dd, yyyy" is-open="datepickrs.sd"
+                           ng-model-options="{ updateOn: 'blur' }" ng-change="SaveOnBlur(0)"
+                           ng-model="anEvent.EVENT_START_DATE" />
                     <span ng-show="loggedInRole == 'Admin'" class="input-group-btn">
                         <button class="btn btn-default" ng-click="open($event, 'sd')">
                             <i class="glyphicon glyphicon-calendar" />
@@ -55,7 +55,7 @@
                 <div>
                     <div class="input-group">
                         <input ng-show="loggedInRole == 'Admin'" class="form-control" id="inputEVENT_END_DATE" name="ed" ng-disabled="undetermined"
-                               type="text" datepicker-popup="MMMM dd, yyyy" is-open="datepickrs.ed"
+                               type="text" uib-datepicker-popup="MMMM dd, yyyy" is-open="datepickrs.ed"
                                ng-model-options="{ updateOn: 'blur' }" ng-change="SaveOnBlur(0)"
                                ng-model="anEvent.EVENT_END_DATE" />
                         <span ng-show="loggedInRole == 'Admin'" class="input-group-btn">

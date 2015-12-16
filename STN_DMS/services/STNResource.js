@@ -272,7 +272,8 @@
                 query: {},
                 getAll: { method: 'GET', isArray: true, url: rootURL + '/Instruments/GetAll.json' },
                 getstatusInstruments: { method: 'GET', isArray: true, url: rootURL + '/Instruments.json/' }, //CurrentStatus: 1, Event: $scope.evID 
-                getInstrumentStatus: {method: 'GET', url: rootURL + '/Instruments/:id/InstrumentStatus.json'},
+                getFullInstrument: { method: 'GET', url: rootURL + '/Instruments/:id/FullInstrument.json' }, //gets instrument and it's stats together
+                getInstrumentStatus: { method: 'GET', url: rootURL + '/Instruments/:id/InstrumentStatus.json' },
                 update: { method: 'PUT', cache: false, isArray: false },
                 save: { method: 'POST', cache: false, isArray: false },
                 delete: { method: 'DELETE', cache: false, isArray: false }
@@ -384,7 +385,7 @@
                 getAll: { method: 'GET', isArray: true },
                 update: { method: 'PUT', cache: false, isArray: false },
                 createOPControlID: { method: 'POST', cache: false, isArray: false, url: rootURL + "/ObjectivePoints/:id/AddOPControls" },
-                getOPControls: { method: 'GET', cache: false, isArray: true, url: rootURL + "/ObjectivePoints/:id/OPControls" },
+                getOPControls: { method: 'GET', cache: false, isArray: true, url: rootURL + "/ObjectivePoints/:id/OPControls.json" },
                 getOPFiles: {method: 'GET', cache: false, isArray: true, url: rootURL + "/ObjectivePoints/:id/Files"},
                 save: { method: 'POST', cache: false, isArray: false },
                 delete: { method: 'DELETE', cache: false, isArray: false }
@@ -524,7 +525,7 @@
                 postSiteHousing: {method: 'POST', cache: false, isArray:true, url: rootURL + '/site/:id/AddSiteSiteHousing.json'},
                 //Site Parts
                 getSiteOPs: { method: 'GET', isArray: true, url: rootURL + '/Sites/:id/ObjectivePoints.json' },
-                getSiteSensors: { method: 'GET', isArray: true, url: rootURL + '/Sites/:id/Instruments.json' },
+                getSiteSensors: { method: 'GET', isArray: true, url: rootURL + '/Sites/:id/FullInstrumentList.json' }, //all instruments and their stats together
                 getSiteHWMs: { method: 'GET', isArray: true, url: rootURL + '/Sites/:id/HWMs.json' },
                 getSiteFiles: { method: 'GET', isArray: true, url: rootURL + '/Sites/:id/Files.json' },
                 getSitePeaks: { method: 'GET', isArray: true, url: rootURL + '/Sites/:id/PeakSummaries.json' },

@@ -1,7 +1,7 @@
-﻿<accordion close-others="false">
+﻿<uib-accordion close-others="false">
     <!--Section 1: Start Report-->
 
-    <accordion-group heading="Section 1: Report Parameters" is-open="true">
+    <uib-accordion-group heading="Section 1: Report Parameters" is-open="true">
         <div class="pull-left col-md-7">
             <div class="row">
                 <div class="col-md-12">
@@ -19,10 +19,10 @@
             </div>
             <br />
         </div>
-    </accordion-group>
+    </uib-accordion-group>
 
     <!-- Section 2: Personnel and vehcle counts -->
-    <accordion-group heading="Section 2: Personnel and Vehicle Counts">
+    <uib-accordion-group heading="Section 2: Personnel and Vehicle Counts">
         <table class="table">
             <tr>
                 <td></td>
@@ -110,9 +110,9 @@
                 <td>{{WQ_OTHER_DEPL}}</td>
             </tr>
         </table>
-    </accordion-group>
+    </uib-accordion-group>
     <!-- Section 3: Instrumentation & Sampling Counts-->
-    <accordion-group heading="Section 3: Instrumentation & Sampling Counts">
+    <uib-accordion-group heading="Section 3: Instrumentation & Sampling Counts">
         <table class="table">
             <tr>
                 <td colspan="2" class="col-md-5">
@@ -148,7 +148,8 @@
                 <td>
                     <span class="required">To Date</span>
                 </td>
-                <td colspan="2">{{TOT_CHECK_MEAS}}
+                <td colspan="2">
+                    {{TOT_CHECK_MEAS}}
                     <input class="form-control" id="chkMeasToDate" name="newReport.TOT_CHECK_MEAS"
                            ng-model="newReport.TOT_CHECK_MEAS" type="text" numeric-only required />
                 </td>
@@ -157,7 +158,8 @@
                 <td>
                     <span class="required">Planned</span>
                 </td>
-                <td colspan="2">{{PLAN_CHECK_MEAS}}
+                <td colspan="2">
+                    {{PLAN_CHECK_MEAS}}
                     <input class="form-control" id="chkMeasPlanned" name="newReport.PLAN_CHECK_MEAS"
                            ng-model="newReport.PLAN_CHECK_MEAS" type="text" numeric-only required />
                 </td>
@@ -166,7 +168,8 @@
                 <td colspan="2">
                     <span class="required">Indirect measurements planned</span>
                 </td>
-                <td colspan="2">{{PLAN_INDIRECT_MEAS}}
+                <td colspan="2">
+                    {{PLAN_INDIRECT_MEAS}}
                     <input class="form-control" id="indMeasPlan" name="newReport.PLAN_INDIRECT_MEAS"
                            ng-model="newReport.PLAN_INDIRECT_MEAS" type="text" numeric-only required />
                 </td>
@@ -175,7 +178,8 @@
                 <td colspan="2">
                     <span class="required">Rating extensions</span>
                 </td>
-                <td colspan="2">{{}}
+                <td colspan="2">
+                    {{}}
                     <input class="form-control" id="rateExt" name="newReport.RATING_EXTENS"
                            ng-model="newReport.RATING_EXTENS" type="text" numeric-only required />
                 </td>
@@ -184,7 +188,8 @@
                 <td colspan="2">
                     <span class="required">Peaks of record on gages to date<br /> ( > 20 years of record)</span>
                 </td>
-                <td colspan="2">{{}}
+                <td colspan="2">
+                    {{}}
                     <input class="form-control" id="peaks" name="newReport.GAGE_PEAK_RECORD"
                            ng-model="newReport.GAGE_PEAK_RECORD" type="text" numeric-only required />
                 </td>
@@ -451,15 +456,15 @@
                 </td>
             </tr>
         </table>
-    </accordion-group>
+    </uib-accordion-group>
     <!--Section 4: Notes-->
-    <accordion-group heading="Section 4: Notes">
+    <uib-accordion-group heading="Section 4: Notes">
         <div>Notes detailing the day's field activities (optional)</div>
         <textarea class="form-control" id="inputNOTES" type="text" rows="5" cols="90" ng-model="newReport.NOTES" />
         <div>*Limit 2000 characters</div>
-    </accordion-group>
+    </uib-accordion-group>
     <!-- Section 5: Contacts -->
-    <accordion-group heading="Section 5: Contact Information">
+    <uib-accordion-group heading="Section 5: Contact Information">
         <div><b>Submitter</b></div>
         <div><span class="col-md-3">Name:</span><span>{{MemberLoggedIn.FNAME}} {{MemberLoggedIn.LNAME}}</span></div>
         <div><span class="col-md-3">Phone</span><span>{{MemberLoggedIn.PHONE}}</span></div>
@@ -673,7 +678,7 @@
                 </div>
             </div>
         </div>
-    </accordion-group>
+    </uib-accordion-group>
 
     <div>
         <input type="checkbox" name="COMPLETE" ng-model="newReport.COMPLETE" ng-true-value="'1'" ng-false-value="'0'" />
@@ -689,6 +694,6 @@
         </div>
     </div>
 
-</accordion>
+</uib-accordion>
 
 

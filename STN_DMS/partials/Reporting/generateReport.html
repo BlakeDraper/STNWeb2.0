@@ -22,7 +22,7 @@
             <div class="form-group col-md-12 required">
                 <label class="col-md-12 control-label req" for="inputSUM_DATE">Date:</label>
                 <div class="col-md-4 input-group" style="padding-left:15px;padding-right:15px;">
-                    <input uib-datepicker-append-to-body="true" class="form-control" id="inputSUM_DATE" name="sd" type="text" uib-datepicker-popup="MMMM dd, yyyy"
+                    <input datepicker-append-to-body="true" class="form-control" id="inputSUM_DATE" name="sd" type="text" uib-datepicker-popup="MMMM dd, yyyy"
                            is-open="datepickrs.sd" ng-model="genSummary.SUM_DATE" required />
                     <span class="input-group-btn">
                         <button class="btn btn-default" ng-click="open($event, 'sd')">
@@ -65,7 +65,7 @@
             <button class="btn btn-primary" ng-click="displayMetricSum(genReportForm.$valid)">Display Metrics Summary</button>
             <button class="btn btn-primary" ng-click="displayContactsSum(genReportForm.$valid)">Display Contacts Summary</button>
             <!--<button class="btn btn-primary" ng-click="getCSVfile(genReportForm.$valid)">Generate CSV Summary</button>-->
-            <a href="http://localhost/STNServices/ReportingMetrics/FilteredReports.csv?Event=19&States=AL&Date=04/16/2015" target="_blank">Download CSV Summary</a>
+            <a class="btn btn-primary" href="http://localhost/STNServices/ReportingMetrics/FilteredReports.csv?Event={{genSummary.EVENT_ID}}&States={{StateAbbrevs}}&Date={{genSummary.SUM_DATE | date: 'MM/dd/yyyy'}}" target="_blank">Download CSV Summary</a>
         </div>
     </div>
 </form>

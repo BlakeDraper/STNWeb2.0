@@ -10,8 +10,8 @@
         color: black !important;
     }    
 </style>
-<tabset id="bypassme">
-    <tab heading="Today">
+<uib-tabset id="bypassme">
+    <uib-tab heading="Today">
         <div ng-show="todayRpts != undefined || todayRpts.length > 0">
             <ul ng-repeat="(key, value) in todayRpts | groupBy: 'EVENT_NAME'">
                 <label>{{key}}</label>
@@ -29,8 +29,8 @@
         <div ng-show="todayRpts == undefined || todayRpts.length == 0">
             <div>No Reports were filed today.</div>
         </div>
-    </tab>
-    <tab heading="Yesterday">
+    </uib-tab>
+    <uib-tab heading="Yesterday">
         <div ng-show="yesterdayRpts != undefined || yesterdayRpts.length > 0">
             <ul ng-repeat="(key, value) in yesterdayRpts | groupBy: 'EVENT_NAME'">
                 <label>{{key}}</label>
@@ -48,12 +48,12 @@
         <div ng-show="yesterdayRpts == undefined || yesterdayRpts.length == 0">
             <div>No Reports were filed yesterday.</div>
         </div>
-    </tab>
-    <tab heading="Pick a Date">
+    </uib-tab>
+    <uib-tab heading="Pick a Date">
         <div>
             <label class="col-md-1 pull-left">Date:</label>
             <div class="col-md-4 input-group pull-left" style="padding-left:15px;padding-right:15px;"><!--  -->
-                <input type="text" datepicker-append-to-body="true" class="form-control" id="inputTHIS_DATE" name="td" datepicker-popup="MMMM dd, yyyy"
+                <input type="text" datepicker-append-to-body="true" class="form-control" id="inputTHIS_DATE" name="td" uib-datepicker-popup="MMMM dd, yyyy"
                        is-open="datepickrs.td" ng-model="THIS_DATE.date" />
                 <span class="input-group-btn">
                     <button class="btn btn-default" ng-click="open($event, 'td')">
@@ -82,6 +82,6 @@
                 </div>
             </div>
         </div>
-    </tab>
-</tabset>
+    </uib-tab>
+</uib-tabset>
 
