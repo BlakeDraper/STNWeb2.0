@@ -1368,6 +1368,7 @@
         $scope.saveReport = function (valid) {
             if (valid == false) {
                 alert("All fields are required");
+                angular.element("[name='" + $scope.fullReportForm.submit.$name + "']").find('.ng-invalid:visible:first').focus();
             } else {
                 //see if they checked the box to complete
                 if ($scope.newReport.COMPLETE == undefined || $scope.newReport.COMPLETE == 0) {
