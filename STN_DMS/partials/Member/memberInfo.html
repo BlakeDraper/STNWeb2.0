@@ -70,10 +70,9 @@
                        type="text" my-input-mask="{mask: '(999) 999-9999[ x99999]', greedy:false}"
                        ng-model="aMember.PHONE" ng-model-options="{ updateOn: 'blur' }" ng-change="SaveOnBlur()" required />
             </div>&nbsp;
-            <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip"
-                  title="Enter the member's phone number. To add an extension, immediately following the phone number type 'x' and then the extension number."
-                  data-placement="right" tooltip>
-            </span>
+            <button type="button" class="borderLess" tooltip-placement="right" uib-tooltip="Enter the member's phone number. To add an extension, immediately following the phone number type 'x' and then the extension number.">
+                <span class="glyphicon glyphicon-question-sign"></span>
+            </button>
         </div>
 
         <!-- Email -->
@@ -83,10 +82,9 @@
                 <input class="form-control" id="inputEMAIL" name="EMAIL" type="email" placeholder="" ng-model="aMember.EMAIL"
                        ng-model-options="{ updateOn: 'blur' }" ng-change="SaveOnBlur()" required />
             </div>&nbsp;
-            <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip"
-                  title="Enter the member's email address."
-                  data-placement="right" tooltip>
-            </span>
+            <button type="button" class="borderLess" tooltip-placement="right" uib-tooltip="Enter the member's email address.">
+                <span class="glyphicon glyphicon-question-sign"></span>
+            </button>
         </div>
 
         <!-- RSS Feed -->
@@ -95,10 +93,7 @@
             <div class="col-md-6">
                 <input class="form-control" id="inputRSSFEED" name="RSSFEED" type="text" placeholder="" ng-model="aMember.RSSFEED"
                        ng-model-options="{ updateOn: 'blur' }" ng-change="SaveOnBlur()" />
-            </div>&nbsp;
-            <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip"
-                  title="" data-placement="right" tooltip>
-            </span>
+            </div>
         </div>
 
         <!-- Emergency Contact Name -->
@@ -107,10 +102,7 @@
             <div class="col-md-6">
                 <input class="form-control" id="inputEMERGENCY_CONTACT_NAME" name="EMERGENCY_CONTACT_NAME" type="text" placeholder="" ng-model="aMember.EMERGENCY_CONTACT_NAME"
                        ng-model-options="{ updateOn: 'blur' }" ng-change="SaveOnBlur()" />
-            </div>&nbsp;
-            <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip"
-                  title="" data-placement="right" tooltip>
-            </span>
+            </div>
         </div>
 
         <!-- Emergency Contact phone -->
@@ -121,16 +113,16 @@
                        type="text" my-input-mask="{mask: '(999) 999-9999[ x99999]', greedy:false}"
                        ng-model="aMember.EMERGENCY_CONTACT_PHONE" ng-model-options="{ updateOn: 'blur' }" ng-change="SaveOnBlur()" />
             </div>&nbsp;
-            <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip"
-                  title="Enter the emergency contact's phone number. To add an extension, immediately following the phone number type 'x' and then the extension number."
-                  data-placement="right" tooltip>
-            </span>
+            <button type="button" class="borderLess" tooltip-placement="right" uib-tooltip="Enter the emergency contact's phone number. To add an extension, immediately following the phone number type 'x' and then the extension number.">
+                <span class="glyphicon glyphicon-question-sign"></span>
+            </button>
         </div>
 
         <!-- start existing password change section -->
         <div class="form-group" ng-hide="aMember.MEMBER_ID == undefined">
             <label class=" col-md-3 control-label" for="inputPassword">
-            Password:</label>
+                Password:
+            </label>
             <div class="col-md-6">
                 <button ng-show="!changePass" ng-click="changeMyPassBtn($event)">
                     Change Password
@@ -141,20 +133,25 @@
                     <div class="col-md-10">
                         <label class="col-md-5 control-label" for="NewPassword">New Password:</label>
                         <div class="col-md-7"><input class="form-control" ng-model="pass.newP" name="NPASSWORD" id="NPASSWORD" type="password" password-validate /></div>
-                        <span class="ui-state-error h5-message" ng-show="(accountForm.NPASSWORD.$error.passwordValidate)"><span class="h5-arrow"></span><span class="h5-content">For password requirement, click the '?' icon.</span></span>
+                        <span class="ui-state-error h5-message" ng-show="(accountForm.NPASSWORD.$error.passwordValidate)">
+                            <span class="h5-arrow"></span><span class="h5-content">For password requirement, click the '?' icon.</span>
+                        </span>
                     </div>
                     <div style="margin-top:5px;" class="col-md-10">
                         <label class="col-md-5 control-label" for="ConfirmPassword">Confirm Password:</label>
                         <div class="col-md-7"><input class="form-control" id="CPASSWORD" name="CPASSWORD" type="password" placeholder="" password-validate same-as="pass.newP" ng-model="pass.confirmP" /></div>
 
-                        <span class="ui-state-error h5-message" ng-show="(accountForm.CPASSWORD.$error.passwordValidate)"><span class="h5-arrow"></span><span class="h5-content">For password requirement, click the '?' icon.</span></span>
+                        <span class="ui-state-error h5-message" ng-show="(accountForm.CPASSWORD.$error.passwordValidate)"><span class="h5-arrow"></span><span class="h5-content">For password requirement, hover over the '?' icon.</span></span>
                         <span class="ui-state-error h5-message" ng-show="(accountForm.CPASSWORD.$error.passwordMismatch)"><span class="h5-arrow"></span><span class="h5-conent">Mismatch password</span></span>
                     </div>&nbsp;
-                    <!--<tooltip title="...."/>-->
+                    <button type="button" class="borderLess" tooltip-placement="right" uib-tooltip='Password must be at least 8 characters long, contain at least 1 uppercase, 1 lowercase and 1 numeric. Passwords may contain any of these special characters ONLY: "_", "$", "#"'>
+                        <span class="glyphicon glyphicon-question-sign"></span>
+                    </button>
+                    <!--<tooltip title="...."/>
                     <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip"
                           title='Password must be at least 8 characters long, contain at least 1 uppercase, 1 lowercase and 1 numeric. Passwords may contain any of these special characters ONLY: "_", "$", "#"'
-                          data-placement="right" tooltip>
-                    </span>
+                          data-placement="right" uib-tooltip>
+                    </span>-->
                     <!--END new password inputs-->
                     <!--START update/cancel button-->
                     <div class="form-group">
@@ -184,19 +181,17 @@
             <label class="col-md-3 control-label" for="inputPassword">New Password:</label>
             <div class="col-md-3">
                 <input class="form-control" ng-model="pass.newP" name="NPASSWORD" id="NPASSWORD" type="password" password-validate required />
-                <span class="ui-state-error h5-message" ng-show="(accountForm.NPASSWORD.$error.passwordValidate)"><span class="h5-arrow"></span><span class="h5-content">For password requirement, click the '?' icon.</span></span>
+                <span class="ui-state-error h5-message" ng-show="(accountForm.NPASSWORD.$error.passwordValidate)"><span class="h5-arrow"></span><span class="h5-content">For password requirement, hover over the '?' icon.</span></span>
             </div>&nbsp;
-            <!--<tooltip title="...."/>-->
-            <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip"
-                  title='Password must be at least 8 characters long, contain at least 1 uppercase, 1 lowercase and 1 numeric. Passwords may contain any of these special characters ONLY: "_", "$", "#"'
-                  data-placement="right" tooltip>
-            </span>
+            <button type="button" class="borderLess" tooltip-placement="right" uib-tooltip='Password must be at least 8 characters long, contain at least 1 uppercase, 1 lowercase and 1 numeric. Passwords may contain any of these special characters ONLY: "_", "$", "#"'>
+                <span class="glyphicon glyphicon-question-sign"></span>
+            </button>
         </div>
         <div class="form-group required" ng-if="aMember.MEMBER_ID == undefined" ng-class="{'has-error':accountForm.CPASSWORD.$invalid && accountForm.CPASSWORD.$dirty}">
             <label class="col-md-3 control-label" for="inputPassword">Confirm Password:</label>
             <div class="col-md-3">
                 <input class="form-control" id="CPASSWORD" name="CPASSWORD" type="password" placeholder="" password-validate same-as="pass.newP" ng-model="pass.confirmP" required />
-                <span class="ui-state-error h5-message" ng-show="(accountForm.CPASSWORD.$error.passwordValidate)"><span class="h5-arrow"></span><span class="h5-content">For password requirement, click the '?' icon.</span></span>
+                <span class="ui-state-error h5-message" ng-show="(accountForm.CPASSWORD.$error.passwordValidate)"><span class="h5-arrow"></span><span class="h5-content">For password requirement, hover over the '?' icon.</span></span>
                 <span class="ui-state-error h5-message" ng-show="(accountForm.CPASSWORD.$error.passwordMismatch)"><span class="h5-arrow"></span><span class="h5-conent">Mismatch password</span></span>
             </div>
         </div> <!--end new member password section-->

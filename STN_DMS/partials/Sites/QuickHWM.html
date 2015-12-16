@@ -1,13 +1,13 @@
 ﻿<div ng-if="sessionEventExists">
     <form class="form-horizontal" name="qhwmForm.quickHWM">
         <fieldset>
-            <accordion close-others="false">
+            <uib-accordion close-others="false">
                 <!-- SITE part close-others="false"-->
-                <accordion-group is-open="status.siteOpen" ng-class="{'panel-danger': siteErrors}">
-                    <accordion-heading>
+                <uib-accordion-group is-open="status.siteOpen" ng-class="{'panel-danger': siteErrors}">
+                    <uib-accordion-heading>
                         <i style="margin-right:10px" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.siteOpen, 'glyphicon-chevron-right': !status.siteOpen}"></i>
                         <span>Site</span>
-                    </accordion-heading>
+                    </uib-accordion-heading>
 
                     <div class="col-md-6">
                         <!--Site Description*-->
@@ -159,6 +159,22 @@
                             </div>
                         </div>
 
+                        <!--Access Permission Granted-->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="ACCESS_GRANTED">Access Permission Granted:</label>
+                            <div class="col-md-8">
+                                <label class="radio-inline">
+                                    <input type="radio" name="ACCESS_GRANTED" ng-model="aSite.ACCESS_GRANTED" value="Yes"> Yes
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="ACCESS_GRANTED" ng-model="aSite.ACCESS_GRANTED" value="No"> No
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="ACCESS_GRANTED" ng-model="aSite.ACCESS_GRANTED" value="Not Needed"> Not Needed
+                                </label>
+                            </div>
+                        </div>
+
                         <!--Drainage Area-->
                         <div class="form-group">
                             <label class="col-md-4 control-label" for="inputDRAINAGE_AREA_SQMI">Drainage Area (sq mi):</label>
@@ -185,20 +201,32 @@
 
                         <!--Other Station ID-->
                         <div class="form-group">
-                            <label class="col-md-4 control-label" for="inputOTHER_SID">Other Station ID:</label>
+                            <label class="col-md-4 control-label" for="OTHER_SID">Other Station ID:</label>
                             <div class="col-md-8">
-                                <input class="form-control" id="inputOTHER_SID" name="OTHER_SID" placeholder="Please add details in the Site Description" ng-model="aSite.OTHER_SID" type="text" />
+                                <input class="form-control" id="OTHER_SID" name="OTHER_SID" placeholder="Please add details in the Site Description" ng-model="aSite.OTHER_SID" type="text" />
+                            </div>
+                        </div>
+
+                        <!--Sensor Not Appropriate-->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="SENSOR_NOT_APPROPRIATE">Check if Sensor is not appropriate here:</label>
+                            <div class="col-md-8">
+                                <ul style="padding-left:0">
+                                    <li style="list-style:none;">
+                                        <input type="checkbox" name="SENSOR_NOT_APPROPRIATE" ng-model="aSite.SENSOR_NOT_APPROPRIATE" ng-true-value="1" ng-false-value="0" />
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
 
-                </accordion-group>
+                </uib-accordion-group>
 
-                <accordion-group is-open="status.opOpen" ng-class="{'panel-danger':opErrors}">
-                    <accordion-heading>
+                <uib-accordion-group is-open="status.opOpen" ng-class="{'panel-danger':opErrors}">
+                    <uib-accordion-heading>
                         <i style="margin-right:10px" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.opOpen, 'glyphicon-chevron-right': !status.opOpen}"></i>
                         <span>Objective Point</span>
-                    </accordion-heading>
+                    </uib-accordion-heading>
                     <div class="col-md-6">
                         <!-- Type: -->
                         <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.OP_TYPE_ID.$invalid && qhwmForm.quickHWM.OP_TYPE_ID.$dirty}">
@@ -358,7 +386,7 @@
                         <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.DATE_ESTABLISHED.$invalid && qhwmForm.quickHWM.DATE_ESTABLISHED.$dirty}">
                             <label class="col-md-4 control-label req" for="DATE_ESTABLISHED">Date Established:</label>
                             <div class="col-md-8 input-group" style="padding-right:14px;padding-left:14px">
-                                <input class="form-control" id="OP_DATE_ESTABLISHED" name="de" type="text" datepicker-popup="MMM dd, yyyy"
+                                <input class="form-control" id="OP_DATE_ESTABLISHED" name="de" type="text" uib-datepicker-popup="MMM dd, yyyy"
                                        is-open="datepickrs.de" ng-model="aOP.DATE_ESTABLISHED" required />
                                 <span class="input-group-btn">
                                     <button class="btn btn-default" ng-click="open($event, 'de')">
@@ -368,13 +396,13 @@
                             </div>
                         </div>
                     </div>
-                </accordion-group>
+                </uib-accordion-group>
 
-                <accordion-group is-open="status.hwmOpen" ng-class="{'panel-danger': hwmErrors}">
-                    <accordion-heading>
+                <uib-accordion-group is-open="status.hwmOpen" ng-class="{'panel-danger': hwmErrors}">
+                    <uib-accordion-heading>
                         <i style="margin-right:10px" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.hwmOpen, 'glyphicon-chevron-right': !status.hwmOpen}"></i>
                         <span>HWM</span>
-                    </accordion-heading>
+                    </uib-accordion-heading>
 
                     <div class="col-md-6">
                         <!-- HWM Type:* -->
@@ -484,7 +512,7 @@
                         <div class="form-group required" ng-class="{'has-error':qhwmForm.quickHWM.FLAG_DATE.$invalid && qhwmForm.quickHWM.FLAG_DATE.$dirty}">
                             <label class="col-md-4 control-label req" for="inputFLAG_DATE">Flagged Date:</label>
                             <div class="col-md-8 input-group" style="padding-right:14px;padding-left:14px">
-                                <input class="form-control" id="FLAG_DATE" name="fd" type="text" datepicker-popup="MMM dd, yyyy"
+                                <input class="form-control" id="FLAG_DATE" name="fd" type="text" uib-datepicker-popup="MMM dd, yyyy"
                                        is-open="datepickrs.fd" ng-model="aHWM.FLAG_DATE" required />
                                 <span class="input-group-btn">
                                     <button class="btn btn-default" ng-click="open($event, 'fd')">
@@ -498,7 +526,7 @@
                         <div class="form-group">
                             <label class="col-md-4 control-label" for="inputSURVEY_DATE">Surveyed Date:</label>
                             <div class="col-md-8 input-group" style="padding-right:14px;padding-left:14px">
-                                <input class="form-control" id="SURVEY_DATE" name="sd" type="text" datepicker-popup="MMM dd, yyyy"
+                                <input class="form-control" id="SURVEY_DATE" name="sd" type="text" uib-datepicker-popup="MMM dd, yyyy"
                                        is-open="datepickrs.sd" ng-model="aHWM.SURVEY_DATE" />
                                 <span class="input-group-btn">
                                     <button class="btn btn-default" ng-click="open($event, 'sd')">
@@ -551,8 +579,8 @@
                             </div>
                         </div>
                     </div>
-
-</accordion>
+                </uib-accordion-group>
+            </uib-accordion>
 
             <br clear="all" />
 

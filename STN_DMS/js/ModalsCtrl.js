@@ -2,9 +2,53 @@
     "use strict"; 
     var ModalControllers = angular.module('ModalControllers',  []);
  
+    //get new Date().toUTCString() with standard time instead of military (optional - pass in a date to have be utc)
+    var utcDateTime = function (d) {
+        var getMonth = function (mo) {
+            switch (mo) {
+                case 'Jan':
+                    return '01';
+                case 'Feb':
+                    return '02';
+                case 'Mar':
+                    return '03';
+                case 'Apr':
+                    return '04';
+                case 'May':
+                    return '05';
+                case 'Jun':
+                    return '06';
+                case 'Jul':
+                    return '07';
+                case 'Aug':
+                    return '08';
+                case 'Sep':
+                    return '09';
+                case 'Oct':
+                    return '10';
+                case 'Nov':
+                    return '11';
+                case 'Dec':
+                    return '12';
+            }
+        };
+        var Time_Stamp = d != undefined ? new Date(d).toUTCString() : new Date().toUTCString();// "Wed, 09 Dec 2015 17:18:26 GMT" == change to standard time for storage
+        var mo = Time_Stamp.substr(8, 3);
+        var actualMo = getMonth(mo);
+        var day = Time_Stamp.substr(5, 2);
+        var year = Time_Stamp.substr(12, 4);
+        var hr = Time_Stamp.substr(17, 2);
+        var standardHrs = hr > 12 ? '0' + (hr - 12).toString() : hr.toString();
+        var min = Time_Stamp.substr(20, 2);
+        var sec = Time_Stamp.substr(23, 2);
+        var amPm = hr > 12 ? 'PM' : 'AM';
+        var time_stampNEW = actualMo + '/' + day + '/' + year + ' ' + standardHrs + ':' + min + ':' + sec + ' ' + amPm; //12/09/2015 04:22:32PM
+        return new Date(time_stampNEW);
+    };
+
     //popup confirm box
-    ModalControllers.controller('ConfirmModalCtrl', ['$scope', '$modalInstance', 'nameToRemove', 'what', ConfirmModalCtrl]);
-    function ConfirmModalCtrl($scope, $modalInstance, nameToRemove, what) {
+    ModalControllers.controller('ConfirmModalCtrl', ['$scope', '$uibModalInstance', 'nameToRemove', 'what', ConfirmModalCtrl]);
+    function ConfirmModalCtrl($scope, $uibModalInstance, nameToRemove, what) {
         //#region switch (long)
         switch (what) {
             case "Member":
@@ -98,29 +142,29 @@
         $scope.what = what;
 
         $scope.ok = function () {
-            $modalInstance.close(nameToRemove);
+            $uibModalInstance.close(nameToRemove);
         };
 
         $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
     }
 
     //popup confirm box
-    ModalControllers.controller('ConfirmReportModalCtrl', ['$scope', '$modalInstance', ConfirmReportModalCtrl]);
-    function ConfirmReportModalCtrl($scope, $modalInstance) {
+    ModalControllers.controller('ConfirmReportModalCtrl', ['$scope', '$uibModalInstance', ConfirmReportModalCtrl]);
+    function ConfirmReportModalCtrl($scope, $uibModalInstance) {
 
         $scope.ok = function () {
-            $modalInstance.close();
+            $uibModalInstance.close();
         };
 
         $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
     }
 
-    ModalControllers.controller('ReportModalCtrl', ['$scope', '$modalInstance', 'report', 'submitPerson', 'contacts', ReportModalCtrl]);
-    function ReportModalCtrl($scope, $modalInstance, report, submitPerson, contacts) {
+    ModalControllers.controller('ReportModalCtrl', ['$scope', '$uibModalInstance', 'report', 'submitPerson', 'contacts', ReportModalCtrl]);
+    function ReportModalCtrl($scope, $uibModalInstance, report, submitPerson, contacts) {
         $scope.ReportView = {};
         $scope.ReportView.Report = report;
         $scope.ReportView.submitter = submitPerson;
@@ -131,20 +175,20 @@
         $scope.ReportView.waterStaff = contacts.filter(function (d) { return d.TYPE == "Water Quality"; });
 
         $scope.ok = function () {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
     }
 
-    ModalControllers.controller('ProjAlertModalCtrl', ['$scope', '$modalInstance', 'ProjAlert', ProjAlertModalCtrl]);
-    function ProjAlertModalCtrl($scope, $modalInstance, ProjAlert) {
+    ModalControllers.controller('ProjAlertModalCtrl', ['$scope', '$uibModalInstance', 'ProjAlert', ProjAlertModalCtrl]);
+    function ProjAlertModalCtrl($scope, $uibModalInstance, ProjAlert) {
         $scope.ProjAlertParts = ProjAlert;
         $scope.ok = function () {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
     }
 
-    ModalControllers.controller('SITEmodalCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$timeout', '$modalInstance', '$filter', 'allDropDownParts', 'thisSiteStuff', 'SITE', 'SITE_HOUSING', 'MEMBER', 'INSTRUMENT', 'INSTRUMENT_STATUS', 'LANDOWNER_CONTACT', SITEmodalCtrl]);
-    function SITEmodalCtrl($scope, $cookies, $location, $state, $http, $timeout, $modalInstance, $filter, allDropDownParts, thisSiteStuff, SITE, SITE_HOUSING, MEMBER, INSTRUMENT, INSTRUMENT_STATUS, LANDOWNER_CONTACT) {
+    ModalControllers.controller('SITEmodalCtrl', ['$scope', '$cookies', '$location', '$state', '$http', '$timeout', '$uibModal', '$uibModalInstance', '$filter', 'allDropDownParts', 'thisSiteStuff', 'SITE', 'SITE_HOUSING', 'MEMBER', 'INSTRUMENT', 'INSTRUMENT_STATUS', 'LANDOWNER_CONTACT', SITEmodalCtrl]);
+    function SITEmodalCtrl($scope, $cookies, $location, $state, $http, $timeout, $uibModal, $uibModalInstance, $filter, allDropDownParts, thisSiteStuff, SITE, SITE_HOUSING, MEMBER, INSTRUMENT, INSTRUMENT_STATUS, LANDOWNER_CONTACT) {
         //dropdowns
         $scope.HorizontalDatumList = allDropDownParts[0];
         $scope.HorCollMethodList = allDropDownParts[1];
@@ -370,8 +414,6 @@
                             PUTsite();
                         }
                     }
-                } else {
-                    alert("Please populate all required fields.");
                 }
             };//end save
 
@@ -436,7 +478,7 @@
                 }, function error(errorResponse) {
                     toastr.error("Error updating Site: " + errorResponse.statusText);
                 }).$promise.then(function () {
-                    $modalInstance.dismiss('cancel');
+                    $uibModalInstance.dismiss('cancel');
                     $(".page-loading").addClass("hidden");
                     $location.path('/Site/' + $scope.aSite.SITE_ID + '/SiteDashboard').replace();//.notify(false);
                     $scope.apply;
@@ -484,9 +526,7 @@
                     } else {
                         postSite();
                     }
-                } else {
-                    alert("Please populate all required fields.");
-                }
+                } 
             };
 
             var postSite = function () {
@@ -570,7 +610,7 @@
                 } //end if sensor parts aren't disabled
                 //now update page
                 $timeout(function () {
-                    $modalInstance.dismiss('cancel');
+                    $uibModalInstance.dismiss('cancel');
                     $(".page-loading").addClass("hidden");
                     $location.path('/Site/' + newSiteId + '/SiteDashboard').replace();//.notify(false);
                     $scope.apply;
@@ -635,7 +675,27 @@
                         //see if there are any sites within a 0.0005 buffer of here for them to use instead
                         SITE.query({ Latitude: $scope.aSite.LATITUDE_DD, Longitude: $scope.aSite.LONGITUDE_DD, Buffer: 0.0005 }, function success(response) {
                             var closeSites = response.Sites;
-                            alert("Number of nearby Sites: " + closeSites.length);
+
+                            //modal for showing # of sites near                  
+                            var modalInstance = $uibModal.open({
+                                template: '<div class="modal-header"><h3 class="modal-title">Sites nearby</h3></div>' +
+                                           '<div class="modal-body"><p>There are: {{num}} sites nearby.</p>' +
+                                           '<p ng-if="num > 0"><span>To use one of these sites instead, click on the site name.</span>' +
+                                           '<ul><li ng-repeat="s in siteListNear" style="list-style:none"><a ui-sref="site.dashboard({id: s.SITE_ID})" ng-click="$close()">{{s.SITE_NO}}</a></li></ul></p></div>' +
+                                           '<div class="modal-footer"><button class="btn btn-primary" ng-click="ok()">OK</button></div>',
+                                controller: function ($scope, $uibModalInstance) {
+                                    $scope.ok = function () {
+                                        $uibModalInstance.close();
+                                    }
+                                    $scope.num = closeSites.length;
+                                    $scope.siteListNear = closeSites;
+                                },
+                                size: 'sm'
+                            });
+                            modalInstance.result.then(function () {
+                                $(".page-loading").addClass("hidden");
+                            });
+                            // alert("Number of nearby Sites: " + closeSites.length);
                         }, function error(errorResponse) {
                             toastr.error("Error: " + errorResponse.statusText);
                         }).$promise;
@@ -661,13 +721,13 @@
 
         //cancel modal
         $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
 
     }
 
-    ModalControllers.controller('OPmodalCtrl', ['$scope', '$cookies', '$http', '$modalInstance', '$modal', 'allDropdowns', 'thisOP', 'thisOPControls', 'opSite', 'OBJECTIVE_POINT', 'OP_CONTROL_IDENTIFIER', OPmodalCtrl]);
-    function OPmodalCtrl($scope, $cookies, $http, $modalInstance, $modal, allDropdowns, thisOP, thisOPControls, opSite, OBJECTIVE_POINT, OP_CONTROL_IDENTIFIER) {
+    ModalControllers.controller('OPmodalCtrl', ['$scope', '$cookies', '$http', '$uibModalInstance', '$uibModal', 'allDropdowns', 'thisOP', 'thisOPControls', 'opSite', 'OBJECTIVE_POINT', 'OP_CONTROL_IDENTIFIER', OPmodalCtrl]);
+    function OPmodalCtrl($scope, $cookies, $http, $uibModalInstance, $uibModal, allDropdowns, thisOP, thisOPControls, opSite, OBJECTIVE_POINT, OP_CONTROL_IDENTIFIER) {
         //defaults for radio buttons
         //dropdowns
         $scope.OPTypeList = allDropdowns[0];
@@ -871,7 +931,8 @@
 
         //cancel modal
         $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
+            if ($scope.OPForm.NAME.$viewValue == "") $scope.OP.NAME = $scope.OPForm.NAME.masterValue;
+            $uibModalInstance.dismiss('cancel');
         };
 
         //fix default radios and lat/long
@@ -916,10 +977,8 @@
                     }
                 }).$promise.then(function () {
                     var sendBack = [createdOP, 'created'];
-                    $modalInstance.close(sendBack);
+                    $uibModalInstance.close(sendBack);
                 });
-            } else {
-                alert("Please populate all required fields");
             }
         } //end Create
 
@@ -962,7 +1021,7 @@
                     }//end foreach removeOPCarray
                 }//end if there's removeOPCs
 
-                //look at OP.FTorMETER ("ft"), OP.FTorCM ("ft"), and OP.decDegORdms ("dd"), make sure site_ID is on there and send it to trim before PUT
+                //look at OP.FTorMETER ("ft"), OP.FTorCM ("ft"), and OP.decDegORdms ("dd"), make sure site_ID is on there and send it to trim before PUT                
                 formatDefaults($scope.OP); //$scope.OP.FTorMETER, FTorCM, decDegORdms
                 var OPtoPOST = trimOP($scope.OP);
                 //$http.defaults.headers.common['X-HTTP-Method-Override'] = 'PUT';
@@ -972,17 +1031,15 @@
                     //    delete $http.defaults.headers.common['X-HTTP-Method-Override'];
                 }).$promise.then(function () {
                     var sendBack = [updatedOP, 'updated'];
-                    $modalInstance.close(sendBack);
+                    $uibModalInstance.close(sendBack);
                 });
-            } else {
-                alert("Please populated all required fields");
             }
         } //end Save
 
         //delete this OP from the SITE
         $scope.deleteOP = function () {
             //TODO:: Delete the files for this OP too or reassign to the Site?? Services or client handling?
-            var DeleteModalInstance = $modal.open({
+            var DeleteModalInstance = $uibModal.open({
                 templateUrl: 'removemodal.html',
                 controller: 'ConfirmModalCtrl',
                 size: 'sm',
@@ -1001,7 +1058,7 @@
                 OBJECTIVE_POINT.delete({ id: opToRemove.OBJECTIVE_POINT_ID }, opToRemove).$promise.then(function () {
                     toastr.success("Objective Point Removed");
                     var sendBack = ["de", 'deleted'];
-                    $modalInstance.close(sendBack);
+                    $uibModalInstance.close(sendBack);
                 }, function error(errorResponse) {
                     toastr.error("Error: " + errorResponse.statusText);
                 });
@@ -1011,8 +1068,8 @@
         }
     }//end OPmodalCtrl
 
-    ModalControllers.controller('HWMmodalCtrl', ['$scope', '$cookies', '$http', '$modalInstance', '$modal', 'allDropdowns', 'thisHWM', 'hwmSite', 'allMembers', 'HWM', HWMmodalCtrl]);
-    function HWMmodalCtrl($scope, $cookies, $http, $modalInstance, $modal, allDropdowns, thisHWM, hwmSite, allMembers, HWM) {
+    ModalControllers.controller('HWMmodalCtrl', ['$scope', '$cookies', '$http', '$uibModalInstance', '$uibModal', 'allDropdowns', 'thisHWM', 'hwmSite', 'allMembers', 'HWM', HWMmodalCtrl]);
+    function HWMmodalCtrl($scope, $cookies, $http, $uibModalInstance, $uibModal, allDropdowns, thisHWM, hwmSite, allMembers, HWM) {
         //TODO:: check to see if they chose an event.. if not, they need to before creating a hwm
         //dropdowns
         $scope.hwmTypeList = allDropdowns[0];
@@ -1058,7 +1115,7 @@
         $scope.cancel = function () {
             $scope.adminChanged = {};
             $scope.EventName = $scope.eventList.filter(function (e) { return e.EVENT_ID == $scope.aHWM.EVENT_ID; })[0].EVENT_NAME;
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
         //convert deg min sec to dec degrees
         var azimuth = function (deg, min, sec) {
@@ -1187,7 +1244,7 @@
                         toastr.success("HWM updated");
                         updatedHWM = response;
                         var sendBack = [updatedHWM, 'updated'];
-                        $modalInstance.close(sendBack);
+                        $uibModalInstance.close(sendBack);
                     });                
                 } else {
                     alert("Please populate all required fields.");
@@ -1197,7 +1254,7 @@
             //delete aHWM
             $scope.deleteHWM = function () {
                 //TODO:: Delete the files for this OP too or reassign to the Site?? Services or client handling?
-                var DeleteModalInstance = $modal.open({
+                var DeleteModalInstance = $uibModal.open({
                     templateUrl: 'removemodal.html',
                     controller: 'ConfirmModalCtrl',
                     size: 'sm',
@@ -1216,7 +1273,7 @@
                     HWM.delete({ id: hwmToRemove.HWM_ID }, hwmToRemove).$promise.then(function () {
                         toastr.success("HWM Removed");
                         var sendBack = ["de", 'deleted'];
-                        $modalInstance.close(sendBack);
+                        $uibModalInstance.close(sendBack);
                     }, function error(errorResponse) {
                         toastr.error("Error: " + errorResponse.statusText);
                     });
@@ -1267,7 +1324,7 @@
                         createdHWM = response;
                         toastr.success("HWM created");
                         var sendBack = [createdHWM, 'created'];
-                        $modalInstance.close(sendBack);
+                        $uibModalInstance.close(sendBack);
                     });
                 } else {
                     alert("Please populate all required fields");
@@ -1282,8 +1339,210 @@
 
     } //end HWM
 
-    ModalControllers.controller('SessionEventmodalCtrl', ['$scope', '$rootScope', '$cookies', '$modalInstance', 'allEvents', 'allEventTypes', 'allStates', 'EVENT', SessionEventmodalCtrl]);
-    function SessionEventmodalCtrl($scope, $rootScope, $cookies, $modalInstance, allEvents, allEventTypes, allStates, EVENT) {
+    ModalControllers.controller('SensormodalCtrl', ['$scope', '$cookies', '$http', '$uibModalInstance', '$uibModal', 'allDropdowns', 'allDepTypes', 'thisSensor', 'SensorSite', 'siteOPs', 'allMembers', 'INSTRUMENT','INSTRUMENT_STATUS', SensormodalCtrl]);
+    function SensormodalCtrl($scope, $cookies, $http, $uibModalInstance, $uibModal, allDropdowns, allDepTypes, thisSensor, SensorSite, siteOPs, allMembers, INSTRUMENT, INSTRUMENT_STATUS) {
+        //TODO:: check to see if they chose an event.. if not, they need to before creating a hwm
+
+        $(".page-loading").addClass("hidden"); //loading...
+        //dropdowns [0]allSensorTypes, [1]allSensorBrands, [2]allHousingTypes, [3]allSensDeps, [4]allEvents
+        $scope.sensorTypeList = allDropdowns[0];
+        $scope.sensorBrandList = allDropdowns[1];
+        $scope.houseTypeList = allDropdowns[2];
+        $scope.sensorDeployList = allDropdowns[3];
+        $scope.eventList = allDropdowns[4];
+        $scope.depTypeList = allDepTypes; //get fresh version so not messed up with the Temperature twice
+        $scope.filteredDeploymentTypes = [];
+        $scope.timeZoneList = ['UTC', 'PST', 'MST', 'CST', 'EST'];
+        $scope.userRole = $cookies.get('usersRole');
+        $scope.showEventDD = false; //toggle to show/hide event dd (admin only)
+        $scope.adminChanged = {}; //will hold EVENT_ID if admin changes it. apply when PUTting
+        $scope.IntervalType = {}; //holder for minute/second radio buttons
+
+        //new datetimepicker https://github.com/zhaber/angular-js-bootstrap-datetimepicker
+        $scope.dateOptions = {
+            startingDay: 1,
+            showWeeks: false
+        };
+        
+        //button click to show event dropdown to change it on existing hwm (admin only)
+        $scope.showChangeEventDD = function () {
+            $scope.showEventDD = !$scope.showEventDD;
+        }
+
+        //change event = apply it to the $scope.EventName
+        $scope.ChangeEvent = function () {
+            $scope.EventName = $scope.eventList.filter(function (el) { return el.EVENT_ID == $scope.adminChanged.EVENT_ID; })[0].EVENT_NAME;
+        }
+
+        //get deployment types for sensor type chosen
+        $scope.getDepTypes = function () {
+            $scope.filteredDeploymentTypes = [];
+            var matchingSensDeplist = $scope.sensorDeployList.filter(function (sd) { return sd.SENSOR_TYPE_ID == $scope.aSensor.SENSOR_TYPE_ID; });
+
+            for (var y = 0; y < matchingSensDeplist.length; y++) {
+                for (var i = 0; i < $scope.depTypeList.length; i++) {
+                    //for each one, if projObjectives has this id, add 'selected:true' else add 'selected:false'
+                    if (matchingSensDeplist[y].DEPLOYMENT_TYPE_ID == $scope.depTypeList[i].DEPLOYMENT_TYPE_ID) {
+                        $scope.filteredDeploymentTypes.push($scope.depTypeList[i]);
+                        i = $scope.depTypeList.length; //ensures it doesn't set it as false after setting it as true
+                    }
+                }
+            }
+
+        }
+        // $scope.sessionEvent = $cookies.get('SessionEventName');
+        $scope.LoggedInMember = allMembers.filter(function (m) { return m.MEMBER_ID == $cookies.get('mID'); })[0];
+
+        $scope.aSensor = {};
+        $scope.aSensStatus = {};
+       
+        $scope.thisSensorSite = SensorSite;
+
+        //cancel
+        $scope.cancel = function () {
+            //$scope.adminChanged = {};
+            //$scope.EventName = $scope.eventList.filter(function (e) { return e.EVENT_ID == $scope.aSensor.EVENT_ID; })[0].EVENT_NAME;
+            $uibModalInstance.dismiss('cancel');
+        };
+               
+        // is interval is number
+        $scope.isNum = function (evt) {
+            var theEvent = evt || window.event;
+            var key = theEvent.keyCode || theEvent.which;
+            if (key != 46 && key != 45 && key > 31 && (key < 48 || key > 57)) {
+                theEvent.returnValue = false;
+                if (theEvent.preventDefault) theEvent.preventDefault();
+            }
+        };
+                
+        if (thisSensor != "empty") {
+            //#region existing deployed Sensor .. break apart the 'thisSensor' into 'aSensor' and 'aSensStatus'
+            $scope.aSensor = thisSensor.Instrument;
+            $scope.aSensStatus = thisSensor.InstrumentStats[0];
+
+            //get this hwm's event name
+            $scope.EventName = $scope.eventList.filter(function (e) { return e.EVENT_ID == $scope.aSensor.EVENT_ID; })[0].EVENT_NAME;
+            //date formatting
+            
+            //get collection member's name
+            //$scope.CollectionMember = allMembers.filter(function (m) { return m.MEMBER_ID == ???; })[0];
+
+            //save aSensor
+            $scope.save = function () {
+                if ($scope.SensorForm.$valid) {
+                    var updatedSensor = {};
+                    if ($scope.adminChanged.EVENT_ID != undefined) {
+                        //admin changed the event for this sensor..
+                        $scope.aSensor.EVENT_ID = $scope.adminChanged.EVENT_ID;
+                    }
+                    //also need: SITE_ID, EVENT_ID, INST_COLLECTION_ID (on retrieval)
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
+                    $http.defaults.headers.common['Accept'] = 'application/json';
+                    //INSTRUMENT.update({ id: $scope.aSensor.INSTRUMENT_ID }, $scope.aSensor).$promise.then(function (response) {
+                    //    update instrument_status too .. need: STATUS_TYPE_ID and INSTRUMENT_ID
+                    //    toastr.success("Sensor updated");
+                    //    updatedSensor = response;
+                    //    var sendBack = [updatedSensor, 'updated'];
+                    //    $uibModalInstance.close(sendBack);
+                    //});
+                } else {
+                    alert("Please populate all required fields.");
+                }
+            }//end save()
+
+            //delete aSensor and sensor statuses
+            $scope.deleteSensor = function () {
+                //TODO:: Delete the files for this sensor too or reassign to the Site?? Services or client handling?
+                var DeleteModalInstance = $uibModal.open({
+                    templateUrl: 'removemodal.html',
+                    controller: 'ConfirmModalCtrl',
+                    size: 'sm',
+                    resolve: {
+                        nameToRemove: function () {
+                            return $scope.aSensor
+                        },
+                        what: function () {
+                            return "Sensor";
+                        }
+                    }
+                });
+
+                DeleteModalInstance.result.then(function (sensorToRemove) {
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
+                    INSTRUMENT.delete({ id: sensorToRemove.INSTRUMENT_ID }, sensorToRemove).$promise.then(function () {
+                        //remove the statuses too
+                        toastr.success("Sensor Removed");
+                        var sendBack = ["de", 'deleted'];
+                        $uibModalInstance.close(sendBack);
+                    }, function error(errorResponse) {
+                        toastr.error("Error: " + errorResponse.statusText);
+                    });
+                }, function () {
+                    //logic for cancel
+                });//end modal
+            }
+
+            //#endregion existing Sensor
+        } else {
+            //#region Deploying new Sensor
+            $scope.IntervalType.type = 'Seconds'; //default
+            $scope.aSensStatus.TIME_STAMP = utcDateTime();
+            $scope.aSensStatus.TIME_ZONE = 'UTC'; //default
+            $scope.EventName = $cookies.get('SessionEventName');
+            $scope.CollectionMember = $scope.LoggedInMember;
+
+            //create (POST) a deployed sensor click
+            $scope.deploy = function () {
+                if (this.SensorForm.$valid) {
+                    //see if they used Minutes or seconds for interval. need to store in seconds
+                    if ($scope.IntervalType.type == "Minutes")
+                        $scope.aSensor.INTERVAL = $scope.aSensor.INTERVAL * 60;
+                    //set event_id
+                    $scope.aSensor.EVENT_ID = $cookies.get('SessionEventID');
+                    $scope.aSensor.SITE_ID = SensorSite.SITE_ID;
+
+                    //check and see if they are not using UTC
+                    if ($scope.aSensStatus.TIME_ZONE != "UTC") {
+                        //convert it
+                        var utcDateTime = new Date($scope.aSensStatus.TIME_STAMP).toUTCString();
+                        $scope.aSensStatus.TIME_STAMP = utcDateTime;
+                        $scope.aSensStatus.TIME_ZONE = 'UTC';
+                    } else {
+                        //make sure 'GMT' is tacked on so it doesn't try to add hrs to make the already utc a utc in db
+                        var i = $scope.aSensStatus.TIME_STAMP.toString().indexOf('GMT') + 3;
+                        $scope.aSensStatus.TIME_STAMP = $scope.aSensStatus.TIME_STAMP.toString().substring(0, i);
+                    }
+                    
+                    $scope.aSensStatus.STATUS_TYPE_ID = 1; //deployed status
+                    var createdSensor = {}; var createdSenStat = {};
+                    
+                    $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
+                    $http.defaults.headers.common['Accept'] = 'application/json';
+                    INSTRUMENT.save($scope.aSensor).$promise.then(function (response) {
+                        //create instrumentstatus too need: STATUS_TYPE_ID and INSTRUMENT_ID
+                        createdSensor = response; createdSensor.Deployment_Type = $scope.depTypeList.filter(function (d) { return d.DEPLOYMENT_TYPE_ID == response.DEPLOYMENT_TYPE_ID; })[0].METHOD;
+                        $scope.aSensStatus.INSTRUMENT_ID = response.INSTRUMENT_ID;
+                        INSTRUMENT_STATUS.save($scope.aSensStatus).$promise.then(function (statResponse) {
+                            //build the createdSensor to send back and add to the list page
+                            createdSenStat = statResponse;
+                            var sensorObjectToSendBack = {
+                                Instrument: createdSensor,
+                                InstrumentStats: [createdSenStat]
+                            };
+                            toastr.success("Sensor created");
+                            var sendBack = [sensorObjectToSendBack, 'created'];
+                            $uibModalInstance.close(sendBack);
+                        });
+                    });
+                }
+            }//end create()
+            //#endregion new Sensor
+        }        
+    } //end SENSOR
+
+
+    ModalControllers.controller('SessionEventmodalCtrl', ['$scope', '$rootScope', '$cookies', '$uibModalInstance', 'allEvents', 'allEventTypes', 'allStates', 'EVENT', SessionEventmodalCtrl]);
+    function SessionEventmodalCtrl($scope, $rootScope, $cookies, $uibModalInstance, allEvents, allEventTypes, allStates, EVENT) {
         $scope.EventList = allEvents;
         $scope.EventTypeList = allEventTypes;
         $scope.StateList = allStates;
@@ -1304,6 +1563,7 @@
         //clear the filters
         $scope.clearFilters = function () {
             $scope.event = { EventChosen: chosenEv != undefined ? Number(chosenEv) : "" };
+            $scope.EventList = allEvents;
         }
         //event has been chosen. Set it as session event
         $scope.setEvent = function () {
@@ -1313,7 +1573,7 @@
             $cookies.put('SessionEventName', eventName.EVENT_NAME);
 
             $rootScope.sessionEvent = "Session Event: " + eventName.EVENT_NAME + ".";
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         }
 
         //they want to clear the session event
@@ -1322,7 +1582,7 @@
             $cookies.remove('SessionEventID');
             $cookies.remove('SessionEventName');
             $rootScope.sessionEvent = "";
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         }
 
         //Datepicker
@@ -1336,7 +1596,7 @@
 
         //cancel
         $scope.close = function () {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
 
         $(".page-loading").addClass("hidden");

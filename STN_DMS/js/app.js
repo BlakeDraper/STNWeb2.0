@@ -2,13 +2,15 @@
     "use strict"; 
     var app = angular.module('app',
         ['ngResource', 'ui.router', 'ngCookies', 'ui.mask', 'ui.bootstrap', 'isteven-multi-select', 'ngInputModified', 'ui.validate',
-            'angular.filter', 'xeditable', 'checklist-model', 'ngFileUpload', 'STNResource', 'STNControllers', 'LogInOutController', 'ModalControllers', 'SettingsControllers']);
+            'angular.filter', 'xeditable', 'checklist-model', 'ngFileUpload', 'STNResource', 'ui.bootstrap.datetimepicker',
+            'STNControllers', 'LogInOutController', 'ModalControllers', 'SettingsControllers']);
     
-    app.run(function ($rootScope) {
+    app.run(function ($rootScope, $uibModalStack) {
         $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
             $("#ui-view").html("");
             $(".page-loading").removeClass("hidden");
-            //check to see if they are going to project info
+            //close all modals when changing states (site create open, want to use a nearby site or just change the url up top, close the modal too)
+            $uibModalStack.dismissAll();
 
             if (toState.url == "/") {
                 //make username focus
@@ -18,6 +20,10 @@
 
         $rootScope.$on('$stateChangeSuccess', function () {
             $(".page-loading").addClass("hidden");
+        });
+        $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {            
+            $(".page-loading").addClass("hidden");        
+            alert("Error occurred: Status" + error.status + ", " + error.statusText + ". The following request was unsuccessful: " + error.config.url + " Please refresh and try again.");
         });
         
     });

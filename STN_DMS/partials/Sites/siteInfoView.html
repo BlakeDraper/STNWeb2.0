@@ -3,21 +3,21 @@
 </div>
 <hr />-->
 
-<accordion close-others="false">
-    <accordion-group is-open="status.mapOpen">
-        <accordion-heading>
+<uib-accordion close-others="false">
+    <uib-accordion-group is-open="status.mapOpen">
+        <uib-accordion-heading>
             <i style="margin-right:10px" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.mapOpen, 'glyphicon-chevron-right': !status.mapOpen}"></i>
             <span>Map</span>
             <a ui-sref="map" title="Go to this Site on the Map tab."><i class="pull-right glyphicon glyphicon-globe"></i></a>
-        </accordion-heading>
+        </uib-accordion-heading>
         <!--<leaflet markers="markers" center="center"></leaflet>-->
-    </accordion-group>
+    </uib-accordion-group>
 
-    <accordion-group is-open="status.siteOpen">
-        <accordion-heading>
+    <uib-accordion-group is-open="status.siteOpen">
+        <uib-accordion-heading>
             <i style="margin-right:10px" class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.siteOpen, 'glyphicon-chevron-right': !status.siteOpen}"></i>
             <span>Site</span>
-        </accordion-heading>
+        </uib-accordion-heading>
         <button type="button" ng-if="aSite.SITE_ID != undefined" class="btn btn-primary pull-right" ng-click="openSiteCreate()">Edit Site</button>
         <button type="button" ng-if="aSite.SITE_ID == undefined" class="btn btn-primary pull-right" ng-click="openSiteCreate()">Create Site</button>
         <div ng-if="aSite.SITE_ID != undefined">
@@ -299,8 +299,8 @@
             </form>
         </div>
 
-    </accordion-group>
-</accordion>
+    </uib-accordion-group>
+</uib-accordion>
 
 <style type="text/css">
     .darkClass {

@@ -57,8 +57,6 @@
                     </div>
                 </div>
 
-                <!--<lat-long location="LOCATION"></lat-long>-->
-
                 <!-- dec deg or dms: -->
                 <div class="form-group">
                     <label class="col-md-3 control-label"></label>
@@ -332,7 +330,7 @@
 
                 <!--Sensor Not Appropriate-->
                 <div class="form-group">
-                    <label class="col-md-3 control-label" for="inputSENSOR_NOT_APPROPRIATE">Check if Sensor is not Appropriate here:</label>
+                    <label class="col-md-3 control-label" for="inputSENSOR_NOT_APPROPRIATE">Check if Sensor is not appropriate here:</label>
                     <div class="col-md-6">
                         <ul style="padding-left:0">
                             <li style="list-style:none;">
@@ -517,13 +515,13 @@
     </form>
 </script>
 
-<!-- MODAL for Objective Point-->
+<!-- MODAL for Objective Point  novalidate-->
 <script type="text/ng-template" id="OPmodal.html">
     <div class="modal-header">
         <h3 class="modal-title">Objective Point</h3>
     </div>
 
-    <form class="form-horizontal" name="OPForm" novalidate>
+    <form class="form-horizontal" name="OPForm">
         <fieldset>
             <div class="modal-body">
 
@@ -758,7 +756,7 @@
                 <div class="form-group required" ng-class="{'has-error':OPForm.DATE_ESTABLISHED.$invalid && OPForm.DATE_ESTABLISHED.$dirty}">
                     <label class="col-md-3 control-label req" for="inputDATE_ESTABLISHED">Date Established:</label>
                     <div class="col-md-6 input-group" style="padding-right:14px;padding-left:14px">
-                        <input class="form-control" id="inputDATE_ESTABLISHED" name="de" type="text" datepicker-popup="MMM dd, yyyy"
+                        <input class="form-control" id="inputDATE_ESTABLISHED" name="de" type="text" uib-datepicker-popup="MMM dd, yyyy"
                                is-open="datepickrs.de" ng-model="OP.DATE_ESTABLISHED" required />
                         <span class="input-group-btn">
                             <button class="btn btn-default" ng-click="open($event, 'de')">
@@ -772,7 +770,7 @@
                 <div class="form-group">
                     <label class="col-md-3 control-label" for="inputDATE_RECOVERED">Date Recovered:</label>
                     <div class="col-md-6 input-group" style="padding-right:14px;padding-left:14px">
-                        <input class="form-control" id="inputDATE_RECOVERED" name="dr" type="text" datepicker-popup="MMM dd, yyyy"
+                        <input class="form-control" id="inputDATE_RECOVERED" name="dr" type="text" uib-datepicker-popup="MMM dd, yyyy"
                                is-open="datepickrs.dr" ng-model="OP.DATE_RECOVERED" />
                         <span class="input-group-btn">
                             <button class="btn btn-default" ng-click="open($event, 'dr')">
@@ -785,31 +783,54 @@
                 <div ng-if="OPFiles">
                     <h3>Objective Point Files</h3>
                     <!--<div style="height:140px;display:inline">
-                        <carousel interval="myInterval" no-wrap="noWrapSlides">
-                            <slide ng-repeat="slide in slides" active="slide.active">
-                                <img ng-src="{{slide.image}}" style="margin:auto;">
-                                <div class="carousel-caption">
-                                    <h4>Slide {{$index}}</h4>
-                                    <p>{{slide.text}}</p>
-                                </div>
-                            </slide>
-                        </carousel>
-                    </div>-->
+                    <carousel interval="myInterval" no-wrap="noWrapSlides">
+                        <slide ng-repeat="slide in slides" active="slide.active">
+                            <img ng-src="{{slide.image}}" style="margin:auto;">
+                            <div class="carousel-caption">
+                                <h4>Slide {{$index}}</h4>
+                                <p>{{slide.text}}</p>
+                            </div>
+                        </slide>
+                    </carousel>
+                </div>-->
                     <!--<div ng-repeat="opf in OPFiles">
-                        <div ng-if="opf.FILETYPE_ID == 1">
-                            <h3>Photo Files</h3>
+                    <div ng-if="opf.FILETYPE_ID == 1">
+                        <h3>Photo Files</h3>
 
-                        </div>
-                    </div>-->
+                    </div>
+                </div>-->
                 </div>
-
 
                 <div class="modal-footer">
-                    <button class="btn btn-primary" ng-if="OP.OBJECTIVE_POINT_ID != undefined" ng-click="save()">Save</button>
-                    <button class="btn btn-danger" ng-if="OP.OBJECTIVE_POINT_ID != undefined" ng-click="deleteOP()">Delete</button>
-                    <button class="btn btn-primary" ng-if="OP.OBJECTIVE_POINT_ID == undefined" ng-click="create()">Create</button>
-                    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
-                </div>
+                    <div class="form-group">
+                        <div class="col-md-4 col-md-offset-2">
+                            <span>
+                                <button ng-show="OP.OBJECTIVE_POINT_ID == undefined" class="btn btn-primary" ng-click="create(OPForm.$valid)">
+                                    <span>Create</span>
+                                </button>
+                                <span>
+                                    <button ng-show="OP.OBJECTIVE_POINT_ID != undefined" class="btn btn-primary" ng-click="save(OPForm.$valid)">
+                                        <span>Save</span>
+                                    </button>
+                                </span>
+                                <span>
+                                    <button ng-show="OP.OBJECTIVE_POINT_ID != undefined" class="btn btn-danger" ng-click="deleteOP(OPForm.$valid)">
+                                        <span>Delete</span>
+                                    </button>
+                                </span>
+                                <span>
+                                    <button type="button" class="btn btn-warning" ng-click="cancel()">
+                                        <span>Cancel</span>
+                                    </button>
+                                </span>
+                        </div>
+
+
+                        <!--<button class="btn btn-primary" ng-if="OP.OBJECTIVE_POINT_ID != undefined" ng-click="save()">Save</button>
+                        <button class="btn btn-danger" ng-if="OP.OBJECTIVE_POINT_ID != undefined" ng-click="deleteOP()">Delete</button>
+                        <button class="btn btn-primary" ng-if="OP.OBJECTIVE_POINT_ID == undefined" ng-click="create()">Create</button>
+                        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>-->
+                    </div>
         </fieldset>
     </form>
 </script>
@@ -1035,7 +1056,7 @@
                 <div class="form-group required" ng-class="{'has-error':HWMForm.FLAG_DATE.$invalid && HWMForm.FLAG_DATE.$dirty}">
                     <label class="col-md-3 control-label req" for="inputFLAG_DATE">Flagged Date:</label>
                     <div class="col-md-6 input-group" style="padding-right:14px;padding-left:14px">
-                        <input class="form-control" id="inputFLAG_DATE" name="fd" type="text" datepicker-popup="MMM dd, yyyy"
+                        <input class="form-control" id="inputFLAG_DATE" name="fd" type="text" uib-datepicker-popup="MMM dd, yyyy"
                                is-open="datepickrs.fd" ng-model="aHWM.FLAG_DATE" required />
                         <span class="input-group-btn">
                             <button class="btn btn-default" ng-click="open($event, 'fd')">
@@ -1049,7 +1070,7 @@
                 <div class="form-group" ng-class="{'has-error':HWMForm.SURVEY_DATE.$invalid && HWMForm.SURVEY_DATE.$dirty}">
                     <label class="col-md-3 control-label" for="inputSURVEY_DATE">Surveyed Date:</label>
                     <div class="col-md-6 input-group" style="padding-right:14px;padding-left:14px">
-                        <input class="form-control" id="inputSURVEY_DATE" name="sd" type="text" datepicker-popup="MMM dd, yyyy"
+                        <input class="form-control" id="inputSURVEY_DATE" name="sd" type="text" uib-datepicker-popup="MMM dd, yyyy"
                                is-open="datepickrs.sd" ng-model="aHWM.SURVEY_DATE" />
                         <span class="input-group-btn">
                             <button class="btn btn-default" ng-click="open($event, 'sd')">
@@ -1129,3 +1150,194 @@
         </fieldset>
     </form>
 </script>
+
+<!-- MODAL for Sensor-->
+<script type="text/ng-template" id="Sensormodal.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Sensor</h3>
+    </div>
+
+    <form class="form-horizontal" name="SensorForm" novalidate>
+        <fieldset>
+            <div class="modal-body">
+
+                <!-- Event: -->
+                <div class="form-group" ng-class="{'has-error':SensorForm.EVENT_ID.$invalid && SensorForm.EVENT_ID.$dirty}">
+                    <label class="col-md-3 control-label" for="EVENT_ID">Event:</label>
+                    <div class="col-md-6">
+                        <div class="col-md-8">{{EventName}}</div>
+                        <div class="col-md-3" ng-show="userRole == 'Admin' && aSensor.INSTRUMENT_ID != undefined">
+                            <button type="button" ng-click="showChangeEventDD()" class="btn btn-primary">Change Event</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!--Event dropdown for admin -->
+                <div ng-show="showEventDD">
+                    <div class="form-group">
+                        <label class="col-md-3 control-label" for="EVENT_ID">Events:</label>
+                        <div class="col-md-6">
+                            <select class="form-control" id="EVENT_ID" name="EVENT_ID" ng-model="adminChanged.EVENT_ID" ng-change="ChangeEvent()"
+                                    ng-options="e.EVENT_ID as (e.EVENT_NAME + ' --- ' + (e.EVENT_START_DATE | date: 'MM/dd/yyyy') + ' to ' + ((e.EVENT_END_DATE || '-Not Set-') | date: 'MM/dd/yyyy'))  for e in eventList | orderBy: '-EVENT_START_DATE'"
+                                <option value=""></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sensor Type:* -->
+                <div class="form-group required" ng-class="{'has-error':SensorForm.SENSOR_TYPE_ID.$invalid && SensorForm.SENSOR_TYPE_ID.$dirty}">
+                    <label class="col-md-3 control-label req" for="SENSOR_TYPE_ID">Sensor Type:</label>
+                    <div class="col-md-6">
+                        <select class="form-control" id="SENSOR_TYPE_ID" name="SENSOR_TYPE_ID" ng-model="aSensor.SENSOR_TYPE_ID"
+                                ng-options="s.SENSOR_TYPE_ID as s.SENSOR for s in sensorTypeList" ng-change="getDepTypes()" required>
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Sensor Brand:* -->
+                <div class="form-group required" ng-class="{'has-error':SensorForm.SENSOR_BRAND_ID.$invalid && SensorForm.SENSOR_BRAND_ID.$dirty}">
+                    <label class="col-md-3 control-label req" for="SENSOR_BRAND_ID">Sensor Brand:</label>
+                    <div class="col-md-6">
+                        <select class="form-control" id="SENSOR_BRAND_ID" name="SENSOR_BRAND_ID" ng-model="aSensor.SENSOR_BRAND_ID"
+                                ng-options="sb.SENSOR_BRAND_ID as sb.BRAND_NAME for sb in sensorBrandList" required>
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Serial Number:* -->
+                <div class="form-group required" ng-class="{'has-error':SensorForm.SERIAL_NUMBER.$invalid && SensorForm.SERIAL_NUMBER.$dirty}">
+                    <label class="col-md-3 control-label req" for="SERIAL_NUMBER">Serial Number:</label>
+                    <div class="col-md-6">
+                        <input class="form-control" name="SERIAL_NUMBER" ng-model="aSensor.SERIAL_NUMBER" type="text" required />
+                    </div>
+                </div>
+
+                <!-- Housing Serial Number: -->
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="HOUSING_SERIAL_NUMBER">Housing Serial Number:</label>
+                    <div class="col-md-6">
+                        <input class="form-control" name="HOUSING_SERIAL_NUMBER" ng-model="aSensor.HOUSING_SERIAL_NUMBER" type="text" />
+                    </div>
+                </div>
+
+                <!-- Housing Types: -->
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="HOUSING_TYPE_ID">Housing Types:</label>
+                    <div class="col-md-6">
+                        <select class="form-control" id="HOUSING_TYPE_ID" name="HOUSING_TYPE_ID" ng-model="aSensor.HOUSING_TYPE_ID"
+                                ng-options="ht.HOUSING_TYPE_ID as ht.TYPE_NAME for ht in houseTypeList">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Deployment Type: -->
+                <div class="form-group">
+                    <label class="col-md-3 control-label req" for="DEPLOYMENT_TYPE_ID">Deployment Type:</label>
+                    <div class="col-md-6">
+                        <select class="form-control" id="DEPLOYMENT_TYPE_ID" name="DEPLOYMENT_TYPE_ID" ng-model="aSensor.DEPLOYMENT_TYPE_ID"
+                                ng-options="dt.DEPLOYMENT_TYPE_ID as dt.METHOD for dt in filteredDeploymentTypes">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Location Description: -->
+                <div class="form-group" ng-class="{'has-error':SensorForm.LOCATION_DESCRIPTION.$invalid && SensorForm.LOCATION_DESCRIPTION.$dirty}">
+                    <label class="col-md-3 control-label" for="LOCATION_DESCRIPTION">Location Description:</label>
+                    <div class="col-md-6">
+                        <textarea class="form-control" id="LOCATION_DESCRIPTION" name="LOCATION_DESCRIPTION" type=" text" rows="3" ng-model="aSensor.LOCATION_DESCRIPTION" />
+                    </div>
+                </div>
+
+                <!-- Interval: -->
+                <div class="form-group" style="margin-bottom:0">
+                    <label class="col-md-3 control-label" for="INTERVAL">Interval:</label>
+                    <div class="col-md-6">
+                        <input class="form-control" ng-keypress="isNum($event)" name="INTERVAL" ng-model="aSensor.INTERVAL" type="text" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"></label>
+                    <div class="col-md-6">
+                        <label class="radio-inline">
+                            <input type="radio" name="intervalType" ng-model="IntervalType.type" value="Minutes" />Minutes
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="intervalType" ng-model="IntervalType.type" value="Seconds" />Seconds
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Deploy Time: * -->
+                <div class="form-group required" ng-class="{'has-error':SensorForm.TIME_STAMP.$invalid && SensorForm.TIME_STAMP.$dirty}">
+                    <label class="col-md-3 control-label req" style="margin-top:3%" for="TIME_STAMP">Deploy Time:</label>
+                    <div class="col-md-6">
+                        <datetimepicker hour-step="1" minute-step="1" ng-model="aSensStatus.TIME_STAMP" show-meridian="true"
+                                        date-format="MM/dd/yyyy" readonly-date="false" readonly-time="false" date-options="dateOptions"
+                                        hidden-time="true" hidden-date="false" show-spinners="true">
+                        </datetimepicker>
+                    </div>
+                </div>
+                
+                <!-- Time Zone:* -->
+                <div class="form-group required">
+                    <label class="col-md-3 control-label" for="TIME_ZONE">Time Zone:</label>
+                    <div class="col-md-6">
+                        <select class="form-control" id="TIME_ZONE" name="TIME_ZONE" ng-model="aSensStatus.TIME_ZONE"
+                                ng-options="vcm for vcm in timeZoneList">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Note: -->
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="NOTES">Note:</label>
+                    <div class="col-md-6">
+                        <textarea class="form-control" id="NOTES" name="NOTES" type=" text" rows="3" ng-model="aSensor.NOTES" />
+                    </div>
+                </div>
+
+                <!-- Collection Member: -->
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Deploy Member:</label>
+                    <div class="col-md-6">
+                        <span>{{CollectionMember.FNAME}} {{CollectionMember.LNAME}}</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <span>
+                            <button ng-show="aSensor.INSTRUMENT_ID == undefined" class="btn btn-primary" ng-click="deploy(SensorForm.$valid)">
+                                <span>Deploy</span>
+                            </button>
+                            <span>
+                                <button ng-show="aSensor.INSTRUMENT_ID != undefined" class="btn btn-primary" ng-click="save(SensorForm.$valid)">
+                                    <span>Save</span>
+                                </button>
+                            </spa        n>
+                            <span>
+                                <button ng-show="aSensor.INSTRUMENT_ID != undefined" class="btn btn-danger" ng-click="delete(SensorForm.$valid)">
+                                    <span>Save</span>
+                                </button>
+                            </span>
+                            <span>
+                                <button type="button" class="btn btn-warning" ng-click="cancel()">
+                                    <span>Cancel</span>
+                                </button>
+                            </span>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+</script>
+

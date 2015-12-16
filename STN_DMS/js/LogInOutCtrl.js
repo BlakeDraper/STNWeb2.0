@@ -3,8 +3,8 @@
 
     var LogInOutController = angular.module('LogInOutController', []);
 
-    LogInOutController.controller('LoginCtrl', ['$scope', '$state', '$http', '$cookies', '$rootScope', 'Login', LoginCtrl]);
-    function LoginCtrl($scope, $state, $http, $cookies, $rootScope, Login) {
+    LogInOutController.controller('LoginCtrl', ['$scope', '$state', '$location', '$uibModal', '$http', '$cookies', '$rootScope', 'Login', LoginCtrl]);
+    function LoginCtrl($scope, $state, $location, $uibModal, $http, $cookies, $rootScope, Login) {
         //login //
         //#region CAP lock Check
         $('[type=password]').keypress(function (e) {
@@ -77,7 +77,23 @@
                     }
                 },
                 function error(errorResponse) {
-                    alert("Error: " + errorResponse.statusText);
+                    //modal for error
+                    var modalInstance = $uibModal.open({
+                        template: '<div class="modal-header"><h3 class="modal-title">Error</h3></div>' +
+                                   '<div class="modal-body"><p>Something went wrong.</p><p>Error: {{status}} - {{statusText}}</p></div>' +
+                                   '<div class="modal-footer"><button class="btn btn-primary" ng-click="ok()">OK</button></div>',
+                        controller: function ($scope, $uibModalInstance) {
+                            $scope.ok = function () {
+                                $uibModalInstance.close();
+                            }
+                            $scope.status = errorResponse.status;
+                            $scope.statusText = errorResponse.statusText;
+                        },
+                        size: 'sm'
+                    });
+                    modalInstance.result.then(function (fieldFocus) {
+                        $location.path('/login');
+                    });
                 }
             );
         };
@@ -90,6 +106,7 @@
             $cookies.remove('STNUsername');
             $cookies.remove('usersName');
             $cookies.remove('usersRole');
+            $cookies.remove('mID');
             $cookies.remove('SessionEventID');
             $cookies.remove('SessionEventName');
             $rootScope.thisPage = "";

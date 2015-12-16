@@ -6,7 +6,11 @@ form .ng-pristine.ng-invalid-required
 {
     box-shadow: none;
 }
-
+.borderLess {
+    background: none;
+    border: none;
+    padding: 0;
+}
 .wizard a {
     background: #efefef;
     display: inline-block;
