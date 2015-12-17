@@ -1514,13 +1514,15 @@
                     }
                     
                     $scope.aSensStatus.STATUS_TYPE_ID = 1; //deployed status
+                    $scope.aSensStatus.COLLECTION_MEMBER_ID = $cookies.get('mID'); //user that logged in is deployer
                     var createdSensor = {}; var createdSenStat = {};
                     
                     $http.defaults.headers.common['Authorization'] = 'Basic ' + $cookies.get('STNCreds');
                     $http.defaults.headers.common['Accept'] = 'application/json';
                     INSTRUMENT.save($scope.aSensor).$promise.then(function (response) {
                         //create instrumentstatus too need: STATUS_TYPE_ID and INSTRUMENT_ID
-                        createdSensor = response; createdSensor.Deployment_Type = $scope.depTypeList.filter(function (d) { return d.DEPLOYMENT_TYPE_ID == response.DEPLOYMENT_TYPE_ID; })[0].METHOD;
+                        createdSensor = response;
+                        createdSensor.Deployment_Type = response.DEPLOYMENT_TYPE_ID != null ? $scope.depTypeList.filter(function (d) { return d.DEPLOYMENT_TYPE_ID == response.DEPLOYMENT_TYPE_ID; })[0].METHOD : "";
                         $scope.aSensStatus.INSTRUMENT_ID = response.INSTRUMENT_ID;
                         INSTRUMENT_STATUS.save($scope.aSensStatus).$promise.then(function (statResponse) {
                             //build the createdSensor to send back and add to the list page
